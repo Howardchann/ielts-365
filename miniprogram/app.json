@@ -6,17 +6,17 @@
     "pages/settings/settings"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#B8860B",
-    "navigationBarTitleText": "雅思365 · 零基础到6.5",
+    "navigationBarBackgroundColor": "#176B5B",
+    "navigationBarTitleText": "开溜 · IELTS 365",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#F7F4EC",
+    "backgroundColor": "#F3F8EF",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#B8860B",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "color": "#7B8A84",
+    "selectedColor": "#176B5B",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
     "list": [
       { "pagePath": "pages/today/today", "text": "今日", "iconPath": "images/today.png", "selectedIconPath": "images/today-active.png" },
       { "pagePath": "pages/weeks/weeks", "text": "周计划", "iconPath": "images/weeks.png", "selectedIconPath": "images/weeks-active.png" },
