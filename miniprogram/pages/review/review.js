@@ -6,6 +6,7 @@ const speech = require('../../utils/speech.js');
 Page({
   data: {
     poolSize: 0,
+    dueCount: 0,
     current: null,      // {w, m, p, e, starred}
     showZh: false,
     starred: [],
@@ -28,14 +29,14 @@ Page({
 
   onShow() {
     store.onResume();
-    this._pool = null;   // 云端可能刚同步过进度，缓存作废以便重新计算
+    this._pool = null;
     this.refreshPool();
     this.setData({ starred: store.get('starredWords') || [] });
   },
 
   refreshPool() {
     if (!this._pool) this._pool = plan.learnedWords(store.get('checkedDays'));
-    this.setData({ poolSize: this._pool.length });
+    this.setData({ poolSize: this._pool.length, dueCount: store.dueWords(this._pool).length });
     return this._pool;
   },
 
