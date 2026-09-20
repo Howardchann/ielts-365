@@ -24,12 +24,6 @@
       { "pagePath": "pages/settings/settings", "text": "设置", "iconPath": "images/settings.png", "selectedIconPath": "images/settings-active.png" }
     ]
   },
-  "plugins": {
-    "WechatSI": {
-      "version": "0.3.6",
-      "provider": "wx069ba97219f66d99"
-    }
-  },
   "sitemapLocation": "sitemap.json",
   "style": "v2",
   "lazyCodeLoading": "requiredComponents"

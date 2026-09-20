@@ -15,33 +15,45 @@ Page({
     theme: '',
     weekNum: 0,
     dayData: null,
+    vocab: [],
     checked: false,
-    playingWord: '',   // 正在朗读的文本
+    playingText: '',   // 正在朗读的文本
+    playingMode: 'idle', // idle | single | queue
     pluginOk: false,
   },
 
-  onLoad(options) {
-    // 语音初始化（同声传译插件）
+  onLoad() {
     const ok = speech.initPlugin();
-    this.setData({ pluginOk: ok });
     speech.setRate(store.get('rate'));
+    speech.setAccent(store.get('accent') || 'us');
     speech.setEngine(store.get('engine'));
-    speech.onStateChange((text, playing) => {
-      this.setData({ playingWord: playing ? text : '' });
+    // 监听器只注册一次，并在页面卸载时注销（旧实现每次调用朗读全部都会多挂一个回调）
+    this._offSpeech = speech.onStateChange((payload) => {
+      this.setData({
+        playingText: payload.playing ? payload.text : '',
+        playingMode: payload.mode,
+      });
     });
-    // 支持从周计划页跳转：?day=N
-    if (options && options.day) this._jumpDay = parseInt(options.day, 10);
+    this.setData({ pluginOk: ok });
   },
 
   onShow() {
     store.onResume(); // 双端同步：切回前台拉云端
+    // 支持从周计划页跳转（switchTab 不支持 query，改由 globalData 传递）
+    const jump = getApp().globalData.jumpDay || 0;
+    getApp().globalData.jumpDay = 0;
     const todayNum = plan.currentDayFromStart(store.get('startDate'));
-    let viewDay = this._jumpDay || todayNum || 1;
-    this._jumpDay = null;
+    let viewDay = jump || todayNum || 1;
     if (viewDay < 1) viewDay = 1;
     if (viewDay > plan.TOTAL_DAYS) viewDay = plan.TOTAL_DAYS;
     this.setData({ todayNum, preStart: todayNum === 0, daysToStart: this._daysToStart() });
     this.renderDay(viewDay);
+  },
+
+  onUnload() {
+    speech.stop();                 // 离开页面停止朗读
+    if (this._offSpeech) this._offSpeech();
+    this._offSpeech = null;
   },
 
   _daysToStart() {
@@ -54,12 +66,11 @@ Page({
   renderDay(day) {
     const info = plan.dayInfo(day);
     const week = plan.WEEKS[info.wIdx];
-    const d = plan.getDay(day);
-    // 词汇加星标状态
-    let vocab = [];
-    if (d && d.v) {
-      vocab = d.v.map(v => Object.assign({}, v, { starred: store.isStarred(v.w) }));
-    }
+    const raw = plan.getDay(day);
+    // dayData 里剔除词汇数组 v，避免与 vocab 重复 setData 两份（传输量翻倍）
+    const dayData = raw ? Object.assign({}, raw) : null;
+    if (dayData) delete dayData.v;
+    const vocab = (raw && raw.v ? raw.v : []).map(v => Object.assign({}, v, { starred: store.isStarred(v.w) }));
     this.setData({
       viewDay: day,
       dayNum: day,
@@ -67,7 +78,7 @@ Page({
       phaseName: plan.PHASE_NAMES[week.p] || '',
       theme: week.theme,
       weekNum: week.w,
-      dayData: d,
+      dayData,
       vocab,
       checked: store.isChecked(info.wIdx + 1, info.k),
     });
@@ -93,42 +104,31 @@ Page({
 
   // ---- 朗读 ----
   onSpeakWord(e) {
-    const word = e.currentTarget.dataset.word;
-    const example = e.currentTarget.dataset.example;
-    const text = example || word;
-    if (this.data.playingWord === text) {
-      // 正在播这条 → 暂停/恢复
+    const text = e.currentTarget.dataset.example || e.currentTarget.dataset.word;
+    if (!text) return;
+    if (this.data.playingText === text) {
       const r = speech.togglePause();
-      this.setData({ playingWord: r === 'paused' ? '' : text });
+      this.setData({ playingText: r === 'paused' ? '' : text });
       return;
     }
-    speech.speak(text);
+    speech.speak(text);   // 引擎内部会打断整日连读，状态由监听器回传
   },
 
   onSpeakAll() {
-    const d = this.data.dayData;
-    if (!d || !d.v) return;
-    if (this.data.playingWord === '__all__') { speech.stop(); this.setData({ playingWord: '' }); return; }
+    if (!this.data.vocab.length) return;
+    if (this.data.playingMode === 'queue') { speech.stop(); return; }
     const texts = [];
-    d.v.forEach(v => { texts.push(v.w); texts.push(v.e); });
-    this.setData({ playingWord: '__all__' });
+    this.data.vocab.forEach(v => { texts.push(v.w); texts.push(v.e); });
     speech.speakQueue(texts);
-    // 连读结束后复位按钮
-    speech.onStateChange((text, playing) => {
-      if (!playing && this.data.playingWord === '__all__') this.setData({ playingWord: '' });
-    });
   },
-
-  onStopSpeak() { speech.stop(); this.setData({ playingWord: '' }); },
 
   onStar(e) {
     const i = e.currentTarget.dataset.index;
     const v = this.data.vocab[i];
     if (!v) return;
     const starred = store.toggleStar(v);
-    const key = 'vocab[' + i + '].starred';
     const patch = {};
-    patch[key] = starred;
+    patch['vocab[' + i + '].starred'] = starred;
     this.setData(patch);
   },
 });

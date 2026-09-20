@@ -5,56 +5,73 @@ const speech = require('../../utils/speech.js');
 
 Page({
   data: {
-    // 随机复习
     poolSize: 0,
-    current: null,      // {w, m, p, e}
+    current: null,      // {w, m, p, e, starred}
     showZh: false,
-    // 重点词
     starred: [],
     playingWord: '',
     tab: 'random',      // random | starred
   },
 
   onLoad() {
-    // 朗读状态回调：结束后清掉高亮
-    speech.onStateChange((text, playing) => {
-      this.setData({ playingWord: playing ? text : '' });
+    // 监听器返回取消函数，页面卸载时注销（旧实现会永久堆积回调）
+    this._offSpeech = speech.onStateChange((payload) => {
+      this.setData({ playingWord: payload.playing ? payload.text : '' });
     });
+  },
+
+  onUnload() {
+    speech.stop();
+    if (this._offSpeech) this._offSpeech();
+    this._offSpeech = null;
   },
 
   onShow() {
     store.onResume();
+    this._pool = null;   // 云端可能刚同步过进度，缓存作废以便重新计算
     this.refreshPool();
     this.setData({ starred: store.get('starredWords') || [] });
   },
 
   refreshPool() {
-    this.pool = plan.learnedWords(store.get('checkedDays'));
-    this.setData({ poolSize: this.pool.length });
+    if (!this._pool) this._pool = plan.learnedWords(store.get('checkedDays'));
+    this.setData({ poolSize: this._pool.length });
+    return this._pool;
   },
 
   onTab(e) {
     this.setData({ tab: e.currentTarget.dataset.tab });
   },
 
+  // 抽一个词：优先重点词（30%），并尽量避开上一次抽到的词
+  pickItem(pool, starred, avoidWord) {
+    let item = null;
+    for (let tries = 0; tries < 4; tries++) {
+      if (starred.length && Math.random() < 0.3) {
+        item = starred[Math.floor(Math.random() * starred.length)];
+      } else {
+        item = pool[Math.floor(Math.random() * pool.length)];
+      }
+      if (!avoidWord || item.w !== avoidWord || pool.length < 2) break;
+    }
+    return item;
+  },
+
   // ---- 随机复习 ----
   onNext() {
-    this.refreshPool();
-    if (!this.pool.length) {
+    const pool = this.refreshPool();
+    if (!pool.length) {
       this.setData({ current: null });
       wx.showToast({ title: '先去打卡几天，词汇池才有内容', icon: 'none' });
       return;
     }
-    // 优先抽重点词（30% 概率），否则从已学词汇随机
-    let item = null;
     const starred = store.get('starredWords') || [];
-    if (starred.length && Math.random() < 0.3) {
-      item = starred[Math.floor(Math.random() * starred.length)];
-    } else {
-      item = this.pool[Math.floor(Math.random() * this.pool.length)];
-    }
-    this.setData({ current: item, showZh: false });
-    speech.speak(item.w);
+    const item = this.pickItem(pool, starred, this._lastWord);
+    this._lastWord = item.w;
+    // 重点词池里的对象是副本，没有 starred 字段 —— 必须按单词实际状态回填，否则已收藏的词永远显示"未收藏"
+    const current = Object.assign({}, item, { starred: store.isStarred(item.w) });
+    this.setData({ current, showZh: false });
+    speech.speak(current.w);
   },
 
   onShowZh() { this.setData({ showZh: true }); },
@@ -81,7 +98,10 @@ Page({
     const c = this.data.current;
     if (!c) return;
     const starred = store.toggleStar(c);
-    this.setData({ starred: store.get('starredWords') || [], 'current.starred': starred });
+    this.setData({
+      starred: store.get('starredWords') || [],
+      'current.starred': starred,
+    });
   },
 
   // ---- 重点词列表 ----

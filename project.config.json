@@ -13,7 +13,6 @@
     "lazyloadPlaceholderEnable": false,
     "ignoreUploadUnusedFiles": true
   },
-  "cloudfunctionRoot": "cloudfunctions/",
   "packOptions": {
     "ignore": [
       { "type": "folder", "value": "docs" }
