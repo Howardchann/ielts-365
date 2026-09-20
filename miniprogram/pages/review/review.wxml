@@ -20,6 +20,7 @@
     </view>
     <button class="btn-ghost" wx:else bindtap="onShowZh">显示释义</button>
 
+    <view class="review-result-row" wx:if="{{tab === 'due'}}"><button class="btn-ghost review-result-btn" data-result="wrong" bindtap="onReviewResult">不太会</button><button class="btn-primary review-result-btn" data-result="remember" bindtap="onReviewResult">记得了</button></view>
     <view class="random-actions">
       <view class="star-big" bindtap="onStarCurrent">{{current.starred ? '★ 已收藏' : '☆ 收藏'}}</view>
       <button class="btn-primary" bindtap="onNext">下一个</button>
