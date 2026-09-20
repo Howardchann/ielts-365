@@ -1,4 +1,6 @@
-// utils/speech.js —— 语音引擎（微信同声传译插件 + 在线兜底）
+// utils/speech.js —— 语音引擎（在线朗读）
+// 说明：微信同声传译插件不对个人主体开放，app.json 也已不再声明该插件，插件通道实际不可用。
+//       下方与插件相关的分支代码保留，便于日后主体类型变化时恢复。
 // 修复要点（详见变更报告）：
 //   1. iOS 静音键无声：播放前 setInnerAudioOption({obeyMuteSwitch:false})
 //   2. "仅插件"模式下插件未就绪会 TypeError：任何发声路径前都判空，插件不可用自动降级
@@ -11,7 +13,7 @@
 const state = {
   plugin: null,
   pluginOk: false,       // 插件是否可用
-  engine: 'auto',        // auto | plugin | online
+  engine: 'auto',        // auto | online
   rate: 0.9,
   accent: 'us',          // us 美音 | uk 英音（仅在线通道生效）
   audio: null,           // 当前 InnerAudioContext
@@ -36,15 +38,11 @@ function ensureAudioOption() {
 }
 
 function initPlugin() {
-  try {
-    const plugin = requirePlugin('WechatSI');
-    state.plugin = plugin;
-    state.pluginOk = !!(plugin && typeof plugin.textToSpeech === 'function');
-  } catch (e) {
-    state.plugin = null;
-    state.pluginOk = false;
-  }
-  return state.pluginOk;
+  // 不再调用 requirePlugin('WechatSI')：app.json 未声明该插件、个人主体也无法添加，
+  // 调用它只会抛异常（旧实现靠 try/catch 兜住，属于必然失败的死代码）。
+  state.plugin = null;
+  state.pluginOk = false;
+  return false;
 }
 
 function setRate(rate) {
@@ -54,7 +52,10 @@ function setRate(rate) {
 }
 
 function setEngine(engine) {
-  if (['auto', 'plugin', 'online'].indexOf(engine) >= 0) state.engine = engine;
+  // 兼容历史数据：旧版本可能存过 'plugin'（该通道已下线）。
+  // 在 utils 层统一归一，settings 页与 today 页两个调用点都能覆盖，避免朗读被锁死。
+  if (engine === 'plugin') engine = 'online';
+  if (['auto', 'online'].indexOf(engine) >= 0) state.engine = engine;
 }
 
 function setAccent(accent) {

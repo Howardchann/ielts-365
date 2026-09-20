@@ -3,7 +3,9 @@ const plan = require('../../utils/data.js');
 const store = require('../../utils/store.js');
 const speech = require('../../utils/speech.js');
 
-const ENGINES = ['auto', 'plugin', 'online'];
+// 插件通道已停用（微信同声传译插件不对个人主体开放），故不再提供「仅插件」选项。
+// 本数组必须与 data.engineOptions 的 value 顺序严格一致 —— picker 靠下标定位。
+const ENGINES = ['auto', 'online'];
 const ACCENTS = ['us', 'uk'];
 
 Page({
@@ -14,8 +16,7 @@ Page({
     rateText: '0.90×',
     engine: 'online',
     engineOptions: [
-      { value: 'auto', label: '自动（插件优先，失败转在线）' },
-      { value: 'plugin', label: '仅微信同声传译插件' },
+      { value: 'auto', label: '自动（推荐）' },
       { value: 'online', label: '仅在线朗读（需配域名）' },
     ],
     engineIndex: 0,
@@ -51,7 +52,12 @@ Page({
 
   refresh() {
     const rate = store.get('rate') || 0.9;
-    const engine = store.get('engine') || 'auto';
+    let engine = store.get('engine') || 'auto';
+    // 兼容历史数据：旧版本可能存过 'plugin'（通道已下线）。不修正会让 picker 下标变 -1、显示空白。
+    if (ENGINES.indexOf(engine) < 0) {
+      engine = 'online';
+      store.set('engine', engine);
+    }
     const accent = store.get('accent') || 'us';
     speech.setRate(rate);
     speech.setEngine(engine);
@@ -174,7 +180,7 @@ Page({
   // ---- 关于 ----
   onAbout() {
     wx.showModal({
-      title: '关于雅思365',
+      title: '关于开溜6.5',
       content: '零基础雅思全年学习计划：4阶段、52周、364天、1300个核心词汇。语音使用有道在线朗读；进度可在「进度备份」里导出保存，防止换机丢失。',
       showCancel: false,
     });

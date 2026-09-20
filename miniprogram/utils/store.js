@@ -186,7 +186,7 @@ function exportBackup() {
 // 外部数据不可信：逐字段校验、取值域收敛、字符串截断，防止脏数据把存储写坏
 function sanitize(raw) {
   if (!raw || typeof raw !== 'object') throw new Error('不是有效的备份数据');
-  if (raw.app && raw.app !== BACKUP_TAG) throw new Error('这不是「雅思365」的备份');
+  if (raw.app && raw.app !== BACKUP_TAG) throw new Error('这不是「开溜6.5」的备份');
   const d = (raw.data && typeof raw.data === 'object') ? raw.data : raw;
 
   const out = { checkedDays: {}, starredWords: [], startDate: '', rate: 0, accent: '', engine: '' };

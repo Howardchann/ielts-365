@@ -27,9 +27,9 @@
     <view class="picker-value">{{engineOptions[engineIndex].label}}（点击切换）</view>
   </picker>
   <view class="engine-status engine-status--ok">
-    ✓ 当前使用在线朗读（有道 TTS），不依赖任何插件
+    ✓ 当前使用在线朗读（有道 TTS）
   </view>
-  <view class="muted">前提：后台「开发管理 → 开发设置 → 服务器域名」的 downloadFile 合法域名里已加入 dict.youdao.com。若日后能用上官方同声传译插件，把上方引擎切回「自动」即可。</view>
+  <view class="muted">前提：后台「开发管理 → 开发设置 → 服务器域名」的 downloadFile 合法域名里已加入 dict.youdao.com；未配置的话朗读会没有声音。</view>
 </view>
 
 <view class="card">
@@ -37,7 +37,7 @@
   <picker range="{{accentOptions}}" range-key="label" value="{{accentIndex}}" bindchange="onAccent">
     <view class="picker-value">{{accentOptions[accentIndex].label}}（点击切换）</view>
   </picker>
-  <view class="muted" style="margin-top:10rpx;">仅对「在线朗读」通道生效：切换后在设置页点「试听发音」即可对比。插件通道固定为美式发音。</view>
+  <view class="muted" style="margin-top:10rpx;">切换后在设置页点「试听发音」即可对比效果。</view>
 </view>
 
 <view class="card">
@@ -45,7 +45,7 @@
   <view class="sync-state">
     <text wx:if="{{cloud.hasDoc}}" class="sync-dot sync-dot--ok"></text>
     <text wx:else class="sync-dot"></text>
-    <text>{{cloud.hasDoc ? '云端记录正常，双端自动同步中' : (cloud.enabled ? '尚未建立云端记录（打开几天后会自动创建）' : '云同步不可用：请先开通云开发并创建 progress 集合')}}</text>
+    <text>{{cloud.hasDoc ? '云端记录正常，双端自动同步中' : (cloud.enabled ? '尚未建立云端记录（打开几天后会自动创建）' : '云同步未开启，进度只保存在本机。可用下方「进度备份」导出存档，换机时导回即可')}}</text>
   </view>
   <view class="sync-error" wx:if="{{cloud.error && !cloud.hasDoc}}">{{cloud.error}}</view>
   <button class="btn-ghost" bindtap="onSyncNow" style="margin-top:16rpx;">立即同步</button>
