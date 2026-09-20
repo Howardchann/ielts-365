@@ -5,6 +5,7 @@ node_modules/
 .DS_Store
 *.log
 miniprogram_npm/
+project.private.config.json
 
 # 编辑器
 .vscode/
