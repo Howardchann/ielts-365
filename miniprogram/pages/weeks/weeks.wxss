@@ -1,0 +1,78 @@
+/* 周总览页样式 */
+.stat-card { padding: 30rpx 20rpx; }
+
+.stat-row { display: flex; justify-content: space-around; }
+
+.stat-item { text-align: center; }
+
+.stat-num { font-size: 44rpx; font-weight: 700; color: #B8860B; }
+
+.stat-label { font-size: 22rpx; color: #999; margin-top: 4rpx; }
+
+.phase-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #2C3E50;
+  margin: 30rpx 30rpx 6rpx;
+  padding-left: 16rpx;
+  border-left: 8rpx solid #B8860B;
+}
+
+.week-card { padding: 22rpx 26rpx; margin: 14rpx 24rpx; }
+
+.week-card--current { border: 2rpx solid #B8860B; background: #FFFCF5; }
+
+.week-line { display: flex; align-items: center; }
+
+.week-badge {
+  width: 64rpx; height: 64rpx;
+  border-radius: 50%;
+  background: #F0EDE4;
+  color: #999;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28rpx; font-weight: 700;
+  flex-shrink: 0;
+}
+
+.week-badge--past { background: #E8F5E9; color: #2E7D32; }
+.week-badge--current { background: #B8860B; color: #fff; }
+
+.week-info { flex: 1; min-width: 0; margin: 0 20rpx; }
+
+.week-theme { font-size: 28rpx; font-weight: 600; color: #2C3E50; }
+
+.week-progress { display: flex; align-items: center; margin-top: 10rpx; }
+
+.progress-bar {
+  flex: 1;
+  height: 10rpx;
+  border-radius: 5rpx;
+  background: #F0EDE4;
+  overflow: hidden;
+}
+
+.progress-fill { height: 100%; background: linear-gradient(90deg, #D4A017, #B8860B); }
+
+.progress-text { font-size: 20rpx; color: #999; margin-left: 12rpx; }
+
+.week-tag {
+  font-size: 20rpx;
+  color: #fff;
+  background: #B8860B;
+  border-radius: 8rpx;
+  padding: 4rpx 12rpx;
+}
+
+.week-days { display: flex; margin-top: 18rpx; gap: 10rpx; }
+
+.day-chip {
+  flex: 1;
+  text-align: center;
+  font-size: 22rpx;
+  color: #999;
+  background: #F7F4EC;
+  border-radius: 8rpx;
+  padding: 8rpx 0;
+}
+
+.day-chip--done { background: #E8F5E9; color: #2E7D32; font-weight: 600; }

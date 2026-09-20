@@ -1,0 +1,43 @@
+<!-- 52 周计划总览 -->
+<view class="card stat-card">
+  <view class="stat-row">
+    <view class="stat-item">
+      <view class="stat-num">{{totalChecked}}</view>
+      <view class="stat-label">已完成天数</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-num">{{totalDays - totalChecked}}</view>
+      <view class="stat-label">剩余天数</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-num">{{totalChecked >= totalDays ? 100 : (totalChecked * 100 / totalDays).toFixed(1)}}%</view>
+      <view class="stat-label">总进度</view>
+    </view>
+  </view>
+</view>
+
+<view class="phase-block" wx:for="{{phases}}" wx:key="name" wx:for-item="phase">
+  <view class="phase-title">{{phase.name}}</view>
+  <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}}"
+        wx:for="{{phase.weeks}}" wx:key="w" wx:for-item="week"
+        data-w="{{week.w}}" bindtap="onWeekTap">
+    <view class="week-line">
+      <view class="week-badge {{week.isPast ? 'week-badge--past' : (week.isCurrent ? 'week-badge--current' : '')}}">{{week.w}}</view>
+      <view class="week-info">
+        <view class="week-theme">{{week.theme}}</view>
+        <view class="week-progress">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{week.checked / 7 * 100}}%;"></view>
+          </view>
+          <text class="progress-text">{{week.checked}}/7</text>
+        </view>
+      </view>
+      <view class="week-tag" wx:if="{{week.isCurrent}}">本周</view>
+    </view>
+    <view class="week-days">
+      <view class="day-chip {{week.checked >= k ? 'day-chip--done' : ''}}"
+            wx:for="{{[1,2,3,4,5,6,7]}}" wx:key="*this" wx:for-item="k"
+            data-w="{{week.w}}" data-k="{{k}}" catchtap="onDayTap">{{k}}</view>
+    </view>
+  </view>
+</view>

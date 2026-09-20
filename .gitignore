@@ -1,0 +1,14 @@
+# 依赖
+node_modules/
+
+# 微信开发者工具
+.DS_Store
+*.log
+miniprogram_npm/
+
+# 编辑器
+.vscode/
+.idea/
+
+# 系统文件
+Thumbs.db

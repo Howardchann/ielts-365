@@ -1,0 +1,4 @@
+{
+  "desc": "雅思365学习计划",
+  "rules": [{ "action": "allow", "page": "*" }]
+}

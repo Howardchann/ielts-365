@@ -1,0 +1,63 @@
+/* 复习页样式 */
+.tab-row {
+  display: flex;
+  background: #fff;
+  margin: 20rpx 24rpx;
+  border-radius: 44rpx;
+  padding: 8rpx;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  font-size: 28rpx;
+  color: #999;
+  padding: 14rpx 0;
+  border-radius: 40rpx;
+}
+
+.tab--on {
+  background: linear-gradient(135deg, #D4A017, #B8860B);
+  color: #fff;
+  font-weight: 600;
+}
+
+.pool-info { padding: 18rpx 28rpx; }
+
+.random-card { text-align: center; padding: 50rpx 30rpx; }
+
+.random-word {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #2C3E50;
+  line-height: 1.3;
+}
+
+.random-word--playing { color: #B8860B; }
+
+.random-pos { font-size: 24rpx; color: #B8860B; font-style: italic; margin-top: 6rpx; }
+
+.random-zh { margin-top: 30rpx; }
+
+.random-zh-main { font-size: 36rpx; color: #444; }
+
+.random-zh-ex { font-size: 26rpx; color: #888; margin-top: 16rpx; }
+
+.random-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40rpx;
+}
+
+.star-big { font-size: 28rpx; color: #E67E22; padding: 10rpx; }
+
+.empty-text { font-size: 26rpx; color: #999; line-height: 1.8; margin-bottom: 24rpx; }
+
+.word-remove {
+  flex-shrink: 0;
+  width: 56rpx; height: 56rpx;
+  display: flex; align-items: center; justify-content: center;
+  color: #ccc;
+  font-size: 30rpx;
+}

@@ -1,0 +1,36 @@
+{
+  "pages": [
+    "pages/today/today",
+    "pages/weeks/weeks",
+    "pages/review/review",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#B8860B",
+    "navigationBarTitleText": "雅思365 · 零基础到6.5",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F7F4EC",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#B8860B",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/today/today", "text": "今日", "iconPath": "images/today.png", "selectedIconPath": "images/today-active.png" },
+      { "pagePath": "pages/weeks/weeks", "text": "周计划", "iconPath": "images/weeks.png", "selectedIconPath": "images/weeks-active.png" },
+      { "pagePath": "pages/review/review", "text": "复习", "iconPath": "images/review.png", "selectedIconPath": "images/review-active.png" },
+      { "pagePath": "pages/settings/settings", "text": "设置", "iconPath": "images/settings.png", "selectedIconPath": "images/settings-active.png" }
+    ]
+  },
+  "plugins": {
+    "WechatSI": {
+      "version": "0.3.6",
+      "provider": "wx069ba97219f66d99"
+    }
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}
