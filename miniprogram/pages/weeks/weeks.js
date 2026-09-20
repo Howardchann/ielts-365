@@ -9,6 +9,7 @@ Page({
     currentWeek: 0,
     totalChecked: 0,
     totalDays: 364,
+    totalPercent: '0.0',  // WXML 的 {{}} 不支持函数调用（如 toFixed），必须在 JS 算好再传入
     openPhase: 0,     // 当前展开的阶段（0=全部折叠）
   },
 
@@ -37,11 +38,16 @@ Page({
       });
       phases.push({ p: p, name: plan.PHASE_NAMES[p], weeks });
     }
+    const totalChecked = store.checkedCount();
+    const totalPercent = totalChecked >= this.data.totalDays
+      ? '100.0'
+      : (totalChecked * 100 / this.data.totalDays).toFixed(1);
     this.setData({
       phases,
       todayNum,
       currentWeek,
-      totalChecked: store.checkedCount(),
+      totalChecked,
+      totalPercent,
       openPhase: this.data.openPhase || currentPhase,
     });
   },

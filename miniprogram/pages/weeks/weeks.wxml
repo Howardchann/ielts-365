@@ -10,7 +10,7 @@
       <view class="stat-label">剩余天数</view>
     </view>
     <view class="stat-item">
-      <view class="stat-num">{{totalChecked >= totalDays ? 100 : (totalChecked * 100 / totalDays).toFixed(1)}}%</view>
+      <view class="stat-num">{{totalPercent}}%</view>
       <view class="stat-label">总进度</view>
     </view>
   </view>

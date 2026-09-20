@@ -2,7 +2,7 @@
   "miniprogramRoot": "miniprogram/",
   "compileType": "miniprogram",
   "projectname": "ielts-365",
-  "appid": "请替换为你的AppID",
+  "appid": "wx35f7fdf669fb7aab",
   "libVersion": "3.4.10",
   "setting": {
     "es6": true,
@@ -11,15 +11,37 @@
     "urlCheck": false,
     "coverView": true,
     "lazyloadPlaceholderEnable": false,
-    "ignoreUploadUnusedFiles": true
+    "ignoreUploadUnusedFiles": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "enhance": false,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
   "packOptions": {
     "ignore": [
-      { "type": "folder", "value": "docs" }
-    ]
+      {
+        "value": "docs",
+        "type": "folder"
+      }
+    ],
+    "include": []
   },
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2
-  }
+  },
+  "simulatorPluginLibVersion": {}
 }
