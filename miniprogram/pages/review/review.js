@@ -10,7 +10,7 @@ Page({
     showZh: false,
     starred: [],
     playingWord: '',
-    tab: 'random',      // random | starred
+    tab: 'random',      // random | due | starred
   },
 
   onLoad() {
@@ -41,6 +41,31 @@ Page({
 
   onTab(e) {
     this.setData({ tab: e.currentTarget.dataset.tab });
+    if (e.currentTarget.dataset.tab === 'due') this.onNextDue();
+  },
+
+  onNextDue() {
+    const pool = store.dueWords(this.refreshPool());
+    if (!pool.length) {
+      this.setData({ current: null });
+      wx.showToast({ title: '今天没有到期词，继续学习即可', icon: 'none' });
+      return;
+    }
+    const item = pool[Math.floor(Math.random() * pool.length)];
+    const current = Object.assign({}, item, { starred: store.isStarred(item.w) });
+    this._lastWord = item.w;
+    this.setData({ current, showZh: false });
+    speech.speak(current.w);
+  },
+
+  onReviewResult(e) {
+    const remembered = e.currentTarget.dataset.result === 'remember';
+    const c = this.data.current;
+    if (!c) return;
+    store.reviewWord(c.w, remembered);
+    wx.showToast({ title: remembered ? '记得，下一次会更晚复习' : '记不牢，稍后再来', icon: 'none' });
+    this.setData({ current: null, showZh: false });
+    if (this.data.tab === 'due') this.onNextDue();
   },
 
   // 抽一个词：优先重点词（30%），并尽量避开上一次抽到的词
