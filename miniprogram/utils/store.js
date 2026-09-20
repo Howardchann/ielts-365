@@ -127,10 +127,11 @@ function mergeReviewStats(localStats,incomingStats){
   Object.keys(incomingStats||{}).forEach(word=>{
     const incoming=incomingStats[word], local=result[word];
     if(!local){result[word]=incoming;return;}
+    // 备份是“快照”而不是增量日志：合并时取最近一次复习记录，重复导入同一备份不会把次数重复累加。
     const lt=Number(local.lastReviewedAt)||0,it=Number(incoming.lastReviewedAt)||0;
-    result[word]={correct:(Number(local.correct)||0)+(Number(incoming.correct)||0),wrong:(Number(local.wrong)||0)+(Number(incoming.wrong)||0),
-      level:it>=lt?incoming.level:local.level,nextReviewAt:it>=lt?incoming.nextReviewAt:local.nextReviewAt,lastReviewedAt:Math.max(lt,it)};
-  }); return result;
+    if(it>=lt) result[word]=incoming;
+  });
+  return result;
 }
 function importBackup(text,mode){
   const str=String(text==null?'':text).trim(); if(!str)throw new Error('内容为空，请先粘贴备份文本');
