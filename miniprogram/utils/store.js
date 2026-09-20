@@ -88,7 +88,7 @@ function exportBackup() {
   return JSON.stringify({
     app:BACKUP_TAG, v:BACKUP_VERSION, exportedAt:Date.now(),
     data:{
-      startDate:data.startDate, checkedDays:data.checkedDays||{}, starredWords:data.starredWords||{},
+      startDate:data.startDate, checkedDays:data.checkedDays||{}, starredWords:data.starredWords||[],
       reviewStats:data.reviewStats||{}, rate:data.rate, accent:data.accent, engine:'online'
     }
   });
