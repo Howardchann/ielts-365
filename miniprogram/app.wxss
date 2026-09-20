@@ -35,3 +35,11 @@ page {
 .ex-speak { flex-shrink:0; width:52rpx; height:52rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; display:flex; align-items:center; justify-content:center; font-size:26rpx; margin-left:16rpx; }
 .checkin-btn { margin:24rpx 0; }
 .done-state { text-align:center; color:#176B5B; font-size:28rpx; font-weight:700; padding:16rpx 0; }
+
+/* 开溜 · 图标与触控视觉统一 */
+.icon-button{display:flex;align-items:center;justify-content:center;width:64rpx;height:64rpx;border-radius:18rpx;background:#E6F4EE;color:#176B5B;font-size:30rpx;line-height:1;}
+.icon-button:active{background:#D5EDE3;}
+.icon-star{font-size:34rpx;color:#C7D0CC;}
+.icon-star--on{color:#F5C451;}
+.icon-remove{font-size:28rpx;color:#A6B2AD;}
+.icon-speaker{font-size:28rpx;}
