@@ -16,6 +16,7 @@ const defaults = () => ({
   startDate: plan.DEFAULT_START,   // 计划开始日（周一）
   checkedDays: {},           // { 'w1d1': 1, 'w12d3': 1, ... }
   starredWords: [],          // [ {w,m,p,e} ]
+  reviewStats: {},            // { word: { correct, wrong, level, nextReviewAt, lastReviewedAt } }
   rate: 0.9,                 // 朗读语速
   accent: 'us',              // us 美音 | uk 英音
   engine: 'online',          // 个人主体无法添加插件时的默认通道
@@ -87,6 +88,7 @@ function pullCloud(opts) {
           data.startDate = remote.startDate || data.startDate;
           data.checkedDays = remote.checkedDays || data.checkedDays;
           data.starredWords = remote.starredWords || data.starredWords;
+          data.reviewStats = remote.reviewStats || data.reviewStats || {};
           data.rate = remote.rate != null ? remote.rate : data.rate;
           data.accent = remote.accent || data.accent;
           data.engine = remote.engine || data.engine;
@@ -131,6 +133,7 @@ function pushCloud() {
     rate: data.rate,
     accent: data.accent,
     engine: data.engine,
+    reviewStats: data.reviewStats || {},
     updatedAt: Date.now(),
   };
   const finish = (docId) => {
@@ -179,6 +182,7 @@ function exportBackup() {
       rate: data.rate,
       accent: data.accent,
       engine: data.engine,
+      reviewStats: data.reviewStats || {},
     },
   });
 }
@@ -263,6 +267,7 @@ function importBackup(text, mode) {
   if (inc.rate) data.rate = inc.rate;
   if (inc.accent) data.accent = inc.accent;
   if (inc.engine) data.engine = inc.engine;
+  if (inc.reviewStats && typeof inc.reviewStats === 'object') data.reviewStats = inc.reviewStats;
 
   data.updatedAt = Date.now();
   saveLocal();
@@ -360,6 +365,34 @@ function toggleStar(item) {
   return i < 0;
 }
 
+// ---- 间隔复习（轻量 SRS） ----
+function reviewWord(word, remembered) {
+  if (!word) return null;
+  const now = Date.now();
+  const old = data.reviewStats[word] || { correct: 0, wrong: 0, level: 0, nextReviewAt: 0, lastReviewedAt: 0 };
+  const level = remembered ? Math.min((old.level || 0) + 1, 6) : 0;
+  const intervals = [0, 1, 2, 4, 7, 14, 30];
+  const days = intervals[level];
+  const next = now + days * 86400000;
+  data.reviewStats[word] = {
+    correct: (old.correct || 0) + (remembered ? 1 : 0),
+    wrong: (old.wrong || 0) + (remembered ? 0 : 1),
+    level,
+    nextReviewAt: next,
+    lastReviewedAt: now,
+  };
+  saveLocal(); schedulePush(); emit();
+  return data.reviewStats[word];
+}
+function getReviewStats(word) { return (data.reviewStats || {})[word] || { correct:0, wrong:0, level:0, nextReviewAt:0, lastReviewedAt:0 }; }
+function dueWords(words) {
+  const now = Date.now();
+  return (words || []).filter(v => {
+    const s = getReviewStats(v.w);
+    return !s.nextReviewAt || s.nextReviewAt <= now;
+  });
+}
+
 // ---- 手动全量同步（设置页按钮）：真实等待结果，且允许强制重试 ----
 function syncNow() {
   const database = db();
@@ -388,6 +421,7 @@ module.exports = {
   get, set,
   isChecked, toggleCheck, checkedCount, weekCheckedCount, weekCheckedMap,
   isStarred, toggleStar,
+  reviewWord, getReviewStats, dueWords,
   syncNow, cloudStatus,
   exportBackup, importBackup,
 };
