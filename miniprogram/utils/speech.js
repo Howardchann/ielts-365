@@ -26,6 +26,7 @@ const state = {
 };
 
 let playToken = 0;       // 播放令牌：旧的音频回调一律作废
+let audioTimeout = null;  // TTS 无响应时的超时保护
 let audioOptDone = false;
 
 // iOS 上默认遵守静音键，会把 InnerAudioContext 的声音吞掉 —— 这是"没声音"最常见的原因
@@ -127,6 +128,7 @@ function killAudio(audio) {
 }
 
 function cleanup() {
+  if (audioTimeout) { clearTimeout(audioTimeout); audioTimeout = null; }
   if (state.audio) {
     killAudio(state.audio);
     state.audio = null;
@@ -169,6 +171,16 @@ function playAudio(src, onDone) {
   });
 
   audio.play();
+  // 有道接口偶发无响应时，避免页面按钮永久卡在“播放中”。
+  audioTimeout = setTimeout(() => {
+    if (token !== playToken) return;
+    const text = state.playingText;
+    cleanup();
+    state.playing = false;
+    wx.showToast({ title: '朗读超时，请检查网络', icon: 'none' });
+    if (onDone) onDone(false, text);
+    notify('', false, 'idle');
+  }, 12000);
 }
 
 // ---- 停止一切（连读也一并终止）----
