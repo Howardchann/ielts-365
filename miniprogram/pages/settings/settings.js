@@ -7,8 +7,8 @@ const ACCENTS=['us','uk'];
 Page({
   data:{startDate:plan.DEFAULT_START,today:'2026-09-21',rate:0.9,rateText:'0.90×',accent:'us',
     accentOptions:[{value:'us',label:'美式发音（默认）'},{value:'uk',label:'英式发音'}],accentIndex:0,
-    totalChecked:0,starredCount:0,reviewCount:0,appVersion:'1.0.0',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false},
-  onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing}));},
+    totalChecked:0,starredCount:0,reviewCount:0,appVersion:'1.0.0',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音'},
+  onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?('朗读中…'+(p.source?'（'+p.source+'）':'')+' 点击停止'):'试听发音'}));},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}},
   onShow(){this.refresh();},
   refresh(){const rate=store.get('rate')||0.9,accent=store.get('accent')||'us';speech.setRate(rate);speech.setEngine('online');speech.setAccent(accent);
