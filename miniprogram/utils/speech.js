@@ -10,21 +10,25 @@ function setEngine(){state.engine='online';}
 function setAccent(accent){if(accent==='uk'||accent==='us')state.accent=accent;}
 function notify(text,playing,mode){const p={text:text||'',playing:!!playing,mode:mode||(state.queueMode?'queue':(playing?'single':'idle'))};state.listeners.slice().forEach(fn=>{try{fn(p);}catch(e){}});}
 function onlineUrl(text){return 'https://dict.youdao.com/dictvoice?audio='+encodeURIComponent(text)+'&type='+(state.accent==='uk'?1:2);}
+// 备用朗读源：有道是词典查音，遇到音库未收录的短语会返回 HTTP 500（returned null audio），此时降级到百度 TTS。
+// 百度仅英文、无英美音区分，作为兜底足够用。
+function fallbackUrl(text){return 'https://fanyi.baidu.com/gettts?lan=en&spd=3&source=web&text='+encodeURIComponent(text);}
 function killAudio(audio){if(!audio)return;try{audio.stop();}catch(e){}try{audio.destroy();}catch(e){}}
 function cleanup(){if(audioTimeout){clearTimeout(audioTimeout);audioTimeout=null;}if(state.audio){killAudio(state.audio);state.audio=null;}state.playingText='';state.paused=false;}
 function getTimeoutMs(text){const chars=String(text||'').length;const rateFactor=1/Math.max(0.7,state.rate);return Math.min(30000,Math.max(12000,8000+chars*140*rateFactor));}
-function playAudio(src,onDone,text){
+function playAudio(src,onDone,text,allowFallback){
   ensureAudioOption();if(state.audio)killAudio(state.audio);
   const audio=wx.createInnerAudioContext(),token=++playToken;state.audio=audio;state.paused=false;audio.src=src;audio.playbackRate=state.rate;
+  const retry=()=>{if(token!==playToken)return false;cleanup();playAudio(fallbackUrl(text),onDone,text,false);return true;};
   audio.onPlay(()=>{if(token!==playToken)return;state.playing=true;if(audio.playbackRate!==state.rate)audio.playbackRate=state.rate;});
   audio.onEnded(()=>{if(token!==playToken)return;cleanup();state.playing=false;if(onDone)onDone(true);});
-  audio.onError(()=>{if(token!==playToken)return;cleanup();state.playing=false;if(onDone)onDone(false);});
+  audio.onError(()=>{if(token!==playToken)return;if(allowFallback&&retry())return;cleanup();state.playing=false;wx.showToast({title:'朗读失败，请检查网络',icon:'none'});if(onDone)onDone(false);});
   audio.play();
-  audioTimeout=setTimeout(()=>{if(token!==playToken)return;cleanup();state.playing=false;wx.showToast({title:'朗读超时，请检查网络',icon:'none'});if(onDone)onDone(false);notify('',false,'idle');},getTimeoutMs(text));
+  audioTimeout=setTimeout(()=>{if(token!==playToken)return;if(allowFallback&&retry())return;cleanup();state.playing=false;wx.showToast({title:'朗读超时，请检查网络',icon:'none'});if(onDone)onDone(false);notify('',false,'idle');},getTimeoutMs(text));
 }
 function stop(){playToken++;state.queue=[];state.queueMode=false;cleanup();state.playing=false;notify('',false,'idle');}
 function togglePause(){const audio=state.audio;if(!audio)return'none';if(state.paused){audio.play();state.paused=false;state.playing=true;notify(state.playingText,true);return'resumed';}audio.pause();state.paused=true;state.playing=false;notify(state.playingText,false);return'paused';}
-function speakCore(text,onDone){state.playingText=text;state.playing=true;playAudio(onlineUrl(text),ok=>{if(state.queueMode){if(onDone)onDone(ok);return;}if(!ok){stop();if(onDone)onDone(false);}else{if(onDone)onDone(true);notify('',false,'idle');}},text);notify(text,true);}
+function speakCore(text,onDone){state.playingText=text;state.playing=true;playAudio(onlineUrl(text),ok=>{if(state.queueMode){if(onDone)onDone(ok);return;}if(!ok){stop();if(onDone)onDone(false);}else{if(onDone)onDone(true);notify('',false,'idle');}},text,true);notify(text,true);}
 function speak(text,onDone){text=String(text||'').trim();if(!text){if(onDone)onDone(false);return;}if(state.queueMode){state.queue=[];state.queueMode=false;}speakCore(text,onDone);}
 function speakQueue(texts){stop();state.queue=(texts||[]).map(v=>String(v||'').trim()).filter(Boolean);if(!state.queue.length)return;state.queueMode=true;next();}
 function next(){if(!state.queueMode||!state.queue.length){state.queueMode=false;notify('',false,'idle');return;}const text=state.queue.shift();speakCore(text,()=>{if(!state.queueMode)return;setTimeout(next,250);});}
