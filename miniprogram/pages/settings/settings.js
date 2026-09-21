@@ -7,14 +7,15 @@ const ACCENTS=['us','uk'];
 Page({
   data:{startDate:plan.DEFAULT_START,today:'2026-09-21',rate:0.9,rateText:'0.90×',accent:'us',
     accentOptions:[{value:'us',label:'美式发音（默认）'},{value:'uk',label:'英式发音'}],accentIndex:0,
-    totalChecked:0,starredCount:0,reviewCount:0,appVersion:'1.0.0',backupText:'',showBackup:false,importText:'',showImport:false},
-  onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();},
+    totalChecked:0,starredCount:0,reviewCount:0,appVersion:'1.0.0',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false},
+  onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing}));},
+  onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}},
   onShow(){this.refresh();},
   refresh(){const rate=store.get('rate')||0.9,accent=store.get('accent')||'us';speech.setRate(rate);speech.setEngine('online');speech.setAccent(accent);
     this.setData({startDate:store.get('startDate')||plan.DEFAULT_START,rate,rateText:Number(rate).toFixed(2)+'×',accent,accentIndex:Math.max(0,ACCENTS.indexOf(accent)),totalChecked:store.checkedCount(),starredCount:(store.get('starredWords')||[]).length,reviewCount:Object.keys(store.get('reviewStats')||{}).length});},
   onStartDate(e){store.set('startDate',e.detail.value);this.refresh();wx.showToast({title:'开始日期已更新',icon:'success'});},
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
-  onTestVoice(){speech.speak('Hello. Nice to meet you. This is your daily learning voice.');},
+  onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}speech.speak('Hello. Nice to meet you. This is your daily learning voice.');},
   onAccent(e){const idx=Number(e.detail.value),accent=this.data.accentOptions[idx].value;store.set('accent',accent);speech.setAccent(accent);this.setData({accent,accentIndex:idx});},
   onExport(){let text;try{text=store.exportBackup();}catch(e){wx.showToast({title:'导出失败',icon:'none'});return;}this.setData({backupText:text,showBackup:true,showImport:false,importText:''});wx.setClipboardData({data:text,success:()=>wx.showToast({title:'已复制，请粘贴到备忘录保存',icon:'none',duration:2500}),fail:()=>wx.showToast({title:'复制失败，请长按选中文本手动复制',icon:'none',duration:2500})});},
   onCopyBackup(){wx.setClipboardData({data:this.data.backupText,success:()=>wx.showToast({title:'已复制',icon:'success'})});},

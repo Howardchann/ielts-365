@@ -18,13 +18,22 @@ function cleanup(){if(audioTimeout){clearTimeout(audioTimeout);audioTimeout=null
 function getTimeoutMs(text){const chars=String(text||'').length;const rateFactor=1/Math.max(0.7,state.rate);return Math.min(30000,Math.max(12000,8000+chars*140*rateFactor));}
 function playAudio(src,onDone,text,allowFallback){
   ensureAudioOption();if(state.audio)killAudio(state.audio);
-  const audio=wx.createInnerAudioContext(),token=++playToken;state.audio=audio;state.paused=false;audio.src=src;audio.playbackRate=state.rate;
-  const retry=()=>{if(token!==playToken)return false;cleanup();playAudio(fallbackUrl(text),onDone,text,false);return true;};
-  audio.onPlay(()=>{if(token!==playToken)return;state.playing=true;if(audio.playbackRate!==state.rate)audio.playbackRate=state.rate;});
-  audio.onEnded(()=>{if(token!==playToken)return;cleanup();state.playing=false;if(onDone)onDone(true);});
-  audio.onError(()=>{if(token!==playToken)return;if(allowFallback&&retry())return;cleanup();state.playing=false;wx.showToast({title:'朗读失败，请检查网络',icon:'none'});if(onDone)onDone(false);});
-  audio.play();
-  audioTimeout=setTimeout(()=>{if(token!==playToken)return;if(allowFallback&&retry())return;cleanup();state.playing=false;wx.showToast({title:'朗读超时，请检查网络',icon:'none'});if(onDone)onDone(false);notify('',false,'idle');},getTimeoutMs(text));
+  const token=++playToken;
+  const fail=()=>{if(token!==playToken)return;cleanup();state.playing=false;if(allowFallback){playAudio(fallbackUrl(text),onDone,text,false);return;}wx.showToast({title:'朗读失败，请检查网络',icon:'none'});if(onDone)onDone(false);};
+  // 先用 downloadFile 把音频下到本地再播：真机上 InnerAudioContext 直连外链若返回 500/被拦，
+  // onError 可能不回调，导致静默无声且无法降级。downloadFile 能拿到明确 statusCode。
+  wx.downloadFile({url:src,timeout:15000,
+    success:res=>{if(token!==playToken)return;if(res.statusCode!==200){fail();return;}startPlay(res.tempFilePath);},
+    fail:()=>fail()});
+  function startPlay(file){
+    if(token!==playToken)return;
+    const audio=wx.createInnerAudioContext();state.audio=audio;state.paused=false;audio.src=file;audio.playbackRate=state.rate;
+    audioTimeout=setTimeout(()=>{if(token!==playToken)return;cleanup();state.playing=false;if(allowFallback){playAudio(fallbackUrl(text),onDone,text,false);return;}wx.showToast({title:'朗读超时，请检查网络',icon:'none'});if(onDone)onDone(false);notify('',false,'idle');},getTimeoutMs(text));
+    audio.onPlay(()=>{if(token!==playToken)return;state.playing=true;if(audio.playbackRate!==state.rate)audio.playbackRate=state.rate;});
+    audio.onEnded(()=>{if(token!==playToken)return;cleanup();state.playing=false;if(onDone)onDone(true);});
+    audio.onError(()=>fail());
+    audio.play();
+  }
 }
 function stop(){playToken++;state.queue=[];state.queueMode=false;cleanup();state.playing=false;notify('',false,'idle');}
 function togglePause(){const audio=state.audio;if(!audio)return'none';if(state.paused){audio.play();state.paused=false;state.playing=true;notify(state.playingText,true);return'resumed';}audio.pause();state.paused=true;state.playing=false;notify(state.playingText,false);return'paused';}
