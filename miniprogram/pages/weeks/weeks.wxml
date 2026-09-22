@@ -1,4 +1,4 @@
-<!-- 52 周计划总览 -->
+<!-- 学习计划总览（78 周 / 18 个月） -->
 <view class="card stat-card">
   <view class="stat-row">
     <view class="stat-item">
@@ -30,6 +30,7 @@
         <view class="week-badge {{week.isPast ? 'week-badge--past' : (week.isCurrent ? 'week-badge--current' : '')}}">{{week.w}}</view>
         <view class="week-info">
           <view class="week-theme">{{week.theme}}</view>
+          <view class="week-words">每日 {{week.perDay}} 词 · 本周 {{week.weekTotal}} 词</view>
           <view class="week-progress">
             <view class="progress-bar">
               <view class="progress-fill" style="width: {{week.checked / 7 * 100}}%;"></view>

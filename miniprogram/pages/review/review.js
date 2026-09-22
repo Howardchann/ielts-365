@@ -56,7 +56,7 @@ Page({
     const current = Object.assign({}, item, { starred: store.isStarred(item.w) });
     this._lastWord = item.w;
     this.setData({ current, showZh: false });
-    speech.speak(current.w);
+    speech.speak(current.w, { ai: current.ai, kind: 'w' });
   },
 
   onReviewResult(e) {
@@ -97,7 +97,7 @@ Page({
     // 重点词池里的对象是副本，没有 starred 字段 —— 必须按单词实际状态回填，否则已收藏的词永远显示"未收藏"
     const current = Object.assign({}, item, { starred: store.isStarred(item.w) });
     this.setData({ current, showZh: false });
-    speech.speak(current.w);
+    speech.speak(current.w, { ai: current.ai, kind: 'w' });
   },
 
   onShowZh() { this.setData({ showZh: true }); },
@@ -110,14 +110,14 @@ Page({
       this.setData({ playingWord: r === 'paused' ? '' : c.w });
       return;
     }
-    speech.speak(c.w);
+    speech.speak(c.w, { ai: c.ai, kind: 'w' });
     this.setData({ playingWord: c.w });
   },
 
   onSpeakExample() {
     const c = this.data.current;
     if (!c || !c.e) return;
-    speech.speak(c.e);
+    speech.speak(c.e, { ai: c.ai, kind: 's' });
   },
 
   onStarCurrent() {
@@ -138,7 +138,9 @@ Page({
       this.setData({ playingWord: r === 'paused' ? '' : w });
       return;
     }
-    speech.speak(w);
+    // 重点词列表只传了单词文本，需从收藏数组里取回音频编号
+    const it = (this.data.starred || []).filter(x => x && x.w === w)[0];
+    speech.speak(w, { ai: it && it.ai, kind: 'w' });
     this.setData({ playingWord: w });
   },
 

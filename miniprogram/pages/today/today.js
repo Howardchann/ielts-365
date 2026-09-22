@@ -5,9 +5,9 @@ const speech = require('../../utils/speech.js');
 
 Page({
   data: {
-    viewDay: 1,        // 当前查看的计划第几天（1-364）
-    todayNum: 0,       // 今天对应的计划天数（0=尚未开始）
-    preStart: false,   // 准备期
+    viewDay: 1,
+    todayNum: 0,
+    preStart: false,
     daysToStart: 0,
     dayNum: 1,
     dowText: '',
@@ -16,9 +16,12 @@ Page({
     weekNum: 0,
     dayData: null,
     vocab: [],
+    extraStart: -1,   // 扩展词在 vocab 中的起始下标（-1 表示全是核心词）
+    coreCount: 0,
+    extraCount: 0,
     checked: false,
-    playingText: '',   // 正在朗读的文本
-    playingMode: 'idle', // idle | single | queue
+    playingText: '',
+    playingMode: 'idle',
     pluginOk: false,
   },
 
@@ -27,19 +30,15 @@ Page({
     speech.setRate(store.get('rate'));
     speech.setAccent(store.get('accent') || 'us');
     speech.setEngine(store.get('engine'));
-    // 监听器只注册一次，并在页面卸载时注销（旧实现每次调用朗读全部都会多挂一个回调）
+    speech.setEngineMode(store.get('engineMode') || 'auto');
     this._offSpeech = speech.onStateChange((payload) => {
-      this.setData({
-        playingText: payload.playing ? payload.text : '',
-        playingMode: payload.mode,
-      });
+      this.setData({ playingText: payload.playing ? payload.text : '', playingMode: payload.mode });
     });
     this.setData({ pluginOk: ok });
   },
 
   onShow() {
-    store.onResume(); // 双端同步：切回前台拉云端
-    // 支持从周计划页跳转（switchTab 不支持 query，改由 globalData 传递）
+    store.onResume();
     const jump = getApp().globalData.jumpDay || 0;
     getApp().globalData.jumpDay = 0;
     const todayNum = plan.currentDayFromStart(store.get('startDate'));
@@ -51,7 +50,7 @@ Page({
   },
 
   onUnload() {
-    speech.stop();                 // 离开页面停止朗读
+    speech.stop();
     if (this._offSpeech) this._offSpeech();
     this._offSpeech = null;
   },
@@ -70,7 +69,10 @@ Page({
     // dayData 里剔除词汇数组 v，避免与 vocab 重复 setData 两份（传输量翻倍）
     const dayData = raw ? Object.assign({}, raw) : null;
     if (dayData) delete dayData.v;
-    const vocab = (raw && raw.v ? raw.v : []).map(v => Object.assign({}, v, { starred: store.isStarred(v.w) }));
+    const list = (raw && raw.v ? raw.v : []).map(v => Object.assign({}, v, { starred: store.isStarred(v.w) }));
+    const coreCount = dayData ? dayData.coreCount || 0 : 0;
+    // 练习任务按 "1) 2) 3)" 编号拆行（数据源里是一整段，无换行符）
+    const prLines = dayData && dayData.pr ? String(dayData.pr).split(/(?=\d\)\s)/) : [];
     this.setData({
       viewDay: day,
       dayNum: day,
@@ -79,10 +81,20 @@ Page({
       theme: week.theme,
       weekNum: week.w,
       dayData,
-      vocab,
+      prLines,
+      vocab: list,
+      extraStart: coreCount < list.length ? coreCount : -1,
+      coreCount: coreCount,
+      extraCount: list.length - coreCount,
       checked: store.isChecked(info.wIdx + 1, info.k),
     });
     wx.setNavigationBarTitle({ title: 'Day ' + day + ' · ' + plan.DOW[info.k - 1] });
+    // 后台把当天音频预拉进本地缓存（静默，失败不影响播放）
+    if (list.length) {
+      const items = [];
+      list.forEach(v => { items.push({ ai: v.ai, kind: 'w' }); items.push({ ai: v.ai, kind: 's' }); });
+      speech.prefetch(items.slice(0, 40));
+    }
   },
 
   prevDay() { if (this.data.viewDay > 1) { speech.stop(); this.renderDay(this.data.viewDay - 1); } },
@@ -104,22 +116,26 @@ Page({
 
   // ---- 朗读 ----
   onSpeakWord(e) {
-    const text = e.currentTarget.dataset.example || e.currentTarget.dataset.word;
+    const ds = e.currentTarget.dataset;
+    const text = ds.text || ds.example || ds.word;
     if (!text) return;
     if (this.data.playingText === text) {
       const r = speech.togglePause();
       this.setData({ playingText: r === 'paused' ? '' : text });
       return;
     }
-    speech.speak(text);   // 引擎内部会打断整日连读，状态由监听器回传
+    speech.speak(text, { ai: Number(ds.ai) || 0, kind: ds.kind || 's' });
   },
 
   onSpeakAll() {
     if (!this.data.vocab.length) return;
     if (this.data.playingMode === 'queue') { speech.stop(); return; }
-    const texts = [];
-    this.data.vocab.forEach(v => { texts.push(v.w); texts.push(v.e); });
-    speech.speakQueue(texts);
+    const items = [];
+    this.data.vocab.forEach(v => {
+      items.push({ text: v.w, ai: v.ai, kind: 'w' });
+      if (v.e) items.push({ text: v.e, ai: v.ai, kind: 's' });
+    });
+    speech.speakQueue(items);
   },
 
   onStar(e) {

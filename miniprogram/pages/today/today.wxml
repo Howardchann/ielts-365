@@ -41,20 +41,23 @@
 
   <!-- 学习日：词汇 -->
   <view class="card" wx:if="{{dayData.type === 'study'}}">
-    <view class="section-label">核心词汇（{{vocab.length}}）</view>
+    <view class="section-label">本日词汇（{{vocab.length}}）</view>
     <view class="speak-all-row">
       <button class="btn-ghost btn-speak-all {{playingMode === 'queue' ? 'btn-speak-all--active' : ''}}" bindtap="onSpeakAll">
         {{playingMode === 'queue' ? '停止朗读' : '朗读全部'}}
       </button>
     </view>
     <view class="word-row" wx:for="{{vocab}}" wx:key="w">
+      <view class="group-tag" wx:if="{{index === 0 && coreCount > 0}}">主题词 · {{coreCount}}</view>
+      <view class="group-tag group-tag--extra" wx:if="{{index === extraStart}}">扩展词 · {{extraCount}}</view>
       <view class="word-speak {{playingText === item.w ? 'playing' : ''}}"
-            data-word="{{item.w}}" bindtap="onSpeakWord">🔊</view>
+            hover-class="speak-hover" hover-stay-time="120"
+            data-text="{{item.w}}" data-ai="{{item.ai}}" data-kind="w" bindtap="onSpeakWord">🔊</view>
       <view class="word-main">
         <view><text class="word-en">{{item.w}}</text><text class="word-pos">{{item.p}}</text></view>
         <view class="word-zh">{{item.m}}</view>
         <view class="word-example {{playingText === item.e ? 'word-example--playing' : ''}}"
-              data-example="{{item.e}}" bindtap="onSpeakWord">{{item.e}}</view>
+              data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">{{item.e}}</view>
       </view>
       <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" bindtap="onStar">{{item.starred ? '★' : '☆'}}</view>
     </view>
@@ -65,8 +68,11 @@
     <view class="section-label">语法 · {{dayData.g.t}}</view>
     <view class="grammar-exp">{{dayData.g.exp}}</view>
     <view class="grammar-ex" wx:for="{{dayData.g.ex}}" wx:key="*this">
+      <view class="ex-no">{{index + 1}}</view>
       <text class="grammar-ex-text {{playingText === item ? 'word-example--playing' : ''}}">{{item}}</text>
-      <view class="ex-speak" data-example="{{item}}" bindtap="onSpeakWord">🔊</view>
+      <view class="ex-speak {{playingText === item ? 'playing' : ''}}"
+            hover-class="speak-hover" hover-stay-time="120"
+            data-text="{{item}}" data-kind="g" bindtap="onSpeakWord">🔊</view>
     </view>
   </view>
 
@@ -83,7 +89,7 @@
   <!-- 练习任务 -->
   <view class="card" wx:if="{{dayData.pr}}">
     <view class="section-label">{{dayData.type === 'sun' ? '自检任务' : (dayData.type === 'sat' ? '今日可选任务' : '练习任务')}}</view>
-    <view class="practice-text">{{dayData.pr}}</view>
+    <view class="practice-line" wx:for="{{prLines}}" wx:key="*this">{{item}}</view>
   </view>
 
   <!-- 学习提示 -->
