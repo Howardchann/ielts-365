@@ -5,6 +5,8 @@ page {
   font-size: 28rpx;
   line-height: 1.6;
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  /* 预留底部空间：避免最后一张卡片贴住/视觉上重叠 tabBar（含全面屏安全区） */
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
 }
 .card { background:#fff; border-radius:24rpx; padding:28rpx; margin:20rpx 24rpx; box-shadow:0 4rpx 18rpx rgba(23,107,91,.06); }
 .section-label { font-size:26rpx; font-weight:700; color:#176B5B; margin-bottom:14rpx; letter-spacing:1rpx; }
@@ -23,6 +25,9 @@ page {
 .word-row:last-child { border-bottom:none; }
 .word-speak { flex-shrink:0; width:64rpx; height:64rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; display:flex; align-items:center; justify-content:center; font-size:34rpx; margin-right:20rpx; }
 .word-speak.playing { background:#176B5B; color:#fff; }
+/* 按下即时反馈：小程序里 view 的 :active 不可靠，统一用 hover-class="speak-hover" */
+.word-speak.speak-hover { background:#CBE6DC; }
+.word-speak.playing.speak-hover { background:#0E4C41; }
 .word-main { flex:1; min-width:0; }
 .word-en { font-size:32rpx; font-weight:700; color:#24332F; }
 .word-pos { font-size:22rpx; color:#176B5B; font-style:italic; margin-left:10rpx; }
@@ -30,9 +35,16 @@ page {
 .word-example { font-size:25rpx; color:#82908B; margin-top:6rpx; padding-left:4rpx; }
 .word-star { flex-shrink:0; width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center; font-size:34rpx; color:#C7D0CC; }
 .word-star.on { color:#F5C451; }
-.grammar-ex { display:flex; align-items:center; padding:12rpx 0; }
-.grammar-ex-text { flex:1; font-size:27rpx; color:#43504C; }
+/* 语法例句：一句一行，长句自动折行。
+   关键：flex 子项必须 min-width:0 —— 否则它的自动最小宽度按内容算，长句会被撑成一行不折 */
+.grammar-ex { display:flex; align-items:flex-start; padding:14rpx 0; border-bottom:1rpx solid #EEF4F1; }
+.grammar-ex:last-child { border-bottom:none; }
+.grammar-ex-text { flex:1; min-width:0; font-size:27rpx; line-height:1.75; color:#43504C; white-space:normal; word-break:break-word; overflow-wrap:break-word; }
+.ex-no { flex-shrink:0; width:36rpx; height:36rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; font-size:22rpx; font-weight:700; display:flex; align-items:center; justify-content:center; margin:8rpx 14rpx 0 0; }
 .ex-speak { flex-shrink:0; width:52rpx; height:52rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; display:flex; align-items:center; justify-content:center; font-size:26rpx; margin-left:16rpx; }
+.ex-speak.playing { background:#176B5B; color:#fff; }
+.ex-speak.speak-hover { background:#CBE6DC; }
+.ex-speak.playing.speak-hover { background:#0E4C41; }
 .checkin-btn { margin:24rpx 0; }
 .done-state { text-align:center; color:#176B5B; font-size:28rpx; font-weight:700; padding:16rpx 0; }
 

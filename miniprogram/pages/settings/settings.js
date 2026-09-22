@@ -4,23 +4,48 @@ const store=require('../../utils/store.js');
 const speech=require('../../utils/speech.js');
 const ACCENTS=['us','uk'];
 
+// ====================== 「关于」模块文案（想改这块的文字，只改本段即可） ======================
+// ① 卡片标题：设置页里那一小块的标题
+const ABOUT_CARD_LABEL = '关于';
+// ② 卡片里那行文字，版本号会自动拼在后面 → 屏幕显示「关于本计划 v1.0」
+const ABOUT_TITLE = '和好友一起学习雅思，目前暂未发布。';
+// ③ 版本号：以后发新版只改这里
+const ABOUT_VERSION = '版本V1.0';
+// ④ 点击后弹窗的标题
+const ABOUT_MODAL_TITLE = '关于开溜';
+// ⑤ 弹窗正文：\n 表示换行。行首不要留空格，否则手机弹窗里会出现空档
+const ABOUT_TEXT =
+  '零基础雅思 18 个月学习计划：4 个阶段、78 周、546 天、8000 词汇。\n' +
+  '词汇分两组：1125 个主题核心词 + 6875 个词频扩展词，每日新词从 11 个逐步升到 30 个。\n' +
+  '每 2 周系统课程后安排 1 个巩固周，复习前两周词汇并做词根词缀训练，全程共 26 个巩固周。\n' +
+  '语音为预生成高清音频，播过即缓存到本机，之后同一句可离线播放。\n' +
+  '学习进度只保存在本机、不上传。可在「进度备份」里导出保存，换手机时导入恢复。';
+// ========================================================================================
+
 Page({
   data:{startDate:plan.DEFAULT_START,today:'2026-09-21',rate:0.9,rateText:'0.90×',accent:'us',
     accentOptions:[{value:'us',label:'美式发音（默认）'},{value:'uk',label:'英式发音'}],accentIndex:0,
-    totalChecked:0,starredCount:0,reviewCount:0,appVersion:'1.0.0',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音'},
+    engineOptions:[{value:'auto',label:'自动（推荐）：优先预生成，失败切在线'},{value:'pregen',label:'仅预生成高清音频'},{value:'online',label:'仅在线 TTS（有道/百度）'}],engineIndex:0,
+    totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:ABOUT_VERSION,aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音'},
   onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?('朗读中…'+(p.source?'（'+p.source+'）':'')+' 点击停止'):'试听发音'}));},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}},
   onShow(){this.refresh();},
-  refresh(){const rate=store.get('rate')||0.9,accent=store.get('accent')||'us';speech.setRate(rate);speech.setEngine('online');speech.setAccent(accent);
-    this.setData({startDate:store.get('startDate')||plan.DEFAULT_START,rate,rateText:Number(rate).toFixed(2)+'×',accent,accentIndex:Math.max(0,ACCENTS.indexOf(accent)),totalChecked:store.checkedCount(),starredCount:(store.get('starredWords')||[]).length,reviewCount:Object.keys(store.get('reviewStats')||{}).length});},
+  refresh(){const rate=store.get('rate')||0.9,accent=store.get('accent')||'us',engineMode=store.get('engineMode')||'auto';speech.setRate(rate);speech.setEngineMode(engineMode);speech.setAccent(accent);
+    const eng=speech.getEngineInfo(),pre=eng.engine==='pregen';
+    const MODES={auto:['自动（当前云端音频可用，优先预生成）','优先播预生成高清音频（美音），失败自动切在线 TTS。在线音色与预生成不同，属正常现象。'],pregen:['仅预生成高清音频','只用预生成音频（美音），不连网朗读。若某条失败会直接提示，不再切在线。'],online:['仅在线 TTS（有道 / 百度）','全部走在线朗读。音色与预生成不同；口音切换（英/美）只在这个音源下生效。']};
+    const m=MODES[engineMode]||MODES.auto;
+    this.setData({startDate:store.get('startDate')||plan.DEFAULT_START,rate,rateText:Number(rate).toFixed(2)+'×',accent,accentIndex:Math.max(0,ACCENTS.indexOf(accent)),engineIndex:Math.max(0,this.data.engineOptions.findIndex(o=>o.value===engineMode)),totalChecked:store.checkedCount(),totalDays:plan.TOTAL_DAYS,starredCount:(store.get('starredWords')||[]).length,reviewCount:Object.keys(store.get('reviewStats')||{}).length,
+      engineLabel:m[0],
+      engineHint:(pre?'':'⚠️ 云端音频不可用，预生成将自动降级在线。')+m[1]});},
+  onEngineMode(e){const m=this.data.engineOptions[Number(e.detail.value)].value;store.set('engineMode',m);speech.setEngineMode(m);this.refresh();},
   onStartDate(e){store.set('startDate',e.detail.value);this.refresh();wx.showToast({title:'开始日期已更新',icon:'success'});},
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
-  onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}speech.speak('Hello. Nice to meet you. This is your daily learning voice.');},
+  onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
   onAccent(e){const idx=Number(e.detail.value),accent=this.data.accentOptions[idx].value;store.set('accent',accent);speech.setAccent(accent);this.setData({accent,accentIndex:idx});},
   onExport(){let text;try{text=store.exportBackup();}catch(e){wx.showToast({title:'导出失败',icon:'none'});return;}this.setData({backupText:text,showBackup:true,showImport:false,importText:''});wx.setClipboardData({data:text,success:()=>wx.showToast({title:'已复制，请粘贴到备忘录保存',icon:'none',duration:2500}),fail:()=>wx.showToast({title:'复制失败，请长按选中文本手动复制',icon:'none',duration:2500})});},
-  onCopyBackup(){wx.setClipboardData({data:this.data.backupText,success:()=>wx.showToast({title:'已复制',icon:'success'})});},
+  onCopyBackup(){wx.setClipboardData({data:this.data.backupText,success:()=>wx.showToast({title:'已复制',icon:'success'}),fail:()=>wx.showToast({title:'复制失败，请长按上方文本手动复制',icon:'none',duration:2500})});},
   onHideBackup(){this.setData({showBackup:false});},onShowImport(){this.setData({showImport:true,showBackup:false,importText:''});},onHideImport(){this.setData({showImport:false,importText:''});},onImportInput(e){this.setData({importText:e.detail.value});},
   doImport(mode){const text=(this.data.importText||'').trim();if(!text){wx.showToast({title:'请先粘贴备份内容',icon:'none'});return;}let r;try{r=store.importBackup(text,mode);}catch(e){wx.showModal({title:'导入失败',content:e.message||String(e),showCancel:false});return;}this.setData({showImport:false,importText:''});this.refresh();const head=mode==='merge'?'合并完成':'覆盖完成';const detail=mode==='merge'?('新增 '+r.addedDays+' 天打卡、'+r.addedWords+' 个重点词\n合并后共 '+r.totalDays+' 天、'+r.totalWords+' 个重点词\n已恢复 '+r.reviewWords+' 个复习记录'):('已替换为备份中的 '+r.totalDays+' 天打卡、'+r.totalWords+' 个重点词、'+r.reviewWords+' 个复习记录');wx.showModal({title:head,content:detail,showCancel:false});},
   onImportMerge(){this.doImport('merge');},onImportReplace(){this.doImport('replace');},
-  onAbout(){wx.showModal({title:'关于开溜',content:'零基础雅思全年学习计划：4阶段、52周、364天、1300个核心词汇。语音使用在线 TTS；学习进度只保存在本机，可在「进度备份」里导出保存，换机时导入恢复。',showCancel:false});}
+  onAbout(){wx.showModal({title:ABOUT_MODAL_TITLE,content:ABOUT_TEXT,showCancel:false});}
 });
