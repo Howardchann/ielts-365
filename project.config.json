@@ -1,5 +1,6 @@
 {
   "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
   "compileType": "miniprogram",
   "projectname": "ielts-365",
   "appid": "wx5d3d08abc0968ee1",

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
+  "envId": "cloud1-d2gfv3f254c476e40",
+  "functionRoot": "cloudfunctions",
+  "functions": [
+    {
+      "name": "audio-url",
+      "timeout": 10,
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "memorySize": 256,
+      "installDependency": true
+    }
+  ]
+}
