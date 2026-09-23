@@ -10,6 +10,14 @@
       "handler": "index.main",
       "memorySize": 256,
       "installDependency": true
+    },
+    {
+      "name": "sync",
+      "timeout": 20,
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "memorySize": 256,
+      "installDependency": true
     }
   ]
 }

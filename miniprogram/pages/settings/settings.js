@@ -10,7 +10,7 @@ const ABOUT_CARD_LABEL = '关于';
 // ② 卡片里那行文字，版本号会自动拼在后面 → 屏幕显示「关于本计划 v1.0」
 const ABOUT_TITLE = '和好友一起来学雅思';
 // ③ 版本号：以后发新版只改这里
-const ABOUT_VERSION = '版本V1.0';
+const ABOUT_VERSION = '版本V2.0';
 // ④ 点击后弹窗的标题
 const ABOUT_MODAL_TITLE = '关于开溜';
 // ⑤ 弹窗正文：\n 表示换行。行首不要留空格，否则手机弹窗里会出现空档
@@ -19,16 +19,18 @@ const ABOUT_TEXT =
   '词汇分两组：1125 个主题核心词 + 6875 个词频扩展词，每日新词从 11 个逐步升到 30 个。\n' +
   '每 2 周系统课程后安排 1 个巩固周，复习前两周词汇并做词根词缀训练，全程共 26 个巩固周。\n' +
   '语音为预生成高清音频，播过即缓存到本机，之后同一句可离线播放。\n' +
-  '学习进度只保存在本机、不上传。可在「进度备份」里导出保存，换手机时导入恢复。';
+  '学习进度会自动同步到云端：换手机登录同一个微信，进度自动恢复。\n' +
+  '也可以在「进度备份」里导出文本自己存档，需要时导入恢复。';
 // ========================================================================================
 
 Page({
   data:{startDate:plan.DEFAULT_START,today:'2026-09-21',rate:0.9,rateText:'0.90×',accent:'us',
     accentOptions:[{value:'us',label:'美式发音（默认）'},{value:'uk',label:'英式发音'}],accentIndex:0,
     engineOptions:[{value:'auto',label:'自动（推荐）：优先预生成，失败切在线'},{value:'pregen',label:'仅预生成高清音频'},{value:'online',label:'仅在线 TTS（有道/百度）'}],engineIndex:0,
-    totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:ABOUT_VERSION,aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音'},
-  onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?('朗读中…'+(p.source?'（'+p.source+'）':'')+' 点击停止'):'试听发音'}));},
-  onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}},
+    totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:ABOUT_VERSION,aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音',
+    cloudOn:true,cloudMeta:'',cloudErr:'',cloudTip:'',syncing:false},
+  onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?('朗读中…'+(p.source?'（'+p.source+'）':'')+' 点击停止'):'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
+  onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}if(this._offStore){this._offStore();this._offStore=null;}},
   onShow(){this.refresh();},
   refresh(){const rate=store.get('rate')||0.9,accent=store.get('accent')||'us',engineMode=store.get('engineMode')||'auto';speech.setRate(rate);speech.setEngineMode(engineMode);speech.setAccent(accent);
     const eng=speech.getEngineInfo(),pre=eng.engine==='pregen';
@@ -36,7 +38,7 @@ Page({
     const m=MODES[engineMode]||MODES.auto;
     this.setData({startDate:store.get('startDate')||plan.DEFAULT_START,rate,rateText:Number(rate).toFixed(2)+'×',accent,accentIndex:Math.max(0,ACCENTS.indexOf(accent)),engineIndex:Math.max(0,this.data.engineOptions.findIndex(o=>o.value===engineMode)),totalChecked:store.checkedCount(),totalDays:plan.TOTAL_DAYS,starredCount:(store.get('starredWords')||[]).length,reviewCount:Object.keys(store.get('reviewStats')||{}).length,
       engineLabel:m[0],
-      engineHint:(pre?'':'⚠️ 云端音频不可用，预生成将自动降级在线。')+m[1]});},
+      engineHint:(pre?'':'⚠️ 云端音频不可用，预生成将自动降级在线。')+m[1]});this.refreshCloud();},
   onEngineMode(e){const m=this.data.engineOptions[Number(e.detail.value)].value;store.set('engineMode',m);speech.setEngineMode(m);this.refresh();},
   onStartDate(e){store.set('startDate',e.detail.value);this.refresh();wx.showToast({title:'开始日期已更新',icon:'success'});},
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
@@ -47,5 +49,21 @@ Page({
   onHideBackup(){this.setData({showBackup:false});},onShowImport(){this.setData({showImport:true,showBackup:false,importText:''});},onHideImport(){this.setData({showImport:false,importText:''});},onImportInput(e){this.setData({importText:e.detail.value});},
   doImport(mode){const text=(this.data.importText||'').trim();if(!text){wx.showToast({title:'请先粘贴备份内容',icon:'none'});return;}let r;try{r=store.importBackup(text,mode);}catch(e){wx.showModal({title:'导入失败',content:e.message||String(e),showCancel:false});return;}this.setData({showImport:false,importText:''});this.refresh();const head=mode==='merge'?'合并完成':'覆盖完成';const detail=mode==='merge'?('新增 '+r.addedDays+' 天打卡、'+r.addedWords+' 个重点词\n合并后共 '+r.totalDays+' 天、'+r.totalWords+' 个重点词\n已恢复 '+r.reviewWords+' 个复习记录'):('已替换为备份中的 '+r.totalDays+' 天打卡、'+r.totalWords+' 个重点词、'+r.reviewWords+' 个复习记录');wx.showModal({title:head,content:detail,showCancel:false});},
   onImportMerge(){this.doImport('merge');},onImportReplace(){this.doImport('replace');},
+  // 云同步状态：只更新这一小块，避免每次 store 变更都整页 refresh
+  refreshCloud(){
+    const sr=store.cloudStatus();const p=n=>String(n).padStart(2,'0');
+    let meta='';
+    if(!sr.supported) meta='当前微信版本不支持云开发，请升级微信后重试';
+    else if(!sr.enabled) meta='已关闭：进度只保存在本机，不会上传';
+    else if(sr.syncing) meta='正在同步…';
+    else if(!sr.lastSyncAt) meta='尚未同步过';
+    else{const d=new Date(sr.lastSyncAt),today=new Date();const same=d.toDateString()===today.toDateString();
+      meta='上次同步：'+(same?'今天 ':(p(d.getMonth()+1)+'-'+p(d.getDate())+' '))+p(d.getHours())+':'+p(d.getMinutes());}
+    if(sr.enabled&&sr.pending>0) meta+='，待同步 '+sr.pending+' 条复习记录';
+    this.setData({cloudOn:sr.enabled,syncing:!!sr.syncing,cloudMeta:meta,cloudErr:sr.error||'',
+      cloudTip:sr.enabled?'进度自动同步到云端：换手机登录同一个微信即可恢复，多台设备共用同一份进度。':'开启后进度自动同步到云端，多台设备共用同一份进度。'});
+  },
+  onCloudToggle(e){const on=!!e.detail.value;this.setData({cloudOn:on});store.setSyncEnabled(on).then(r=>{this.refreshCloud();wx.showToast({title:(r&&r.ok)?(on?'云同步已开启':'云同步已关闭'):((r&&r.msg)||'操作失败'),icon:on&&r&&r.ok?'success':'none',duration:2200});});},
+  onSyncNow(){if(this.data.syncing)return;this.setData({syncing:true});store.syncNow().then(r=>{this.refreshCloud();wx.showModal({title:r.ok?'同步完成':'同步失败',content:r.ok?('进度已与云端对齐。\n'+(r.msg||'')):((r.msg||'未知错误')+'\n\n本地进度不受影响，可稍后点「立即同步」重试。'),showCancel:false});});},
   onAbout(){wx.showModal({title:ABOUT_MODAL_TITLE,content:ABOUT_TEXT,showCancel:false});}
 });
