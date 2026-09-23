@@ -42,7 +42,9 @@ Page({
     const jump = getApp().globalData.jumpDay || 0;
     getApp().globalData.jumpDay = 0;
     const todayNum = plan.currentDayFromStart(store.get('startDate'));
-    let viewDay = jump || todayNum || 1;
+    // 默认落点 = 第一个未完成的学习日（打卡驱动）：没学/没学完，第二天仍停在这一天；
+    // 全部完成时回退自然日 todayNum。从周表跳转（jump）或手动翻页不受影响。
+    let viewDay = jump || store.firstUnfinishedDay() || todayNum || 1;
     if (viewDay < 1) viewDay = 1;
     if (viewDay > plan.TOTAL_DAYS) viewDay = plan.TOTAL_DAYS;
     this.setData({ todayNum, preStart: todayNum === 0, daysToStart: this._daysToStart() });

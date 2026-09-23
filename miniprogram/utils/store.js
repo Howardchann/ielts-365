@@ -43,6 +43,21 @@ function toggleCheck(w, k) {
   data.updatedAt = Date.now(); saveLocal(); emit(); return !!data.checkedDays[key];
 }
 function checkedCount() { return Object.keys(data.checkedDays || {}).length; }
+
+// 进度游标：第一个「需要打卡且未打卡」的学习日。
+// 没学 / 没学完，第二天打开仍停在这一天 —— 进度由打卡驱动，不由自然日驱动
+// （自然日只作「回到今天 Day N」的参照，见 today 页）。
+// 周六弹性日（type='sat'）没有打卡按钮，跳过；无内容的天也跳过。
+// 返回 0 = 全部完成，由调用方回退自然日。
+function firstUnfinishedDay() {
+  for (let day = 1; day <= plan.TOTAL_DAYS; day++) {
+    const raw = plan.getDay(day);
+    if (!raw || raw.type === 'sat') continue;
+    const info = plan.dayInfo(day);
+    if (!data.checkedDays[checkKey(info.wIdx + 1, info.k)]) return day;
+  }
+  return 0;
+}
 function weekCheckedMap(wIdx) {
   const map = {}; for (let k = 1; k <= 7; k++) map[k] = !!data.checkedDays[checkKey(wIdx + 1, k)]; return map;
 }
@@ -148,4 +163,4 @@ function importBackup(text,mode){
   data.engine='online';data.updatedAt=Date.now();saveLocal();emit();
   return {addedDays,addedWords,totalDays:Object.keys(data.checkedDays||{}).length,totalWords:(data.starredWords||[]).length,reviewWords:Object.keys(data.reviewStats||{}).length};
 }
-module.exports={init,onResume,onChange,get,set,isChecked,toggleCheck,checkedCount,weekCheckedCount,weekCheckedMap,isStarred,toggleStar,reviewWord,getReviewStats,dueWords,exportBackup,importBackup};
+module.exports={init,onResume,onChange,get,set,isChecked,toggleCheck,checkedCount,firstUnfinishedDay,weekCheckedCount,weekCheckedMap,isStarred,toggleStar,reviewWord,getReviewStats,dueWords,exportBackup,importBackup};

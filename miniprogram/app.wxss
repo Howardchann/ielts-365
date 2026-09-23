@@ -33,6 +33,10 @@ page {
 .word-pos { font-size:22rpx; color:#176B5B; font-style:italic; margin-left:10rpx; }
 .word-zh { font-size:26rpx; color:#5F6D68; margin-top:4rpx; }
 .word-example { font-size:25rpx; color:#82908B; margin-top:6rpx; padding-left:4rpx; }
+/* 例句行：文本占满 + 右侧播放按钮（与语法区 ex-speak 同款，让人一眼看出可以播） */
+.word-example-row { display:flex; align-items:flex-start; }
+.word-example-row .word-example { flex:1; min-width:0; }
+.word-example-row .ex-speak { margin-top:2rpx; }
 .word-star { flex-shrink:0; width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center; font-size:34rpx; color:#C7D0CC; }
 .word-star.on { color:#F5C451; }
 /* 语法例句：一句一行，长句自动折行。

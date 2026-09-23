@@ -56,8 +56,13 @@
       <view class="word-main">
         <view><text class="word-en">{{item.w}}</text><text class="word-pos">{{item.p}}</text></view>
         <view class="word-zh">{{item.m}}</view>
-        <view class="word-example {{playingText === item.e ? 'word-example--playing' : ''}}"
-              data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">{{item.e}}</view>
+        <view class="word-example-row">
+          <view class="word-example {{playingText === item.e ? 'word-example--playing' : ''}}"
+                data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">{{item.e}}</view>
+          <view class="ex-speak {{playingText === item.e ? 'playing' : ''}}"
+                hover-class="speak-hover" hover-stay-time="120"
+                data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">🔊</view>
+        </view>
       </view>
       <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" bindtap="onStar">{{item.starred ? '★' : '☆'}}</view>
     </view>

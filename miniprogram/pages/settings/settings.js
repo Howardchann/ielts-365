@@ -8,7 +8,7 @@ const ACCENTS=['us','uk'];
 // ① 卡片标题：设置页里那一小块的标题
 const ABOUT_CARD_LABEL = '关于';
 // ② 卡片里那行文字，版本号会自动拼在后面 → 屏幕显示「关于本计划 v1.0」
-const ABOUT_TITLE = '和好友一起学习雅思，目前暂未发布。';
+const ABOUT_TITLE = '和好友一起来学雅思';
 // ③ 版本号：以后发新版只改这里
 const ABOUT_VERSION = '版本V1.0';
 // ④ 点击后弹窗的标题
