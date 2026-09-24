@@ -9,7 +9,9 @@ const ACCENTS=['us','uk'];
 const ABOUT_CARD_LABEL = '关于';
 // ② 卡片里那行文字，版本号会自动拼在后面 → 屏幕显示「关于本计划 v1.0」
 const ABOUT_TITLE = '和好友一起来学雅思';
-// ③ 版本号：以后发新版只改这里
+// ③ 版本号：以后发新版只改这里。
+//    屏幕实际显示 = 本行 + 环境 + 构建标识，如「版本V2.0 · 开发版 · 8dad358 · 09-24 17:40」
+//    构建标识由 tools/stamp-build.js 生成（上传 / 预览前跑一次），用来确认手机上跑的是哪次提交
 const ABOUT_VERSION = '版本V2.0';
 // ④ 点击后弹窗的标题
 const ABOUT_MODAL_TITLE = '关于开溜';
@@ -23,11 +25,43 @@ const ABOUT_TEXT =
   '也可以在「进度备份」里导出文本自己存档，需要时导入恢复。';
 // ========================================================================================
 
+// ---------- 构建标识（为什么需要：小程序运行时无法调用 git，"跑的是哪一版"只能在上传前固化） ----------
+// 缺文件也要能跑（比如刚 clone 还没跑 stamp-build.js）→ 降级为只显示 ABOUT_VERSION
+let BUILD = null;
+try { BUILD = require('../../utils/build-info.js'); } catch (e) { BUILD = null; }
+
+// 当前运行环境：开发版（含「预览」扫码）/ 体验版 / 正式版
+function envLabel() {
+  try {
+    const info = wx.getAccountInfoSync && wx.getAccountInfoSync();
+    const v = info && info.miniProgram && info.miniProgram.envVersion;
+    if (v === 'release') return '正式版';
+    if (v === 'trial') return '体验版';
+    if (v === 'develop') return '开发版';
+  } catch (e) {}
+  return '';
+}
+
+function buildLabel() {
+  const p = n => String(n).padStart(2, '0');
+  const parts = [ABOUT_VERSION];
+  const env = envLabel(); if (env) parts.push(env);
+  if (BUILD && BUILD.sha) {
+    parts.push(BUILD.sha + (BUILD.dirty ? '*' : ''));
+  }
+  const t = Number(BUILD && BUILD.builtAt) || 0;
+  if (t) {
+    const d = new Date(t);
+    parts.push(p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()));
+  }
+  return parts.join(' · ');
+}
+
 Page({
   data:{startDate:plan.DEFAULT_START,today:'2026-09-21',rate:0.9,rateText:'0.90×',accent:'us',
     accentOptions:[{value:'us',label:'美式发音（默认）'},{value:'uk',label:'英式发音'}],accentIndex:0,
     engineOptions:[{value:'auto',label:'自动（推荐）：优先预生成，失败切在线'},{value:'pregen',label:'仅预生成高清音频'},{value:'online',label:'仅在线 TTS（有道/百度）'}],engineIndex:0,
-    totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:ABOUT_VERSION,aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音',
+    totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:buildLabel(),aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音',
     cloudOn:true,cloudMeta:'',cloudErr:'',cloudTip:'',syncing:false},
   onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?('朗读中…'+(p.source?'（'+p.source+'）':'')+' 点击停止'):'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}if(this._offStore){this._offStore();this._offStore=null;}},
