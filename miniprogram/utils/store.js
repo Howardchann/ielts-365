@@ -233,7 +233,7 @@ function buildPayload() {
   sent.forEach(w => { const s = data.reviewStats[w]; if (s) { reviewDirty[w] = s; sentVersions[w] = Number(s.lastReviewedAt) || 0; } });
   return {
     sentWords: sent,
-    sentVersions:
+    sentVersions: sentVersions,
     payload: {
       action: 'merge',
       core: {
@@ -253,6 +253,14 @@ function buildPayload() {
 // ⚠️ 这里不直接覆盖本地，而是再合并一次（用同一套时间戳规则）：
 //    同步请求来回有几百毫秒，期间用户可能刚好点了打卡，直接覆盖会把这个操作吞掉。
 function applyMerged(r, sentWords, sentVersions) {
+  // 记录请求飞行期间本地是否又产生了更新；后面的云端回包不能覆盖这些新操作。
+  const inFlightLocal = {};
+  (sentWords || []).forEach(w => {
+    const sentAt = Number(sentVersions && sentVersions[w]) || 0;
+    const current = data.reviewStats && data.reviewStats[w];
+    const currentAt = Number(current && current.lastReviewedAt) || 0;
+    if (current && currentAt > sentAt) inFlightLocal[w] = current;
+  });
   const c = r.core || {};
 
   const dm = mergeFlagMaps(data.checkedDays, data.uncheckedDays, c.checkedDays, c.uncheckedDays);
@@ -285,6 +293,12 @@ function applyMerged(r, sentWords, sentVersions) {
   // lastReviewedAt 已经变化，必须保留 dirty，让下一轮继续同步，不能把新操作误删。
   (sentWords || []).forEach(w => {
     const sentAt = Number(sentVersions && sentVersions[w]) || 0;
+    if (inFlightLocal[w]) {
+      // 请求期间的新版本必须恢复到本地，并保留 dirty，下一轮继续推云。
+      data.reviewStats[w] = inFlightLocal[w];
+      data.reviewDirty[w] = 1;
+      return;
+    }
     const current = data.reviewStats && data.reviewStats[w];
     const currentAt = Number(current && current.lastReviewedAt) || 0;
     if (currentAt === sentAt) delete data.reviewDirty[w];
