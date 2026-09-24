@@ -272,7 +272,16 @@ function dump(id) { const c = DB.progress; return c ? c.get(id) : undefined; }
   const cntAfter = [...DB.progress.values()].filter(d => d.kind === 'rs').reduce((n, d) => n + Object.keys(d.stats || {}).length, 0);
   ok(cntBefore === cntAfter, '云端记录数未变（' + cntAfter + '）');
   ok(d2.store.getReviewStats('zzzoffline').correct === 1, '本地仍然记住了（关同步不影响本机）');
-  d2.store.setSyncEnabled(true); await sleep(30);
+
+  // 【A7】把开关重新打开 → 内部会直接 syncNow()，关闭期间攒下的 dirty 必须一次补齐
+  d2.store.setSyncEnabled(true); await sleep(50);
+  const cloudStats = {};
+  [...DB.progress.values()].filter(d => d.kind === 'rs').forEach(d => Object.assign(cloudStats, d.stats || {}));
+  ok(cloudStats['zzzoffline'] && cloudStats['zzzoffline'].correct === 1,
+    '重新打开开关后自动补齐：关闭期间攒下的复习记录已上云', cloudStats['zzzoffline']);
+  const offAll = [...DB.progress.values()].filter(d => d.kind === 'rs').reduce((n, d) => n + Object.keys(d.stats || {}).length, 0);
+  ok(offAll === cntBefore + 1, '云端记录数已由 ' + cntBefore + ' 变为 ' + offAll);
+  ok(d2.store.cloudStatus().pending === 0, '补齐后待推队列清空', d2.store.cloudStatus());
 
   console.log('\n【13】在途（in-flight）竞态：请求飞行期间的复习不能被回包吞掉');
   use(d1); await sleep(5);
