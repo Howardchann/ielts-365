@@ -229,9 +229,11 @@ function buildPayload() {
   const all = Object.keys(data.reviewDirty || {});
   const sent = all.slice(0, MAX_DIRTY_PER_SYNC);
   const reviewDirty = {};
-  sent.forEach(w => { const s = data.reviewStats[w]; if (s) reviewDirty[w] = s; });
+  const sentVersions = {};
+  sent.forEach(w => { const s = data.reviewStats[w]; if (s) { reviewDirty[w] = s; sentVersions[w] = Number(s.lastReviewedAt) || 0; } });
   return {
     sentWords: sent,
+    sentVersions:
     payload: {
       action: 'merge',
       core: {
@@ -250,7 +252,7 @@ function buildPayload() {
 // 把云端结果合进本地。
 // ⚠️ 这里不直接覆盖本地，而是再合并一次（用同一套时间戳规则）：
 //    同步请求来回有几百毫秒，期间用户可能刚好点了打卡，直接覆盖会把这个操作吞掉。
-function applyMerged(r, sentWords) {
+function applyMerged(r, sentWords, sentVersions) {
   const c = r.core || {};
 
   const dm = mergeFlagMaps(data.checkedDays, data.uncheckedDays, c.checkedDays, c.uncheckedDays);
@@ -279,7 +281,14 @@ function applyMerged(r, sentWords) {
     });
   }
 
-  (sentWords || []).forEach(w => { delete data.reviewDirty[w]; });
+  // 只清理“发出时的那一版”。如果请求飞行期间用户又复习了同一个词，
+  // lastReviewedAt 已经变化，必须保留 dirty，让下一轮继续同步，不能把新操作误删。
+  (sentWords || []).forEach(w => {
+    const sentAt = Number(sentVersions && sentVersions[w]) || 0;
+    const current = data.reviewStats && data.reviewStats[w];
+    const currentAt = Number(current && current.lastReviewedAt) || 0;
+    if (currentAt === sentAt) delete data.reviewDirty[w];
+  });
   data.reviewRev = Number(r.reviewRev) || 0;
   data.lastSyncAt = Date.now();
   data.updatedAt = data.lastSyncAt;
@@ -333,7 +342,7 @@ function sync(force) {
     wx.cloud.callFunction({ name: SYNC_FN, data: built.payload }).then(res => {
       const r = (res && res.result) || {};
       if (!r.ok) throw new Error(r.error || '云端返回失败');
-      applyMerged(r, built.sentWords);
+      applyMerged(r, built.sentWords, built.sentVersions);
       syncError = ''; lastFailAt = 0;
       resolve({ ok: true, msg: '已同步' });
     }).catch(err => {
