@@ -106,6 +106,15 @@ function cleanWordTs(raw, limit) {
   return out;
 }
 
+function sameReviewEntry(a, b) {
+  if (!a || !b) return false;
+  return Number(a.correct) === Number(b.correct) &&
+    Number(a.wrong) === Number(b.wrong) &&
+    Number(a.level) === Number(b.level) &&
+    Number(a.nextReviewAt) === Number(b.nextReviewAt) &&
+    Number(a.lastReviewedAt) === Number(b.lastReviewedAt);
+}
+
 function cleanEntry(s) {
   if (!s || typeof s !== 'object') return null;
   return {
@@ -309,7 +318,12 @@ exports.main = async (event) => {
     const inc = dirty[w];
     const merged = (!old || (inc.lastReviewedAt || 0) >= (old.lastReviewedAt || 0)) ? inc : cleanEntry(old);
     if (!merged) return;
+
+    // 只有服务端最终值真的发生变化，才进入 patch / 写库 / reviewRev +1。
+    // 旧设备重复上传同一快照、或上传比云端更旧的记录，都不应制造“虚假的新版本”。
+    const changed = !old || !sameReviewEntry(merged, old);
     cur[w] = merged;                 // 同步更新内存快照，needFull 时才能把本次合并结果一起回给客户端
+    if (!changed) return;
     if (!patchByShard[i]) patchByShard[i] = {};
     patchByShard[i][w] = merged;
     reviewPatch[w] = merged;
