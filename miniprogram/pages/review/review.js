@@ -28,6 +28,7 @@ Page({
   },
 
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: 2 });
     store.onResume();
     this._pool = null;
     this.refreshPool();

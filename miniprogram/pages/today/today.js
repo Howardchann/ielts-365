@@ -38,6 +38,7 @@ Page({
   },
 
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: 0 });
     store.onResume();
     const jump = getApp().globalData.jumpDay || 0;
     getApp().globalData.jumpDay = 0;

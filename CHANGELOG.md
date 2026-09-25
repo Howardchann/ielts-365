@@ -12,6 +12,14 @@
 
 ## 2026-09-25 · tabBar 改版落库 + 新增备份导入导出测试清单
 
+> 🔧 **当日补修（用户真机截图发现）**：自定义 tabBar **选中态不跟随页面**（人在「设置」页、底栏高亮「复习」）。
+> 根因：`custom-tab-bar/index.js` 靠 `pageLifetimes.show()` 自动同步——**该生命周期对 tabBar 组件不生效**
+> （组件不在页面组件树内），而全部 4 个 tab 页都**没有**调用 `getTabBar()`。修复：按微信官方模式，
+> 在 `today / weeks / review / settings` 四页 `onShow()` 首行各加一句
+> `if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: N })`
+> （N = 0/1/2/3，共 4 文件 +4/−1）。验证：语法通过；**高亮是否正确需模拟器/真机编译后目视确认（未验证）**。
+> ⚠️ 教训：给小程序加 `custom: true` 的 tabBar，**必须**在四个页面里手动同步选中态，组件内部自作聪明无效。
+
 **tabBar（另一 AI 经 GitHub 网页提交，`c08624d..d589139`，共 6 个提交）**：
 
 - 改动全部集中在 `miniprogram/custom-tab-bar/`（新增自定义 tabbar 组件 js/json/wxml/wxss，+127 行）+ `app.json` / `app.wxss` 微调；**未触及** store.js、云函数、备份逻辑、build-info

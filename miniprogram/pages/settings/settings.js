@@ -65,7 +65,7 @@ Page({
     cloudOn:true,cloudMeta:'',cloudErr:'',cloudTip:'',syncing:false},
   onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?('朗读中…'+(p.source?'（'+p.source+'）':'')+' 点击停止'):'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}if(this._offStore){this._offStore();this._offStore=null;}},
-  onShow(){this.refresh();},
+  onShow(){if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: 3 });this.refresh();},
   refresh(){const rate=store.get('rate')||0.9,accent=store.get('accent')||'us',engineMode=store.get('engineMode')||'auto';speech.setRate(rate);speech.setEngineMode(engineMode);speech.setAccent(accent);
     const eng=speech.getEngineInfo(),pre=eng.engine==='pregen';
     const MODES={auto:['自动（当前云端音频可用，优先预生成）','优先播预生成高清音频（美音），失败自动切在线 TTS。在线音色与预生成不同，属正常现象。'],pregen:['仅预生成高清音频','只用预生成音频（美音），不连网朗读。若某条失败会直接提示，不再切在线。'],online:['仅在线 TTS（有道 / 百度）','全部走在线朗读。音色与预生成不同；口音切换（英/美）只在这个音源下生效。']};
