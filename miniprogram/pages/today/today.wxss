@@ -17,3 +17,24 @@
   color: #185fa5;
   background: #e6f1fb;
 }
+
+/* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */
+@media (min-width: 700px) {
+  .nav-btn { font-size: 13px; padding: 7px 9px; }
+  .day-num { font-size: 22px; }
+  .day-dow { font-size: 12px; margin-top: 2px; }
+  .phase-line { font-size: 13px; margin-top: 6px; }
+  .is-today { font-size: 12px; margin-top: 5px; padding: 4px; }
+  .obj-text { font-size: 14px; margin-top: 3px; }
+  .time-text { font-size: 12px; margin-top: 4px; }
+  .btn-cancel { font-size: 12px; margin-top: 6px; padding: 3px; }
+  .btn-speak-all { font-size: 13px; padding: 1px 15px; }
+  .grammar-exp { font-size: 13px; padding: 10px 11px; }
+  .practice-text { font-size: 13px; }
+  .practice-line { font-size: 13px; margin-top: 4px; }
+  .prestart-card { padding: 30px 15px; }
+  .prestart-title { font-size: 20px; }
+  .prestart-sub { font-size: 14px; margin-top: 7px; }
+  .prestart-days { font-size: 30px; margin: 15px 0; }
+  .group-tag { font-size: 11px; border-radius: 4px; padding: 2px 7px; margin: 8px 0 3px; }
+}

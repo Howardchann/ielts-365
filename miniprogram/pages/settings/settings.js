@@ -74,7 +74,7 @@ Page({
       engineLabel:m[0],
       engineHint:(pre?'':'⚠️ 云端音频不可用，预生成将自动降级在线。')+m[1]});this.refreshCloud();},
   onEngineMode(e){const m=this.data.engineOptions[Number(e.detail.value)].value;store.set('engineMode',m);speech.setEngineMode(m);this.refresh();},
-  onStartDate(e){store.set('startDate',e.detail.value);this.refresh();wx.showToast({title:'开始日期已更新',icon:'success'});},
+  onStartDate(e){const v=e.detail.value,d=new Date(v+'T00:00:00'),off=(d.getDay()+6)%7;if(off)d.setDate(d.getDate()-off);const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()));this.refresh();wx.showToast({title:off?('已对齐到周一 '+ms):'开始日期已更新',icon:'none'});},
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
   onAccent(e){const idx=Number(e.detail.value),accent=this.data.accentOptions[idx].value;store.set('accent',accent);speech.setAccent(accent);this.setData({accent,accentIndex:idx});},

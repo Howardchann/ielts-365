@@ -60,3 +60,17 @@
   color: #176B5B;
   font-weight: 700;
 }
+
+/* iPad / 宽屏覆盖（纯追加，手机端不受影响），尺寸 = rpx × 0.5 */
+@media (min-width: 700px) {
+  .tabbar {
+    height: calc(56px + env(safe-area-inset-bottom));
+    padding: 4px 9px env(safe-area-inset-bottom);
+    border-top-width: 1px;
+  }
+  .tab-item { height: 48px; }
+  .tab-item-inner { width: 66px; height: 41px; border-radius: 11px; }
+  .tab-icon { width: 23px; height: 23px; margin-bottom: 1px; }
+  .tab-item.is-active .tab-icon { width: 24px; height: 24px; }
+  .tab-text { font-size: 11px; line-height: 15px; }
+}

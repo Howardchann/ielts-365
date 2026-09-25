@@ -1,3 +1,22 @@
 /* 开溜 · 周总览页（含阶段折叠所需样式） */
 .stat-card{padding:30rpx 20rpx}.stat-row{display:flex;justify-content:space-around}.stat-item{text-align:center}.stat-num{font-size:44rpx;font-weight:800;color:#176B5B}.stat-label{font-size:22rpx;color:#8B9893;margin-top:4rpx}.phase-title{display:flex;align-items:center;justify-content:space-between;font-size:30rpx;font-weight:800;color:#24332F;margin:30rpx 30rpx 6rpx;padding:0 16rpx;border-left:8rpx solid #FF8A78}.phase-toggle{font-size:24rpx;font-weight:400;color:#176B5B;flex-shrink:0}.week-card{padding:22rpx 26rpx;margin:14rpx 24rpx}.week-card--current{border:2rpx solid #9ED8C5;background:#F8FCF9}.week-line{display:flex;align-items:center}.week-badge{width:64rpx;height:64rpx;border-radius:50%;background:#EEF2F0;color:#8B9893;display:flex;align-items:center;justify-content:center;font-size:28rpx;font-weight:800;flex-shrink:0}.week-badge--past{background:#E6F4EE;color:#176B5B}.week-badge--current{background:#176B5B;color:#fff}.week-info{flex:1;min-width:0;margin:0 20rpx}.week-theme{font-size:28rpx;font-weight:700;color:#24332F}.week-progress{display:flex;align-items:center;margin-top:10rpx}.progress-bar{flex:1;height:10rpx;border-radius:5rpx;background:#E9F0EC;overflow:hidden}.progress-fill{height:100%;background:#176B5B}.progress-text{font-size:20rpx;color:#8B9893;margin-left:12rpx}.week-tag{font-size:20rpx;color:#fff;background:#FF8A78;border-radius:8rpx;padding:4rpx 12rpx}.week-days{display:flex;margin-top:18rpx;gap:10rpx}.day-chip{flex:1;text-align:center;font-size:22rpx;color:#8B9893;background:#F3F8EF;border-radius:8rpx;padding:8rpx 0}.day-chip--done{background:#E6F4EE;color:#176B5B;font-weight:700}
 .week-words{font-size:22rpx;color:#8B9893;margin-top:4rpx}
+
+/* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */
+@media (min-width: 700px) {
+  .stat-card { padding: 15px 10px; }
+  .stat-num { font-size: 22px; }
+  .stat-label { font-size: 11px; margin-top: 2px; }
+  .phase-title { max-width: 640px; margin: 15px auto 3px; font-size: 15px; padding: 0 8px; box-sizing: border-box; }
+  .phase-toggle { font-size: 12px; }
+  .week-card { margin: 7px auto; padding: 11px 13px; max-width: 640px; box-sizing: border-box; }
+  .week-badge { width: 32px; height: 32px; font-size: 14px; }
+  .week-info { margin: 0 10px; }
+  .week-theme { font-size: 14px; }
+  .week-words { font-size: 11px; margin-top: 2px; }
+  .progress-bar { height: 5px; border-radius: 3px; }
+  .progress-text { font-size: 10px; margin-left: 6px; }
+  .week-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; }
+  .week-days { margin-top: 9px; gap: 5px; }
+  .day-chip { font-size: 11px; border-radius: 4px; padding: 4px 0; }
+}

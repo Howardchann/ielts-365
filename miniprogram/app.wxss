@@ -59,3 +59,38 @@ page {
 .icon-star--on{color:#F5C451;}
 .icon-remove{font-size:28rpx;color:#A6B2AD;}
 .icon-speaker{font-size:28rpx;}
+
+/* ── iPad / 宽屏适配（纯追加，不影响手机端）──
+   rpx 按「窗口宽度/750」换算，iPad Pro 窗口宽 1000px+ 时所有尺寸被放大约 3 倍。
+   ≥700px 时改用固定 px 并把内容限宽居中，字号取手机端 ×0.5rpx 值。 */
+@media (min-width: 700px) {
+  page { font-size: 15px; padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
+  .card { max-width: 640px; margin: 12px auto; border-radius: 12px; padding: 14px; box-sizing: border-box; }
+  .section-label { font-size: 14px; margin-bottom: 7px; }
+  .btn-primary { border-radius: 22px; font-size: 15px; }
+  .btn-ghost { border-width: 1px; border-radius: 22px; font-size: 15px; }
+  .tip-box { border-left-width: 3px; border-radius: 7px; padding: 10px 12px; margin-top: 10px; }
+  .tip-text { font-size: 13px; }
+  .muted { font-size: 12px; }
+  .brand-head { max-width: 640px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 10px 14px 2px; }
+  .brand-logo { width: 38px; height: 38px; }
+  .brand-copy { margin-left: 8px; }
+  .brand-name { font-size: 18px; }
+  .brand-sub { font-size: 11px; margin-top: 3px; }
+  .word-row { padding: 9px 0; }
+  .word-speak { width: 32px; height: 32px; font-size: 17px; margin-right: 10px; }
+  .word-en { font-size: 16px; }
+  .word-pos { font-size: 11px; margin-left: 5px; }
+  .word-zh { font-size: 13px; margin-top: 2px; }
+  .word-example { font-size: 13px; margin-top: 3px; padding-left: 2px; }
+  .word-star { width: 28px; height: 28px; font-size: 17px; }
+  .grammar-ex { padding: 7px 0; }
+  .grammar-ex-text { font-size: 14px; }
+  .ex-no { width: 18px; height: 18px; font-size: 11px; margin: 4px 7px 0 0; }
+  .ex-speak { width: 26px; height: 26px; font-size: 13px; margin-left: 8px; }
+  .checkin-btn { margin: 12px 0; }
+  .done-state { font-size: 14px; padding: 8px 0; }
+  .icon-button { width: 32px; height: 32px; border-radius: 9px; font-size: 15px; }
+  .icon-star { font-size: 17px; }
+  .icon-remove, .icon-speaker { font-size: 14px; }
+}
