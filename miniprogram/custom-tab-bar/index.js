@@ -2,8 +2,8 @@ Component({
   data: {
     active: 0,
     list: [
-      { pagePath: 'pages/today/today', text: '今日', iconPath: '/images/today.png', selectedIconPath: '/images/today-active.png' },
-      { pagePath: 'pages/weeks/weeks', text: '周计划', iconPath: '/images/weeks.png', selectedIconPath: '/images/weeks-active.png' },
+      { pagePath: 'pages/today/today', text: '今日', iconPath: '/images/weeks.png', selectedIconPath: '/images/weeks-active.png' },
+      { pagePath: 'pages/weeks/weeks', text: '周计划', iconPath: '/images/today.png', selectedIconPath: '/images/today-active.png' },
       { pagePath: 'pages/review/review', text: '复习', iconPath: '/images/review.png', selectedIconPath: '/images/review-active.png' },
       { pagePath: 'pages/settings/settings', text: '设置', iconPath: '/images/settings.png', selectedIconPath: '/images/settings-active.png' }
     ]

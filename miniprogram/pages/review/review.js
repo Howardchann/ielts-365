@@ -71,7 +71,8 @@ Page({
     const c = this.data.current;
     if (!c) return;
     store.reviewWord(c.w, remembered);
-    wx.showToast({ title: remembered ? '记得，下一次会更晚复习' : '记不牢，稍后再来', icon: 'none' });
+    // 长文字 toast 在快速连按时反复弹出，像整个模块在闪 —— 改短文案+短时长
+    wx.showToast({ title: remembered ? '已记住' : '稍后再来', icon: 'none', duration: 800 });
     this.setData({ current: null, showZh: false });
     if (this.data.tab === 'due') this.onNextDue();
   },

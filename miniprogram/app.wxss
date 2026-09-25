@@ -68,7 +68,7 @@ page {
 .hover-dim{opacity:.55;transform:scale(.96)}
 .btn-press{transform:scale(.96)}
 .btn-primary.btn-press{background:#0E4C41}
-.btn-ghost.btn-press{background:#EAF5F0}
+.btn-ghost.btn-press{background:#DCEFE7}
 .btn-ghost.btn-voice-on.btn-press{background:#0E4C41;color:#fff}
 /* 歌词式朗读进度：已读部分品牌绿，未读保持原色（kara-lit 放在词首 text 上） */
 .kara-lit{color:#176B5B}
