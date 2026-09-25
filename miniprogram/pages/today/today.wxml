@@ -52,7 +52,7 @@
       <view class="group-tag group-tag--extra" wx:if="{{index === extraStart}}">扩展词 · {{extraCount}}</view>
       <view class="word-speak {{playingText === item.w ? 'playing' : ''}}"
             hover-class="speak-hover" hover-stay-time="120"
-            data-text="{{item.w}}" data-ai="{{item.ai}}" data-kind="w" bindtap="onSpeakWord">🔊</view>
+            data-text="{{item.w}}" data-ai="{{item.ai}}" data-kind="w" bindtap="onSpeakWord"><view class="spk-ico {{playingText === item.w ? 'spk-ico--on' : ''}}"></view></view>
       <view class="word-main">
         <view><text class="word-en"><text wx:if="{{playingText === item.w}}" class="kara-lit">{{karaLit}}</text>{{playingText === item.w ? karaRest : item.w}}</text><text class="word-pos">{{item.p}}</text></view>
         <view class="word-zh">{{item.m}}</view>
@@ -61,7 +61,7 @@
                 data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord"><text wx:if="{{playingText === item.e}}" class="kara-lit">{{karaLit}}</text>{{playingText === item.e ? karaRest : item.e}}</view>
           <view class="ex-speak {{playingText === item.e ? 'playing' : ''}}"
                 hover-class="speak-hover" hover-stay-time="120"
-                data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">🔊</view>
+                data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord"><view class="spk-ico {{playingText === item.e ? 'spk-ico--on' : ''}}"></view></view>
         </view>
       </view>
       <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onStar"><view class="star-ico {{item.starred ? 'star-ico--on' : 'star-ico--off'}}"></view></view>
@@ -77,19 +77,12 @@
       <text class="grammar-ex-text"><text wx:if="{{playingText === item}}" class="kara-lit">{{karaLit}}</text>{{playingText === item ? karaRest : item}}</text>
       <view class="ex-speak {{playingText === item ? 'playing' : ''}}"
             hover-class="speak-hover" hover-stay-time="120"
-            data-text="{{item}}" data-kind="g" bindtap="onSpeakWord">🔊</view>
+            data-text="{{item}}" data-kind="g" bindtap="onSpeakWord"><view class="spk-ico {{playingText === item ? 'spk-ico--on' : ''}}"></view></view>
     </view>
   </view>
 
-  <!-- 周日：自检 / 周六：弹性日 -->
-  <view class="card" wx:if="{{dayData.type === 'sun'}}">
-    <view class="section-label">周日自检</view>
-    <view class="obj-text">{{dayData.obj}}</view>
-  </view>
-  <view class="card" wx:if="{{dayData.type === 'sat'}}">
-    <view class="section-label">周六弹性日</view>
-    <view class="obj-text">{{dayData.obj}}</view>
-  </view>
+  <!-- 周六/周日不再单独渲染卡片：标题与目标卡已显示 dayData.t + obj，
+       旧版这里再渲染一次「周六弹性日/周日自检 + 同一段 obj」，造成整段文字重复 -->
 
   <!-- 练习任务 -->
   <view class="card" wx:if="{{dayData.pr}}">

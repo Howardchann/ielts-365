@@ -70,6 +70,11 @@ page {
 .btn-primary.btn-press{background:#0E4C41}
 .btn-ghost.btn-press{background:#DCEFE7}
 .btn-ghost.btn-voice-on.btn-press{background:#0E4C41;color:#fff}
+/* 播放喇叭：SVG 贴图。🔊 emoji 字形基线/光学中心不稳，在圆形按钮内总不居中；
+   改矢量喇叭，尺寸用 em 跟随容器字号（word-speak 34rpx→约30rpx，ex-speak 26rpx→约23rpx） */
+.spk-ico{display:block;width:.88em;height:.88em;background:center/contain no-repeat;background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%23176B5B'/%3E%3C/svg%3E");}
+.spk-ico--on{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%23FFFFFF'/%3E%3C/svg%3E");}
+
 /* 歌词式朗读进度：已读部分品牌绿，未读保持原色（kara-lit 放在词首 text 上） */
 .kara-lit{color:#176B5B}
 
