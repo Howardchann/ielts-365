@@ -58,7 +58,7 @@ function buildLabel() {
 }
 
 Page({
-  data:{startDate:plan.DEFAULT_START,today:'2026-09-21',rate:0.9,rateText:'0.90×',accent:'us',
+  data:{startDate:plan.DEFAULT_START,today:'',rate:0.9,rateText:'0.90×',accent:'us',
     accentOptions:[{value:'us',label:'美式发音（默认）'},{value:'uk',label:'英式发音'}],accentIndex:0,
     engineOptions:[{value:'auto',label:'自动（推荐）：优先预生成，失败切在线'},{value:'pregen',label:'仅预生成高清音频'},{value:'online',label:'仅在线 TTS（有道/百度）'}],engineIndex:0,
     totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:buildLabel(),aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音',

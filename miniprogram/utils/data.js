@@ -27,7 +27,16 @@ const WEEKS = [].concat(p1, p2, p3, p4, p5, p6);
 const TOTAL_DAYS = 546;
 const PHASE_NAMES = ['', '阶段一：基础起步', '阶段二：稳步成长', '阶段三：能力强化', '阶段四：雅思冲刺'];
 const DOW = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-const DEFAULT_START = '2026-09-21';
+// 默认开始日期：动态取「下一个周一」（今天恰为周一则取今天）。
+// 上线后新用户进「准备期」，从最近的整周开始；老用户已存有 startDate，不受影响。
+// （历史默认值 2026-09-21 为开发者私有计划日，已废弃，见 CHANGELOG 09-25）
+const DEFAULT_START = (() => {
+  const n = new Date();
+  const d = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  d.setDate(d.getDate() + ((8 - d.getDay()) % 7)); // getDay(): 周日=0 → 距下周一 (8-getDay())%7 天
+  const p = x => ('0' + x).slice(-2);
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+})();
 
 // 每周每日新词数（双坡道：新课周 14→30，巩固周 11→25，总量 8000）
 const RAMP = [
