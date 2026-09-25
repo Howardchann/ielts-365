@@ -5,6 +5,10 @@
 .btn-ghost.btn-voice-on{background:#176B5B;color:#fff;border-color:#176B5B}
 .btn-reset{display:block;width:100%;margin-top:16rpx;color:#C0392B;border-color:#E8B4AE}
 
+/* picker 行改为「值 + 右侧箭头」图标指引（替代「点击修改/点击切换」文字） */
+.picker-value{display:flex;align-items:center;justify-content:space-between}
+.picker-arrow{width:14rpx;height:14rpx;border-right:4rpx solid #7B8A84;border-bottom:4rpx solid #7B8A84;transform:rotate(-45deg);margin-left:12rpx;flex-shrink:0}
+
 /* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */
 @media (min-width: 700px) {
   .stat-line { font-size: 15px; margin-bottom: 4px; }
@@ -19,4 +23,5 @@
   .about-btn { font-size: 14px; padding: 4px 0; }
   .backup-box { margin-top: 8px; border-radius: 6px; }
   .backup-text { height: 110px; padding: 8px; font-size: 11px; }
+  .picker-arrow { width: 7px; height: 7px; border-width: 2px; margin-left: 6px; }
 }

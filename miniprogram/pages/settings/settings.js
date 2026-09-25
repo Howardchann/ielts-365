@@ -22,7 +22,7 @@ const ABOUT_TEXT =
   '每 2 周系统课程后安排 1 个巩固周，复习前两周词汇并做词根词缀训练，全程共 26 个巩固周。\n' +
   '语音为预生成高清音频，播过即缓存到本机，之后同一句可离线播放。\n' +
   '学习进度会自动同步到云端：换手机登录同一个微信，进度自动恢复。\n' +
-  '也可以在「进度备份」里导出文本自己存档，需要时导入恢复。';
+  '也可以在「备份与重置」里导出文本自己存档，需要时导入恢复。';
 // ========================================================================================
 
 // ---------- 构建标识（为什么需要：小程序运行时无法调用 git，"跑的是哪一版"只能在上传前固化） ----------
@@ -68,7 +68,7 @@ Page({
   onShow(){if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: 3 });this.refresh();},
   refresh(){const rate=store.get('rate')||0.9,accent=store.get('accent')||'us',engineMode=store.get('engineMode')||'auto';speech.setRate(rate);speech.setEngineMode(engineMode);speech.setAccent(accent);
     const eng=speech.getEngineInfo(),pre=eng.engine==='pregen';
-    const MODES={auto:['自动（当前云端音频可用，优先预生成）','优先播预生成高清音频（美音），失败自动切在线 TTS。在线音色与预生成不同，属正常现象。'],pregen:['仅预生成高清音频','只用预生成音频（美音），不连网朗读。若某条失败会直接提示，不再切在线。'],online:['仅在线 TTS（有道 / 百度）','全部走在线朗读。音色与预生成不同；口音切换（英/美）只在这个音源下生效。']};
+    const MODES={auto:['自动（当前云端音频可用，优先预生成）','优先预生成高清音频（美音），失败自动切在线。'],pregen:['仅预生成高清音频','只用预生成音频（美音），失败不切在线。'],online:['仅在线 TTS（有道 / 百度）','全部在线朗读，口音切换只在此音源生效。']};
     const m=MODES[engineMode]||MODES.auto;
     this.setData({startDate:store.get('startDate')||plan.DEFAULT_START,rate,rateText:Number(rate).toFixed(2)+'×',accent,accentIndex:Math.max(0,ACCENTS.indexOf(accent)),engineIndex:Math.max(0,this.data.engineOptions.findIndex(o=>o.value===engineMode)),totalChecked:store.checkedCount(),totalDays:plan.TOTAL_DAYS,starredCount:(store.get('starredWords')||[]).length,reviewCount:store.activeReviewCount(),
       engineLabel:m[0],
@@ -78,10 +78,11 @@ Page({
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
   onAccent(e){const idx=Number(e.detail.value),accent=this.data.accentOptions[idx].value;store.set('accent',accent);speech.setAccent(accent);this.setData({accent,accentIndex:idx});},
-  onExport(){let text;try{text=store.exportBackup();}catch(e){wx.showToast({title:'导出失败',icon:'none'});return;}this.setData({backupText:text,showBackup:true,showImport:false,importText:''});wx.setClipboardData({data:text,success:()=>wx.showToast({title:'已复制，请粘贴到备忘录保存',icon:'none',duration:2500}),fail:()=>wx.showToast({title:'复制失败，请长按选中文本手动复制',icon:'none',duration:2500})});},
+  backupSummaryOf(text){try{const o=JSON.parse(text);return (o&&typeof o.summary==='string')?o.summary:'';}catch(e){return '';}},
+  onExport(){let text;try{text=store.exportBackup();}catch(e){wx.showToast({title:'导出失败',icon:'none'});return;}const s=this.backupSummaryOf(text);this.setData({backupText:text,showBackup:true,showImport:false,importText:''});wx.setClipboardData({data:text,success:()=>wx.showModal({title:'备份已导出',content:(s?s+'\n\n':'')+'全文已复制到剪贴板，粘贴到备忘录等处保存即可。',showCancel:false}),fail:()=>wx.showToast({title:'复制失败，请长按选中文本手动复制',icon:'none',duration:2500})});},
   onCopyBackup(){wx.setClipboardData({data:this.data.backupText,success:()=>wx.showToast({title:'已复制',icon:'success'}),fail:()=>wx.showToast({title:'复制失败，请长按上方文本手动复制',icon:'none',duration:2500})});},
   onHideBackup(){this.setData({showBackup:false});},onShowImport(){this.setData({showImport:true,showBackup:false,importText:''});},onHideImport(){this.setData({showImport:false,importText:''});},onImportInput(e){this.setData({importText:e.detail.value});},
-  doImport(mode){const text=(this.data.importText||'').trim();if(!text){wx.showToast({title:'请先粘贴备份内容',icon:'none'});return;}let r;try{r=store.importBackup(text,mode);}catch(e){wx.showModal({title:'导入失败',content:e.message||String(e),showCancel:false});return;}this.setData({showImport:false,importText:''});this.refresh();const head=mode==='merge'?'合并完成':'覆盖完成';const detail=mode==='merge'?('新增 '+r.addedDays+' 天打卡、'+r.addedWords+' 个重点词\n合并后共 '+r.totalDays+' 天、'+r.totalWords+' 个重点词\n已恢复 '+r.reviewWords+' 个复习记录'):('已替换为备份中的 '+r.totalDays+' 天打卡、'+r.totalWords+' 个重点词、'+r.reviewWords+' 个复习记录');wx.showModal({title:head,content:detail,showCancel:false});},
+  doImport(mode){const text=(this.data.importText||'').trim();if(!text){wx.showToast({title:'请先粘贴备份内容',icon:'none'});return;}let r;try{r=store.importBackup(text,mode);}catch(e){wx.showModal({title:'导入失败',content:e.message||String(e),showCancel:false});return;}this.setData({showImport:false,importText:''});this.refresh();const bs=this.backupSummaryOf(text);const head=mode==='merge'?'合并完成':'覆盖完成';const detail=(bs?('该备份：'+bs+'\n\n'):'')+(mode==='merge'?('新增 '+r.addedDays+' 天打卡、'+r.addedWords+' 个重点词\n合并后共 '+r.totalDays+' 天、'+r.totalWords+' 个重点词\n已恢复 '+r.reviewWords+' 个复习记录'):('已替换为备份中的 '+r.totalDays+' 天打卡、'+r.totalWords+' 个重点词、'+r.reviewWords+' 个复习记录'));wx.showModal({title:head,content:detail,showCancel:false});},
   onImportMerge(){this.doImport('merge');},onImportReplace(){this.doImport('replace');},
   onResetProgress(){wx.showModal({title:'清除学习记录',content:'将清空全部打卡、收藏与复习记录，云端一并清除，其他设备同步后同样清空，无法撤销。建议先「导出备份」。确定从0开始吗？',confirmText:'清除',confirmColor:'#C0392B',success:(r)=>{if(!r.confirm)return;store.resetProgress();this.refresh();wx.showToast({title:'已清除，重新开始',icon:'none',duration:2500});}});},
   // 云同步状态：只更新这一小块，避免每次 store 变更都整页 refresh
@@ -96,7 +97,7 @@ Page({
       meta='上次同步：'+(same?'今天 ':(p(d.getMonth()+1)+'-'+p(d.getDate())+' '))+p(d.getHours())+':'+p(d.getMinutes());}
     if(sr.enabled&&sr.pending>0) meta+='，待同步 '+sr.pending+' 条复习记录';
     this.setData({cloudOn:sr.enabled,syncing:!!sr.syncing,cloudMeta:meta,cloudErr:sr.error||'',
-      cloudTip:sr.enabled?'进度自动同步到云端：换手机登录同一个微信即可恢复，多台设备共用同一份进度。':'开启后进度自动同步到云端，多台设备共用同一份进度。'});
+      cloudTip:sr.enabled?'进度自动同步，多台设备共用同一份进度。':'开启后进度自动同步，多台设备共用同一份进度。'});
   },
   onCloudToggle(e){const on=!!e.detail.value;this.setData({cloudOn:on});store.setSyncEnabled(on).then(r=>{this.refreshCloud();wx.showToast({title:(r&&r.ok)?(on?'云同步已开启':'云同步已关闭'):((r&&r.msg)||'操作失败'),icon:on&&r&&r.ok?'success':'none',duration:2200});});},
   onSyncNow(){if(this.data.syncing)return;this.setData({syncing:true});store.syncNow().then(r=>{this.refreshCloud();wx.showModal({title:r.ok?'同步完成':'同步失败',content:r.ok?('进度已与云端对齐。\n'+(r.msg||'')):((r.msg||'未知错误')+'\n\n本地进度不受影响，可稍后点「立即同步」重试。'),showCancel:false});});},
