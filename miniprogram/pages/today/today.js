@@ -121,7 +121,8 @@ Page({
     const info = plan.dayInfo(this.data.viewDay);
     const now = store.toggleCheck(info.wIdx + 1, info.k);
     this.setData({ checked: now });
-    if (now) wx.showToast({ title: '打卡成功', icon: 'success', duration: 1200 });
+    // 弹窗统一：全项目反馈一律小黑条（icon:'none'）——大白框(success)遮挡且与"已移除/已记住"风格割裂
+    if (now) wx.showToast({ title: '打卡成功', icon: 'none', duration: 900 });
   },
 
   // ---- 朗读 ----

@@ -33,9 +33,8 @@
   box-sizing: border-box;
 }
 
-.tab-item.is-active .tab-item-inner {
-  background: #E6F4EE;
-}
+/* 选中态不再铺浅绿底：图标已分「灰/绿」双色（普通灰 #8B9893 / 选中绿 #176B5B），
+   再叠色块反而三层强调显重。若想恢复，加回 .tab-item.is-active .tab-item-inner{background:#E6F4EE} */
 
 .tab-icon {
   width: 46rpx;
