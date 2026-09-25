@@ -409,8 +409,26 @@ function cloudStatus() {
 // 云端同步之外的第二道保险：导出成一段 JSON 文本，用户自己存到备忘录 / 文件。
 
 function exportBackup() {
+  // 顶部人读摘要：导出时放在 JSON 首个字段，粘贴到备忘录后一眼能看到"这是什么时候、学到哪"的快照。
+  // 导入端 sanitize() 不认识 summary 字段会自动忽略，新旧备份互相兼容。
+  const now = Date.now();
+  const cn = d => d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+  const nd = new Date(now);
+  let maxDay = 0;
+  Object.keys(data.checkedDays || {}).forEach(k => {
+    const m = /^w(\d{1,2})d([1-7])$/.exec(k);
+    if (m) maxDay = Math.max(maxDay, (Number(m[1]) - 1) * 7 + Number(m[2]));
+  });
+  const sd = new Date((data.startDate || plan.DEFAULT_START) + 'T00:00:00');
+  sd.setDate(sd.getDate() + Math.max(0, maxDay - 1));
+  const learnText = maxDay > 0
+    ? '已完成 ' + checkedCount() + '/' + plan.TOTAL_DAYS + ' 天（学至 ' + cn(sd) + '）'
+    : '尚未开始学习';
+  const summary = '导出于 ' + cn(nd) + ' · ' + learnText +
+    ' · 收藏 ' + (data.starredWords || []).length + ' 词 · 复习记录 ' + activeReviewCount() + ' 词';
   return JSON.stringify({
-    app: BACKUP_TAG, v: BACKUP_VERSION, exportedAt: Date.now(),
+    summary: summary,
+    app: BACKUP_TAG, v: BACKUP_VERSION, exportedAt: now,
     data: {
       startDate: data.startDate, checkedDays: data.checkedDays || {},
       uncheckedDays: data.uncheckedDays || {}, starredWords: data.starredWords || [],

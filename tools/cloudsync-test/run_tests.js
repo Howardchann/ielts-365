@@ -396,6 +396,18 @@ function dump(id) { const c = DB.progress; return c ? c.get(id) : undefined; }
   use(d2); await sleep(5); await d2.store.syncNow(); await sleep(10);
   ok(d1.store.isChecked(1, 1) && d2.store.isChecked(1, 1), '重置后重新打卡，两台设备都正常生效');
 
+  console.log('\n【16】导出备份带人读摘要，且摘要字段不影响导入');
+  use(d1); await sleep(5);
+  const bk = JSON.parse(d1.store.exportBackup());
+  ok(typeof bk.summary === 'string' && bk.summary.indexOf('导出于') === 0,
+    '导出文本顶部含摘要', bk.summary);
+  ok(/已完成 1\/546 天（学至 \d{4}年\d{1,2}月\d{1,2}日）/.test(bk.summary),
+    '摘要含"已完成 N/546 天（学至 日期）"量化信息', bk.summary);
+  ok(/复习记录 \d+ 词/.test(bk.summary) && /收藏 \d+ 词/.test(bk.summary),
+    '摘要含收藏/复习计数', bk.summary);
+  const rBk = d2.store.importBackup(d1.store.exportBackup(), 'merge');
+  ok(rBk && typeof rBk.totalDays === 'number', '带 summary 字段的备份可正常导入', rBk);
+
   console.log('\n============================');
   console.log('通过 ' + pass + ' 项，失败 ' + fail + ' 项');
   console.log('============================\n');
