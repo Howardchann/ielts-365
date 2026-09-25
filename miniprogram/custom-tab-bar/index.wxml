@@ -1,0 +1,17 @@
+<cover-view class="tabbar">
+  <cover-view
+    wx:for="{{list}}"
+    wx:key="pagePath"
+    class="tab-item {{index === active ? 'is-active' : ''}}"
+    data-index="{{index}}"
+    bindtap="onTap"
+  >
+    <cover-view class="tab-item-inner">
+      <cover-image
+        class="tab-icon"
+        src="{{index === active ? item.selectedIconPath : item.iconPath}}"
+      />
+      <cover-view class="tab-text">{{item.text}}</cover-view>
+    </cover-view>
+  </cover-view>
+</cover-view>
