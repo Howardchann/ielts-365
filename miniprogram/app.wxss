@@ -37,8 +37,10 @@ page {
 .word-example-row { display:flex; align-items:flex-start; }
 .word-example-row .word-example { flex:1; min-width:0; }
 .word-example-row .ex-speak { margin-top:2rpx; }
-.word-star { flex-shrink:0; width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center; font-size:34rpx; color:#C7D0CC; }
-.word-star.on { color:#F5C451; }
+.word-star { flex-shrink:0; width:64rpx; height:64rpx; display:flex; align-items:center; justify-content:center; font-size:40rpx; color:#C7D0CC; transition:color .2s ease; }
+.word-star.on { color:#FF8A78; animation:star-pop .35s ease; }
+/* 收藏弹跳：空心→实心时 1→1.35→1 回弹（网易云式），取消收藏不播 */
+@keyframes star-pop { 0%{transform:scale(1)} 40%{transform:scale(1.35)} 100%{transform:scale(1)} }
 /* 语法例句：一句一行，长句自动折行。
    关键：flex 子项必须 min-width:0 —— 否则它的自动最小宽度按内容算，长句会被撑成一行不折 */
 .grammar-ex { display:flex; align-items:flex-start; padding:14rpx 0; border-bottom:1rpx solid #EEF4F1; }
@@ -83,7 +85,7 @@ page {
   .word-pos { font-size: 11px; margin-left: 5px; }
   .word-zh { font-size: 13px; margin-top: 2px; }
   .word-example { font-size: 13px; margin-top: 3px; padding-left: 2px; }
-  .word-star { width: 28px; height: 28px; font-size: 17px; }
+  .word-star { width: 32px; height: 32px; font-size: 20px; }
   .grammar-ex { padding: 7px 0; }
   .grammar-ex-text { font-size: 14px; }
   .ex-no { width: 18px; height: 18px; font-size: 11px; margin: 4px 7px 0 0; }

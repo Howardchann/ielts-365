@@ -5,7 +5,7 @@
   <view class="prestart-sub">计划开始日前，可先熟悉操作</view>
   <view class="prestart-days">还有 {{daysToStart}} 天正式开学</view>
   <view class="tip-box">
-    <view class="tip-text">可以提前浏览 Day 1 的内容，先熟悉操作：点小喇叭听发音，点 ☆ 收藏重点词。</view>
+    <view class="tip-text">可以提前浏览 Day 1 的内容，先熟悉操作：点小喇叭听发音，点 ♡ 收藏重点词。</view>
   </view>
   <button class="btn-primary" bindtap="backToToday" style="margin-top:24rpx;">先看看 Day 1</button>
 </view>
@@ -14,12 +14,12 @@
   <!-- 日期导航 -->
   <view class="card day-head">
     <view class="day-nav">
-      <view class="nav-btn" bindtap="prevDay">‹ 前一天</view>
+      <view class="nav-btn" hover-class="nav-btn--press" hover-stay-time="120" bindtap="prevDay">‹ 前一天</view>
       <view class="day-title">
         <view class="day-num">Day {{dayNum}}</view>
         <view class="day-dow">{{dowText}} · 第{{weekNum}}周</view>
       </view>
-      <view class="nav-btn" bindtap="nextDay">后一天 ›</view>
+      <view class="nav-btn" hover-class="nav-btn--press" hover-stay-time="120" bindtap="nextDay">后一天 ›</view>
     </view>
     <view class="phase-line">{{phaseName}} · {{theme}}</view>
     <view class="is-today" wx:if="{{dayNum !== todayNum && todayNum > 0}}" bindtap="backToToday">回到今天（Day {{todayNum}}）</view>
@@ -64,7 +64,7 @@
                 data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">🔊</view>
         </view>
       </view>
-      <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" bindtap="onStar">{{item.starred ? '★' : '☆'}}</view>
+      <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" bindtap="onStar">{{item.starred ? '♥' : '♡'}}</view>
     </view>
   </view>
 
