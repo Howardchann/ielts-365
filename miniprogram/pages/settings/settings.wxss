@@ -7,7 +7,7 @@
 
 /* picker 行改为「值 + 右侧箭头」图标指引（替代「点击修改/点击切换」文字） */
 .picker-value{display:flex;align-items:center;justify-content:space-between}
-.picker-arrow{width:14rpx;height:14rpx;border-right:4rpx solid #7B8A84;border-bottom:4rpx solid #7B8A84;transform:rotate(-45deg);margin-left:12rpx;flex-shrink:0}
+.picker-value--press{background:#CBE6DC}.picker-arrow{width:14rpx;height:14rpx;border-right:4rpx solid #7B8A84;border-bottom:4rpx solid #7B8A84;transform:rotate(-45deg);margin-left:12rpx;flex-shrink:0}
 
 /* 学习进度三列统计（替代一行长文字，大字体下不再折行） */
 .stat-row{display:flex;justify-content:space-around}

@@ -17,7 +17,7 @@
 </view>
 
 <view class="phase-block" wx:for="{{phases}}" wx:key="p" wx:for-item="phase">
-  <view class="phase-title" data-p="{{phase.p}}" bindtap="onPhaseTap">
+  <view class="phase-title" data-p="{{phase.p}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onPhaseTap">
     <text>{{phase.name}}</text>
     <text class="phase-arrow {{openPhase === phase.p ? 'phase-arrow--open' : ''}}"></text>
   </view>
@@ -25,25 +25,19 @@
   <block wx:if="{{openPhase === phase.p}}">
     <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}}"
           wx:for="{{phase.weeks}}" wx:key="w" wx:for-item="week"
-          data-w="{{week.w}}" bindtap="onWeekTap">
+          data-w="{{week.w}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onWeekTap">
       <view class="week-line">
-        <view class="week-badge {{week.isPast ? 'week-badge--past' : (week.isCurrent ? 'week-badge--current' : '')}}">{{week.w}}</view>
+        <view class="week-ring" style="background: conic-gradient(#176B5B {{week.checked / 7 * 100}}%, #E9F0EC 0)"><view class="week-ring-num {{week.isCurrent ? 'week-ring-num--current' : (week.isPast ? 'week-ring-num--past' : '')}}">{{week.w}}</view></view>
         <view class="week-info">
           <view class="week-theme">{{week.theme}}</view>
           <view class="week-words">每日 {{week.perDay}} 词 · 本周 {{week.weekTotal}} 词</view>
-          <view class="week-progress">
-            <view class="progress-bar">
-              <view class="progress-fill" style="width: {{week.checked / 7 * 100}}%;"></view>
-            </view>
-            <text class="progress-text">{{week.checked}}/7</text>
-          </view>
         </view>
         <view class="week-tag" wx:if="{{week.isCurrent}}">本周</view>
       </view>
       <view class="week-days">
         <view class="day-chip {{item.done ? 'day-chip--done' : ''}}"
               wx:for="{{week.days}}" wx:key="k"
-              data-w="{{week.w}}" data-k="{{item.k}}" catchtap="onDayTap">{{item.k}}</view>
+              data-w="{{week.w}}" data-k="{{item.k}}" hover-class="hover-dim" hover-stay-time="120" catchtap="onDayTap">{{item.k}}</view>
       </view>
     </view>
   </block>

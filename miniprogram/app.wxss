@@ -62,6 +62,10 @@ page {
 .icon-remove{font-size:28rpx;color:#A6B2AD;}
 .icon-speaker{font-size:28rpx;}
 
+/* 全局按压反馈（hover-class 挂这些类）：文字/图标类用变暗，原生按钮用 btn-press */
+.hover-dim{opacity:.65}
+.btn-press{opacity:.75}
+
 /* ── iPad / 宽屏适配（纯追加，不影响手机端）──
    rpx 按「窗口宽度/750」换算，iPad Pro 窗口宽 1000px+ 时所有尺寸被放大约 3 倍。
    ≥700px 时改用固定 px 并把内容限宽居中，字号取手机端 ×0.5rpx 值。 */
