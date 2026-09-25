@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "复习巩固"
+  "navigationBarTitleText": "复习巩固",
+  "usingComponents": { "feedback": "/components/feedback/feedback" }
 }

@@ -1,0 +1,91 @@
+/* feedback 组件：轻提示 + 白卡弹窗 */
+/* 轻提示悬于自定义 tabBar 上方：tabbar 是原生层，层级高于 webview 内 fixed 元素，位置须避开 */
+.fb-toast {
+  position:fixed;
+  bottom:calc(150rpx + env(safe-area-inset-bottom));
+  left:50%;
+  transform:translateX(-50%);
+  z-index:9999;
+  background:var(--card, #fff);
+  color:var(--ink, #24332F);
+  font-size:26rpx;
+  border-radius:18rpx;
+  padding:18rpx 28rpx;
+  display:flex;
+  align-items:center;
+  gap:12rpx;
+  box-shadow:0 8rpx 32rpx rgba(23, 107, 91, 0.16);
+  max-width:80vw;
+}
+.fb-toast-ico {
+  flex-shrink:0;
+  width:34rpx;
+  height:34rpx;
+  border-radius:50%;
+  background:#2E8B72;
+  color:#fff;
+  font-size:22rpx;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.fb-toast-msg { line-height:1.5; }
+
+.fb-mask {
+  position:fixed;
+  inset:0;
+  z-index:9998;
+  background:rgba(0, 0, 0, 0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.fb-card {
+  background:var(--card, #fff);
+  border-radius:28rpx;
+  width:640rpx;
+  max-width:86vw;
+  max-height:72vh;
+  padding:40rpx 36rpx 28rpx;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+}
+.fb-title {
+  font-size:32rpx;
+  font-weight:700;
+  color:var(--ink, #24332F);
+  text-align:center;
+  margin-bottom:20rpx;
+}
+.fb-content {
+  font-size:28rpx;
+  color:var(--ink3, #53605B);
+  line-height:1.85;
+  white-space:pre-line;
+  overflow-y:auto;
+  margin-bottom:32rpx;
+}
+.fb-btns { display:flex; gap:20rpx; margin-top:4rpx; }
+.fb-btn {
+  flex:1;
+  text-align:center;
+  font-size:29rpx;
+  font-weight:700;
+  border-radius:44rpx;
+  padding:16rpx 0;
+  transition:transform 0.08s;
+}
+.fb-btn--press { transform:scale(0.96); }
+.fb-btn--cancel { background:var(--soft2, #F0F4F2); color:var(--ink3, #53605B); font-weight:400; }
+.fb-btn--confirm { background:var(--soft, #F0F7F3); color:var(--green, #176B5B); }
+.fb-btn--danger { background:var(--red-soft, #FDECEA); color:var(--red, #C0392B); }
+
+@media (min-width:700px) {
+  .fb-toast { font-size:13px; border-radius:9px; padding:9px 14px; bottom:calc(75px + env(safe-area-inset-bottom)); }
+  .fb-toast-ico { width:17px; height:17px; font-size:11px; }
+  .fb-card { border-radius:14px; width:420px; padding:20px 18px 14px; }
+  .fb-title { font-size:16px; margin-bottom:10px; }
+  .fb-content { font-size:14px; margin-bottom:16px; }
+  .fb-btn { font-size:14px; border-radius:22px; padding:8px 0; }
+}

@@ -1,6 +1,7 @@
 // pages/today/today.js —— 今日学习计划
 const plan = require('../../utils/data.js');
 const store = require('../../utils/store.js');
+const theme = require('../../utils/theme.js');
 const speech = require('../../utils/speech.js');
 
 Page({
@@ -26,6 +27,8 @@ Page({
   },
 
   onLoad() {
+    // 主题在首帧前应用：onLoad 里的 setData 会并入首次渲染，避免「先浅后深」闪屏
+    theme.applyPage(this); theme.syncTabBar(this);
     const ok = speech.initPlugin();
     speech.setRate(store.get('rate'));
     speech.setAccent(store.get('accent') || 'us');
@@ -44,18 +47,28 @@ Page({
     this.setData({ pluginOk: ok });
   },
 
+  applyTheme() { theme.applyPage(this); theme.syncTabBar(this); },
   onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: 0 });
+    theme.syncTabBar(this, 0);
+    this.applyTheme();
     store.onResume();
     const jump = getApp().globalData.jumpDay || 0;
     getApp().globalData.jumpDay = 0;
     const todayNum = plan.currentDayFromStart(store.get('startDate'));
+    // 切 tab 返回（无 jump 且页面未销毁）：保持离开时的浏览位置与准备期预览态，仅刷新打卡/同步数据。
+    // 重新冷启动小程序才回到默认落点（第一个未完成日 / 准备期卡片）。
+    if (!jump && this.data.viewDay) {
+      // 同值守卫：todayNum/daysToStart 多数时候没变，裸 setData 会整树重渲染（切 tab 闪屏）
+      theme.sameSet(this, { todayNum, daysToStart: this._daysToStart() });
+      this.renderDay(this.data.viewDay);
+      return;
+    }
     // 默认落点 = 第一个未完成的学习日（打卡驱动）：没学/没学完，第二天仍停在这一天；
     // 全部完成时回退自然日 todayNum。从周表跳转（jump）或手动翻页不受影响。
     let viewDay = jump || store.firstUnfinishedDay() || todayNum || 1;
     if (viewDay < 1) viewDay = 1;
     if (viewDay > plan.TOTAL_DAYS) viewDay = plan.TOTAL_DAYS;
-    this.setData({ todayNum, preStart: todayNum === 0, daysToStart: this._daysToStart() });
+    theme.sameSet(this, { todayNum, preStart: todayNum === 0 && !jump, daysToStart: this._daysToStart() });
     this.renderDay(viewDay);
   },
 
@@ -82,7 +95,15 @@ Page({
     const list = (raw && raw.v ? raw.v : []).map(v => Object.assign({}, v, { starred: store.isStarred(v.w) }));
     const coreCount = dayData ? dayData.coreCount || 0 : 0;
     // 练习任务按 "1) 2) 3)" 编号拆行（数据源里是一整段，无换行符）
-    const prLines = dayData && dayData.pr ? String(dayData.pr).split(/(?=\d\)\s)/) : [];
+    const prLines = dayData && dayData.pr ? String(dayData.pr).split(/(?=\d\)\s)/).map(s => { const m = s.match(/^(\d+)\)\s*/); return { no: m ? m[1] : '', text: m ? s.slice(m[0].length) : s }; }) : [];
+    // 同日同状态（打卡/收藏位未变）直接跳过整页 setData：
+    // 微信 setData 不做深度 diff，同值也会整树重渲染 —— 这就是切 tab 回页「闪一下像重新渲染」的根源
+    const sig = [day, store.isChecked(info.wIdx + 1, info.k) ? 1 : 0, list.map(v => v.starred ? 1 : 0).join('')].join('|');
+    if (sig === this._daySig) {
+      wx.setNavigationBarTitle({ title: 'Day ' + day + ' · ' + plan.DOW[info.k - 1] });
+      return;
+    }
+    this._daySig = sig;
     this.setData({
       viewDay: day,
       dayNum: day,
@@ -114,15 +135,19 @@ Page({
   backToToday() {
     const t = this.data.todayNum || 1;
     speech.stop();
+    // 准备期（preStart）点「先看看 Day 1」：必须退出准备期卡片，否则 renderDay 渲染了也被 wx:if 盖住
+    this.setData({ preStart: false });
     this.renderDay(t);
   },
+
+  fb() { return this.selectComponent('#fb'); },
 
   onCheckin() {
     const info = plan.dayInfo(this.data.viewDay);
     const now = store.toggleCheck(info.wIdx + 1, info.k);
     this.setData({ checked: now });
-    // 弹窗统一：全项目反馈一律小黑条（icon:'none'）——大白框(success)遮挡且与"已移除/已记住"风格割裂
-    if (now) wx.showToast({ title: '打卡成功', icon: 'none', duration: 900 });
+    // 反馈统一走 feedback 组件白卡轻提示（原生黑块已废除）
+    if (now) this.fb().toast('打卡成功', 900);
   },
 
   // ---- 朗读 ----

@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "今日计划"
+  "navigationBarTitleText": "今日计划",
+  "usingComponents": { "feedback": "/components/feedback/feedback" }
 }

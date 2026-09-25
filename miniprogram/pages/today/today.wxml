@@ -1,3 +1,5 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="page-root {{dark ? 'theme-dark' : ''}}">
 <!-- 今日学习计划 -->
 <!-- 准备期：计划尚未开始 -->
 <view class="card prestart-card" wx:if="{{preStart}}">
@@ -7,7 +9,7 @@
   <view class="tip-box">
     <view class="tip-text">可以提前浏览 Day 1 的内容，先熟悉操作：点小喇叭听发音，点 ♡ 收藏重点词。</view>
   </view>
-  <button class="btn-primary" hover-class="btn-press" bindtap="backToToday" style="margin-top:24rpx;">先看看 Day 1</button>
+  <button class="btn-primary btn-fit" hover-class="btn-press" bindtap="backToToday" style="margin-top:24rpx;">先看看 Day 1</button>
 </view>
 
 <block wx:else>
@@ -33,9 +35,9 @@
 
     <!-- 打卡 -->
     <view class="checkin-btn" wx:if="{{dayData.type !== 'sat'}}">
-      <button class="btn-primary btn-fit" wx:if="{{!checked}}" hover-class="btn-press" hover-stay-time="0" bindtap="onCheckin">完成打卡 ✓</button>
-      <view class="done-state" wx:else>今日已完成 ✓</view>
-      <button class="btn-ghost btn-cancel btn-fit" wx:if="{{checked}}" hover-class="btn-press" hover-stay-time="0" bindtap="onCheckin">取消打卡</button>
+      <button class="btn-primary btn-fit" wx:if="{{!checked}}" hover-class="btn-press" hover-stay-time="0" bindtap="onCheckin">完成打卡<view class="ico ico-check" style="margin-left:6rpx;margin-right:0"></view></button>
+      <view class="done-state" wx:else>今日已完成<view class="ico ico-check" style="margin-left:8rpx;margin-right:0"></view></view>
+      <button class="btn-ghost btn-cancel btn-fit" wx:if="{{checked}}" hover-class="btn-press" hover-stay-time="0" bindtap="onCheckin"><view class="ico ico-undo"></view>取消打卡</button>
     </view>
   </view>
 
@@ -43,13 +45,12 @@
   <view class="card" wx:if="{{dayData.type === 'study'}}">
     <view class="section-label">本日词汇（{{vocab.length}}）</view>
     <view class="speak-all-row">
-      <button class="btn-ghost btn-speak-all {{playingMode === 'queue' ? 'btn-speak-all--active' : ''}}" hover-class="btn-press" bindtap="onSpeakAll">
-        {{playingMode === 'queue' ? '停止朗读' : '朗读全部'}}
-      </button>
+      <button class="btn-ghost btn-speak-all {{playingMode === 'queue' ? 'btn-speak-all--active' : ''}}" hover-class="btn-press" bindtap="onSpeakAll"><view class="ico {{playingMode === 'queue' ? 'ico-stop' : 'ico-play'}}"></view>{{playingMode === 'queue' ? '停止朗读' : '朗读全部'}}</button>
     </view>
-    <view class="word-row" wx:for="{{vocab}}" wx:key="w">
+    <block wx:for="{{vocab}}" wx:key="w">
       <view class="group-tag" wx:if="{{index === 0 && coreCount > 0}}">主题词 · {{coreCount}}</view>
       <view class="group-tag group-tag--extra" wx:if="{{index === extraStart}}">扩展词 · {{extraCount}}</view>
+      <view class="word-row">
       <view class="word-speak {{playingText === item.w ? 'playing' : ''}}"
             hover-class="speak-hover" hover-stay-time="120"
             data-text="{{item.w}}" data-ai="{{item.ai}}" data-kind="w" bindtap="onSpeakWord"><view class="spk-ico {{playingText === item.w ? 'spk-ico--on' : ''}}"></view></view>
@@ -65,7 +66,8 @@
         </view>
       </view>
       <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onStar"><view class="star-ico {{item.starred ? 'star-ico--on' : 'star-ico--off'}}"></view></view>
-    </view>
+      </view>
+    </block>
   </view>
 
   <!-- 学习日：语法 -->
@@ -73,7 +75,7 @@
     <view class="section-label">语法 · {{dayData.g.t}}</view>
     <view class="grammar-exp">{{dayData.g.exp}}</view>
     <view class="grammar-ex" wx:for="{{dayData.g.ex}}" wx:key="*this">
-      <view class="ex-no">{{index + 1}}</view>
+      <view class="ex-no">{{index + 1}}.</view>
       <text class="grammar-ex-text"><text wx:if="{{playingText === item}}" class="kara-lit">{{karaLit}}</text>{{playingText === item ? karaRest : item}}</text>
       <view class="ex-speak {{playingText === item ? 'playing' : ''}}"
             hover-class="speak-hover" hover-stay-time="120"
@@ -87,7 +89,7 @@
   <!-- 练习任务 -->
   <view class="card" wx:if="{{dayData.pr}}">
     <view class="section-label">{{dayData.type === 'sun' ? '自检任务' : (dayData.type === 'sat' ? '今日可选任务' : '练习任务')}}</view>
-    <view class="practice-line" wx:for="{{prLines}}" wx:key="*this">{{item}}</view>
+    <view class="practice-line" wx:for="{{prLines}}" wx:key="no"><text class="prac-no">{{item.no}}.</text><text>{{item.text}}</text></view>
   </view>
 
   <!-- 学习提示 -->
@@ -96,3 +98,6 @@
     <view class="tip-text">{{dayData.tip}}</view>
   </view>
 </block>
+
+<feedback id="fb"/>
+</view>

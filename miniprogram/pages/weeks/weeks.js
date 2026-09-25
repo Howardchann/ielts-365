@@ -1,10 +1,11 @@
 // pages/weeks/weeks.js —— 学习计划总览（78 周 / 18 个月 / 四阶段）
 const plan = require('../../utils/data.js');
 const store = require('../../utils/store.js');
+const theme = require('../../utils/theme.js');
 
 Page({
   data: {
-    phases: [],       // [{p, name, weeks:[{w, theme, checked, days:[{k,done}], isCurrent, isPast}]}]
+    phases: [],       // [{p, name, shortName, range, doneCount, totalWeeks, percent, isCurrentPhase, weeks:[...]}]
     todayNum: 0,
     currentWeek: 0,
     totalChecked: 0,
@@ -13,8 +14,11 @@ Page({
     openPhase: 0,     // 当前展开的阶段（0=全部折叠）
   },
 
+  applyTheme() { theme.applyPage(this); theme.syncTabBar(this); },
+  onLoad() { theme.applyPage(this); theme.syncTabBar(this); },
   onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: 1 });
+    theme.syncTabBar(this, 1);
+    this.applyTheme();
     store.onResume();
     this.refresh();
   },
@@ -39,12 +43,28 @@ Page({
           isPast: currentWeek > 0 && w.w < currentWeek,
         };
       });
-      phases.push({ p: p, name: plan.PHASE_NAMES[p], weeks });
+      phases.push({
+        p: p,
+        name: plan.PHASE_NAMES[p],
+        weeks,
+        shortName: (plan.PHASE_NAMES[p].split('：')[1]) || plan.PHASE_NAMES[p],
+        range: weeks.length ? weeks[0].w + '-' + weeks[weeks.length - 1].w : '',
+        doneCount: weeks.filter(w => w.checked >= 7).length,
+        totalWeeks: weeks.length,
+        percent: weeks.length
+          ? Math.round(weeks.reduce((s, w) => s + w.checked, 0) * 100 / (weeks.length * 7))
+          : 0,
+        isCurrentPhase: weeks.some(w => w.isCurrent),
+      });
     }
     const totalChecked = store.checkedCount();
     const totalPercent = totalChecked >= plan.TOTAL_DAYS
       ? '100.0'
       : (totalChecked * 100 / plan.TOTAL_DAYS).toFixed(1);
+    // 同值守卫：周表全部状态由 checkedDays 派生，无变化就不再整树 setData（切 tab 闪屏根源）
+    const sig = [totalChecked, (store.get('checkedDays') || []).length, todayNum].join('|');
+    if (sig === this._weeksSig) return;
+    this._weeksSig = sig;
     this.setData({
       phases,
       todayNum,

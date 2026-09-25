@@ -1,3 +1,5 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="page-root {{dark ? 'theme-dark' : ''}}">
 <!-- 复习页 -->
 <view class="tab-row">
   <view class="tab {{tab === 'random' ? 'tab--on' : ''}}" data-tab="random" hover-class="hover-dim" hover-stay-time="120" bindtap="onTab">随机抽查</view>
@@ -5,28 +7,31 @@
   <view class="tab {{tab === 'starred' ? 'tab--on' : ''}}" data-tab="starred" hover-class="hover-dim" hover-stay-time="120" bindtap="onTab">重点词（{{starred.length}}）</view>
 </view>
 <block wx:if="{{tab === 'random'}}">
-  <view class="card pool-info"><text class="muted">已学词汇池：{{poolSize}} 个（打卡越多，池子越大）</text></view>
+  <view class="card pool-info"><text class="muted">可抽查词汇 {{poolSize}} 个，随学习进度增加</text></view>
   <view class="card random-card" wx:if="{{current}}">
     <view class="random-head"><text class="random-word"><text wx:if="{{playingWord === current.w}}" class="kara-lit">{{karaLit}}</text>{{playingWord === current.w ? karaRest : current.w}}</text><view class="word-speak {{playingWord === current.w ? 'playing' : ''}}" hover-class="speak-hover" hover-stay-time="0" bindtap="onSpeakCurrent"><view class="spk-ico {{playingWord === current.w ? 'spk-ico--on' : ''}}"></view></view></view>
     <view class="random-pos">{{current.p}}</view>
     <view class="random-zh" wx:if="{{showZh}}"><view class="random-zh-main">{{current.m}}</view><view class="random-zh-ex"><text class="random-zh-text"><text wx:if="{{playingWord === current.e}}" class="kara-lit">{{karaLit}}</text>{{playingWord === current.e ? karaRest : current.e}}</text><view class="ex-speak {{playingWord === current.e ? 'playing' : ''}}" hover-class="speak-hover" hover-stay-time="0" bindtap="onSpeakExample"><view class="spk-ico {{playingWord === current.e ? 'spk-ico--on' : ''}}"></view></view></view></view>
-    <button class="btn-ghost btn-fit" wx:else hover-class="btn-press" hover-stay-time="0" bindtap="onShowZh">显示释义</button>
+    <button class="btn-ghost btn-c btn-fit" wx:else hover-class="btn-press" hover-stay-time="0" bindtap="onShowZh"><view class="ico ico-eye"></view>显示释义</button>
     <view class="random-actions"><view class="star-big {{current.starred ? 'on' : ''}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onStarCurrent"><view class="star-ico {{current.starred ? 'star-ico--on' : 'star-ico--off'}}"></view><text>{{current.starred ? '已收藏' : '收藏'}}</text></view><button class="btn-primary" hover-class="btn-press" hover-stay-time="0" bindtap="onNext">下一个</button></view>
   </view>
-  <view class="card" wx:else><view class="empty-text">点击下方按钮，从已学词汇中随机抽查</view><button class="btn-primary btn-fit" hover-class="btn-press" hover-stay-time="0" bindtap="onNext">开始抽查</button></view>
+  <view class="card" wx:else><view class="empty-text">从已学词汇中随机抽一个，先自己回忆，再点「显示释义」对照</view><button class="btn-primary btn-fit" hover-class="btn-press" hover-stay-time="0" bindtap="onNext">开始抽查</button></view>
 </block>
 <block wx:if="{{tab === 'due'}}">
-  <view class="card pool-info"><text class="muted">到期词：{{dueCount}} 个。回答后自动进入下一个。</text></view>
+  <view class="card pool-info"><text class="muted">今日到期 {{dueCount}} 词，答完自动进入下一个</text></view>
   <view class="card random-card" wx:if="{{current}}">
     <view class="random-head"><text class="random-word {{playingWord === current.w ? 'random-word--playing' : ''}}"><text wx:if="{{playingWord === current.w}}" class="kara-lit">{{karaLit}}</text>{{playingWord === current.w ? karaRest : current.w}}</text><view class="word-speak {{playingWord === current.w ? 'playing' : ''}}" hover-class="speak-hover" hover-stay-time="0" bindtap="onSpeakCurrent"><view class="spk-ico {{playingWord === current.w ? 'spk-ico--on' : ''}}"></view></view></view>
     <view class="random-pos">{{current.p}}</view>
     <view class="random-zh" wx:if="{{showZh}}"><view class="random-zh-main">{{current.m}}</view><view class="random-zh-ex"><text class="random-zh-text"><text wx:if="{{playingWord === current.e}}" class="kara-lit">{{karaLit}}</text>{{playingWord === current.e ? karaRest : current.e}}</text><view class="ex-speak {{playingWord === current.e ? 'playing' : ''}}" hover-class="speak-hover" hover-stay-time="0" bindtap="onSpeakExample"><view class="spk-ico {{playingWord === current.e ? 'spk-ico--on' : ''}}"></view></view></view></view>
-    <button class="btn-ghost btn-fit" wx:else hover-class="btn-press" hover-stay-time="0" bindtap="onShowZh">显示释义</button>
-    <view class="review-result-row"><button class="btn-ghost review-result-btn" data-result="wrong" hover-class="btn-press" hover-stay-time="0" bindtap="onReviewResult">不太会</button><button class="btn-primary review-result-btn" data-result="remember" hover-class="btn-press" hover-stay-time="0" bindtap="onReviewResult">记得了</button></view>
+    <button class="btn-ghost btn-c btn-fit" wx:else hover-class="btn-press" hover-stay-time="0" bindtap="onShowZh"><view class="ico ico-eye"></view>显示释义</button>
+    <view class="review-result-row"><button class="btn-ghost btn-c review-result-btn" data-result="wrong" hover-class="btn-press" hover-stay-time="0" bindtap="onReviewResult"><view class="ico ico-ask"></view>不太会</button><button class="btn-primary review-result-btn" data-result="remember" hover-class="btn-press" hover-stay-time="0" bindtap="onReviewResult">记得了</button></view>
   </view>
-  <view class="card" wx:else><view class="empty-text">目前没有到期复习词。继续学习，之后这里会自动出现需要复习的词。</view></view>
+  <view class="card" wx:else><view class="empty-text">暂无到期词汇。学过的词到复习周期后会自动出现在这里</view></view>
 </block>
 <block wx:if="{{tab === 'starred'}}">
-  <view class="card" wx:if="{{!starred.length}}"><view class="empty-text">还没有收藏重点词。在学习页点词汇右侧的心形按钮即可收藏，随机抽查会优先复习重点词。</view></view>
-  <view class="card" wx:else><view class="word-row" wx:for="{{starred}}" wx:key="w"><view class="word-speak {{playingWord === item.w ? 'playing' : ''}}" hover-class="speak-hover" hover-stay-time="0" data-word="{{item.w}}" bindtap="onSpeakStarred"><view class="spk-ico {{playingWord === item.w ? 'spk-ico--on' : ''}}"></view></view><view class="word-main"><view><text class="word-en">{{item.w}}</text><text class="word-pos">{{item.p}}</text></view><view class="word-zh">{{item.m}}</view><view class="word-example">{{item.e}}</view></view><view class="word-remove" data-index="{{index}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onRemoveStarred">✕</view></view></view>
+  <view class="card" wx:if="{{!starred.length}}"><view class="empty-text">还没有重点词。在学习页点词右侧的 ♡ 即可收藏，随机抽查会优先复习它们</view></view>
+  <view class="card" wx:else><view class="word-row" wx:for="{{starred}}" wx:key="w"><view class="word-speak {{playingWord === item.w ? 'playing' : ''}}" hover-class="speak-hover" hover-stay-time="0" data-word="{{item.w}}" bindtap="onSpeakStarred"><view class="spk-ico {{playingWord === item.w ? 'spk-ico--on' : ''}}"></view></view><view class="word-main"><view><text class="word-en">{{item.w}}</text><text class="word-pos">{{item.p}}</text></view><view class="word-zh">{{item.m}}</view><view class="word-example">{{item.e}}</view></view><view class="word-remove" data-index="{{index}}" hover-class="word-remove--press" hover-stay-time="0" bindtap="onRemoveStarred">✕</view></view></view>
 </block>
+
+<feedback id="fb"/>
+</view>

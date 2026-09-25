@@ -12,6 +12,12 @@ App({
       try { wx.cloud.init({ env: cloudCfg.ENV, traceUser: true }); } catch (e) { console.warn('cloud init failed', e); }
     }
     store.init();
+    // 系统深浅色切换（跟随系统模式下实时换肤）：通知栈内所有页面重新应用主题
+    if (wx.onThemeChange) {
+      wx.onThemeChange(() => {
+        getCurrentPages().forEach(p => { if (p.applyTheme) p.applyTheme(); });
+      });
+    }
   },
 
   // 切回前台：与云端对齐一次（store 内部按 RESUME_GAP 节流，不会每次切页面都请求）

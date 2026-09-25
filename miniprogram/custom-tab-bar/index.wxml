@@ -1,17 +1,14 @@
-<cover-view class="tabbar">
-  <cover-view
+<view class="tabbar {{dark ? 'tabbar-dark' : ''}}">
+  <view
     wx:for="{{list}}"
     wx:key="pagePath"
     class="tab-item {{index === active ? 'is-active' : ''}}"
     data-index="{{index}}"
     bindtap="onTap"
   >
-    <cover-view class="tab-item-inner">
-      <cover-image
-        class="tab-icon"
-        src="{{index === active ? item.selectedIconPath : item.iconPath}}"
-      />
-      <cover-view class="tab-text">{{item.text}}</cover-view>
-    </cover-view>
-  </cover-view>
-</cover-view>
+    <view class="tab-item-inner">
+      <view class="tab-icon i-{{item.key}}{{index === active ? ' on' : ''}}"></view>
+      <view class="tab-text">{{item.text}}</view>
+    </view>
+  </view>
+</view>

@@ -1,65 +1,114 @@
 /* 开溜 · 全局品牌样式 */
 page {
-  background: #F3F8EF;
-  color: #24332F;
-  font-size: 28rpx;
-  line-height: 1.6;
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  /* ── 主题 token（浅色默认值；深色组见 .theme-dark，页面根 view 挂类生效）── */
+  --bg: #F3F8EF; --card: #FFFFFF;
+  --ink: #24332F; --ink2: #5F6D68; --ink3: #53605B; --ink4: #43504C;
+  --muted: #8B9893; --muted2: #82908B; --muted3: #66736E; --muted4: #7B8A84;
+  --green: #176B5B; --green-mid: #2E8B72; --green-press: #0F4A3E; --green-solid: #176B5B;
+  --soft: #F0F7F3; --soft2: #E6F4EE; --press-green: #DCEFE7; --press2: #D5EDE3;
+  --disabled-bg: #EDF3F0; --disabled-ink: #A6B2AD; --star-off: #C7D0CC; --dis2: #D5DDD9;
+  --red: #C0392B; --red-press: #A93226; --red-soft: #FDECEA;
+  --line: #E9F0EC; --cur-line: #9ED8C5; --cur-bg: #F8FCF9; --field: #FBFDFC;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:28rpx;
+  line-height:1.6;
+  font-family:-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
   /* 自定义 tabBar 高度约 112rpx：预留底部空间，避免最后一张卡片被导航栏遮住 */
-  padding-bottom: calc(132rpx + env(safe-area-inset-bottom));
+  padding-bottom:calc(132rpx + env(safe-area-inset-bottom));
 }
-.card { background:#fff; border-radius:24rpx; padding:28rpx; margin:20rpx 24rpx; box-shadow:0 4rpx 18rpx rgba(23,107,91,.06); }
-.section-label { font-size:26rpx; font-weight:700; color:#176B5B; margin-bottom:14rpx; letter-spacing:1rpx; }
-.btn-primary { background:#176B5B; color:#fff; border-radius:44rpx; font-size:30rpx; font-weight:700; }
-.btn-primary[disabled] { background:#CBD5D1; color:#fff; }
-.btn-ghost { background:#fff; color:#176B5B; border:1.5rpx solid #A9DDD0; border-radius:44rpx; font-size:30rpx; }
-.tip-box { background:#FFF7EA; border-left:6rpx solid #FF8A78; border-radius:14rpx; padding:20rpx 24rpx; margin-top:20rpx; }
-.tip-text { color:#68574D; font-size:26rpx; }
-.muted { color:#8B9893; font-size:24rpx; }
+/* 页面根 view：铺 --bg 到整屏（page 本底在深色下仍是浅色，由根 view 覆盖；
+   导航栏/窗口背景由 theme.js 运行时覆盖） */
+.page-root { min-height: 100vh; background:var(--bg); color:var(--ink); }
+/* 深色 token 组 */
+.theme-dark {
+  --bg: #0E1618; --card: #162324;
+  --ink: #E4EEEA; --ink2: #A9BBB4; --ink3: #A9BBB4; --ink4: #BCCBC5;
+  --muted: #7E938B; --muted2: #7E938B; --muted3: #93A7A0; --muted4: #8FA39C;
+  --green: #7CD6B4; --green-mid: #58B394; --green-press: #8FE0C0; --green-solid: #1E5A4B;
+  --soft: #142220; --soft2: #1B2E29; --press-green: #233C36; --press2: #24413A;
+  --disabled-bg: #1A2729; --disabled-ink: #5E7370; --star-off: #556964; --dis2: #445854;
+  --red: #E8795F; --red-press: #F19485; --red-soft: #34211C;
+  --line: #223430; --cur-line: #2E5B4F; --cur-bg: #14211F; --field: #101B1D;
+}
+/* 深色下的特殊覆盖（data-URI 图标 / 语义色点 / 状态块，走不了变量） */
+.theme-dark .group-tag { color:#3FC79B; }
+.theme-dark .group-tag::before { background:#3FC79B; }
+.theme-dark .group-tag--extra { color:#6FB0EA; }
+.card { background:var(--card); border-radius:24rpx; padding:28rpx; margin:20rpx 24rpx; box-shadow:0 4rpx 18rpx rgba(23,107,91,.06); }
+.section-label { font-size:26rpx; font-weight:700; color:var(--green); margin-bottom:14rpx; letter-spacing:1rpx; }
+.btn-primary { background:var(--soft); color:var(--green); border-radius:44rpx; font-size:30rpx; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.btn-primary[disabled] { background:var(--disabled-bg); color:var(--disabled-ink); }
+.btn-ghost { background:transparent; color:var(--green); border:none; border-radius:44rpx; font-size:30rpx; display:flex; align-items:center; justify-content:center; }
+/* 按钮改 flex 后，图标垂直居中由 flex 现算，不再依赖 vertical-align 手调数值（该值仅对非 flex 场景兜底） */
+.btn-ghost::after { border:none; }
+/* 文字按钮裸图标（线条风 SVG data-URI，与喇叭同语言）：颜色固定随类，危险按钮用红色版；随字号缩放 */
+.ico{display:inline-block;width:30rpx;height:30rpx;background:center/contain no-repeat;margin-right:10rpx;vertical-align:-8rpx}
+.ico-play{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%205v14l11-7z'%20fill='%23176B5B'/%3E%3C/svg%3E")}
+.ico-stop{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20x='6.5'%20y='6.5'%20width='11'%20height='11'%20rx='2.5'%20fill='%23176B5B'/%3E%3C/svg%3E")}
+.ico-check{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M4.5%2012.8l5%205L19.5%207'%20fill='none'%20stroke='%23176B5B'%20stroke-width='2.4'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E")}
+.ico-eye{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2%2012s3.5-6%2010-6%2010%206%2010%206-3.5%206-10%206-10-6-10-6z'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='2.6'/%3E%3C/svg%3E")}
+.ico-ask{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='9'/%3E%3Cpath%20d='M9.6%209.3a2.5%202.5%200%201%201%203.3%202.4c-.7.3-.9.8-.9%201.5'/%3E%3Cpath%20d='M12%2016.6h.01'/%3E%3C/svg%3E")}
+.ico-undo{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23C0392B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M9%2014%204%209l5-5'/%3E%3Cpath%20d='M4%209h9.5a6%206%200%200%201%200%2012H10'/%3E%3C/svg%3E")}
+.ico-trash{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23C0392B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4%207h16M9.5%207V4h5v3M6.5%207l1%2013h9l1-13'/%3E%3C/svg%3E")}
+.ico-up{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M12%2015V4M8%208l4-4%204%204'/%3E%3Cpath%20d='M5%2012v7h14v-7'/%3E%3C/svg%3E")}
+.ico-down{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M12%204v11M8%2011l4%204%204-4'/%3E%3Cpath%20d='M5%2019h14'/%3E%3C/svg%3E")}
+.ico-sync{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2012a8%208%200%201%201-2.4-5.7'/%3E%3Cpath%20d='M18%203v4h-4'/%3E%3C/svg%3E")}
+.ico-spk{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z'%20fill='%23176B5B'/%3E%3C/svg%3E")}
+.ico-copy{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20x='9'%20y='9'%20width='11'%20height='11'%20rx='2'/%3E%3Cpath%20d='M5%2015V5h10'/%3E%3C/svg%3E")}
+.ico-merge{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M6%2015V6h12'/%3E%3Cpath%20d='M4%2018h6a4%204%200%200%200%204-4V9'/%3E%3Cpath%20d='M11%2012l3-3%203%203'/%3E%3C/svg%3E")}
+.ico-cover{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4%206h12v12H4z'/%3E%3Cpath%20d='M9%2018h11V7'/%3E%3C/svg%3E")}
+.ico-uparrow{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23176B5B'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M6%2014l6-6%206%206'/%3E%3C/svg%3E")}
+.tip-box { background:var(--soft); border-left:6rpx solid var(--green-mid); border-radius:14rpx; padding:20rpx 24rpx; margin-top:20rpx; }
+.tip-text { color:var(--ink3); font-size:26rpx; }
+.muted { color:var(--muted); font-size:24rpx; }
 .brand-head { display:flex; align-items:center; padding:20rpx 28rpx 4rpx; }
 .brand-logo { width:76rpx; height:76rpx; flex-shrink:0; }
 .brand-copy { margin-left:16rpx; }
-.brand-name { font-size:36rpx; line-height:1.1; font-weight:800; color:#176B5B; }
-.brand-sub { font-size:22rpx; color:#7B8A84; margin-top:6rpx; }
-.word-row { display:flex; align-items:flex-start; padding:18rpx 0; border-bottom:1rpx solid #E9F0EC; }
+.brand-name { font-size:36rpx; line-height:1.1; font-weight:800; color:var(--green); }
+.brand-sub { font-size:22rpx; color:var(--muted4); margin-top:6rpx; }
+/* 播放喇叭对齐（机制级修复，不再手调 margin 常量）：
+   1) 行容器 align-items:baseline —— 喇叭盒与文字首行共享真机字体基线；
+   2) 喇叭盒内放零宽空格 strut（::before），让 flex 能取到该盒的字体基线；
+   3) 图标 vertical-align:middle —— 浏览器按真机字体现算「盒中点 = 基线 + x高度/2」，
+      即排版学的 x-height 中心锚定，有/无降部词、任何机型字体都不需要再补常量。
+   喇叭盒 font-size 必须与对齐目标文字一致（middle 取父盒 x-height）：
+   word-speak 对词 32rpx、ex-speak 对例句 26rpx、random-head 大词 56rpx（review.wxss 覆盖）。 */
+.word-row { display:flex; align-items:baseline; padding:14rpx 0; border-bottom:1rpx solid var(--line); }
 .word-row:last-child { border-bottom:none; }
-.word-speak { flex-shrink:0; width:64rpx; height:64rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; display:flex; align-items:center; justify-content:center; font-size:34rpx; margin-right:20rpx; }
-.word-speak.playing { background:#176B5B; color:#fff; }
-/* 按下即时反馈：小程序里 view 的 :active 不可靠，统一用 hover-class="speak-hover" */
-.word-speak.speak-hover { background:#CBE6DC; }
-.word-speak.playing.speak-hover { background:#0E4C41; }
+/* 播放喇叭去圆形底：裸图标直接跟在文字旁，播放态由 spk-ico--on 变深绿 + 卡拉OK进度变色承担 */
+.word-speak { flex-shrink:0; width:56rpx; height:56rpx; font-size:32rpx; text-align:center; margin-right:16rpx; }
+.word-speak::before, .ex-speak::before, .word-star::before { content:'\200B'; }
+/* 按下即时反馈：无底色后改「缩放+变淡」（小程序里 view 的 :active 不可靠，统一用 hover-class="speak-hover"） */
+.word-speak.speak-hover, .ex-speak.speak-hover { transform:scale(.85); opacity:.6; }
 .word-main { flex:1; min-width:0; }
-.word-en { font-size:32rpx; font-weight:700; color:#24332F; }
-.word-pos { font-size:22rpx; color:#176B5B; font-style:italic; margin-left:10rpx; }
-.word-zh { font-size:26rpx; color:#5F6D68; margin-top:4rpx; }
-.word-example { font-size:25rpx; color:#82908B; margin-top:6rpx; padding-left:4rpx; }
+.word-en { font-size:32rpx; font-weight:700; color:var(--ink); }
+.word-pos { font-size:22rpx; color:var(--green); font-style:italic; margin-left:10rpx; }
+.word-zh { font-size:26rpx; color:var(--ink2); margin-top:4rpx; }
+.word-example { font-size:25rpx; color:var(--muted2); margin-top:6rpx; padding-left:4rpx; }
 /* 例句行：文本占满 + 右侧播放按钮（与语法区 ex-speak 同款，让人一眼看出可以播） */
-.word-example-row { display:flex; align-items:flex-start; }
+.word-example-row { display:flex; align-items:baseline; }
 .word-example-row .word-example { flex:1; min-width:0; }
-.word-example-row .ex-speak { margin-top:2rpx; }
-.word-star { flex-shrink:0; width:64rpx; height:64rpx; display:flex; align-items:center; justify-content:center; font-size:40rpx; color:#C7D0CC; transition:color .2s ease; }
+.word-star { flex-shrink:0; width:64rpx; height:64rpx; font-size:32rpx; text-align:center; color:var(--star-off); transition:color .2s ease; }
 .word-star.on { color:#FF8A78; animation:star-pop .35s ease; }
 /* 收藏弹跳：空心→实心时 1→1.35→1 回弹（网易云式），取消收藏不播 */
 @keyframes star-pop { 0%{transform:scale(1)} 40%{transform:scale(1.35)} 100%{transform:scale(1)} }
 /* 语法例句：一句一行，长句自动折行。
    关键：flex 子项必须 min-width:0 —— 否则它的自动最小宽度按内容算，长句会被撑成一行不折 */
-.grammar-ex { display:flex; align-items:flex-start; padding:14rpx 0; border-bottom:1rpx solid #EEF4F1; }
+.grammar-ex { display:flex; align-items:baseline; padding:14rpx 0; border-bottom:1rpx solid var(--line); }
 .grammar-ex:last-child { border-bottom:none; }
-.grammar-ex-text { flex:1; min-width:0; font-size:27rpx; line-height:1.75; color:#43504C; white-space:normal; word-break:break-word; overflow-wrap:break-word; }
-.ex-no { flex-shrink:0; width:36rpx; height:36rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; font-size:22rpx; font-weight:700; display:flex; align-items:center; justify-content:center; margin:8rpx 14rpx 0 0; }
-.ex-speak { flex-shrink:0; width:52rpx; height:52rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; display:flex; align-items:center; justify-content:center; font-size:26rpx; margin-left:16rpx; }
-.ex-speak.playing { background:#176B5B; color:#fff; }
-.ex-speak.speak-hover { background:#CBE6DC; }
-.ex-speak.playing.speak-hover { background:#0E4C41; }
+.grammar-ex-text { flex:1; min-width:0; font-size:27rpx; line-height:1.75; color:var(--ink4); white-space:normal; word-break:break-word; overflow-wrap:break-word; }
+.ex-no { flex-shrink:0; width:36rpx; color:var(--green); font-weight:700; font-size:26rpx; line-height:1.75; text-align:center; margin:0 14rpx 0 0; }
+.ex-speak { flex-shrink:0; width:46rpx; height:46rpx; font-size:26rpx; text-align:center; margin-left:12rpx; }
 .checkin-btn { margin:24rpx 0; }
-.done-state { text-align:center; color:#176B5B; font-size:28rpx; font-weight:700; padding:16rpx 0; }
+.done-state { display:flex; align-items:center; justify-content:center; color:var(--green); font-size:28rpx; font-weight:700; padding:16rpx 0; }
 
 /* 开溜 · 图标与触控视觉统一 */
-.icon-button{display:flex;align-items:center;justify-content:center;width:64rpx;height:64rpx;border-radius:18rpx;background:#E6F4EE;color:#176B5B;font-size:30rpx;line-height:1;}
-.icon-button:active{background:#D5EDE3;}
-.icon-star{font-size:34rpx;color:#C7D0CC;}
+.icon-button{display:flex;align-items:center;justify-content:center;width:64rpx;height:64rpx;border-radius:18rpx;background:var(--soft2);color:var(--green);font-size:30rpx;line-height:1;}
+.icon-button:active{background:var(--press2);}
+.icon-star{font-size:34rpx;color:var(--star-off);}
 .icon-star--on{color:#F5C451;}
-.icon-remove{font-size:28rpx;color:#A6B2AD;}
+.icon-remove{font-size:28rpx;color:var(--disabled-ink);}
 .icon-speaker{font-size:28rpx;}
 
 /* 全局按压反馈（hover-class 挂这些类）：
@@ -67,61 +116,92 @@ page {
    文字/图标类（无背景）用变暗 + 缩放 */
 .hover-dim{opacity:.55;transform:scale(.96)}
 .btn-press{transform:scale(.96)}
-.btn-primary.btn-press{background:#0E4C41}
-.btn-ghost.btn-press{background:#DCEFE7}
-.btn-ghost.btn-voice-on.btn-press{background:#0E4C41;color:#fff}
+.btn-primary.btn-press{background:var(--press-green);color:var(--green-press)}
+/* 方案A（次级文字按钮）：按压字加深；方案C（重要按钮）加 btn-c：按压浮出淡绿底 #F0F7F3（比 #E6F4EE 更淡），
+   危险类（取消打卡/清除学习记录）由页内规则按压浮淡红底。两者都配合 .btn-press 的缩放 */
+.btn-ghost.btn-press{color:var(--green-press)}
+.btn-c.btn-press{background:var(--soft)}
+.btn-plain.btn-press{color:var(--ink2)!important}
+.btn-ghost.btn-voice-on.btn-press,.btn-speak-all--active.btn-press{background:var(--press-green);color:var(--green-press)}
 /* 独立动作按钮：收缩为内容宽 + 水平居中——2-4 个字铺满全宽左右留白过大；
-   成对/成组按钮（btn-half、不太会/记得了行）保持等宽，不用此类 */
-.btn-fit{display:table;width:auto;margin-left:auto;margin-right:auto;padding:10rpx 24rpx}
-/* 微信 button 默认 line-height≈2.56，文字在行框里视觉偏移；统一收紧让上下真正居中 */
-.btn-primary,.btn-ghost{line-height:1.4}
+   原 display:table 无法 flex 居中图标，改 flex + fit-content（安卓 XWeb / iOS WKWebView 均支持；
+   极旧内核降级为全宽按钮，不影响使用）；成对/成组按钮（btn-half、不太会/记得了行）为内容宽+min-width 兜底，页内各自收窄居中 */
+.btn-fit{display:flex;width:fit-content;margin-left:auto;margin-right:auto;padding:8rpx 20rpx}
+/* 微信 button 默认左右 padding 14px + line-height≈2.56，文字四周留白过大；统一收紧 */
+.btn-primary,.btn-ghost{line-height:1.3;padding:8rpx 20rpx}
 /* 播放喇叭：SVG 贴图。🔊 emoji 字形基线/光学中心不稳，在圆形按钮内总不居中；
    改矢量喇叭，尺寸用 em 跟随容器字号（word-speak 34rpx→约30rpx，ex-speak 26rpx→约23rpx） */
-.spk-ico{display:block;width:.88em;height:.88em;background:center/contain no-repeat;background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%23176B5B'/%3E%3C/svg%3E");}
-.spk-ico--on{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%23FFFFFF'/%3E%3C/svg%3E");}
+/* 播放喇叭：SVG 贴图。🔊 emoji 字形基线/光学中心不稳，在圆形按钮内总不居中；
+   改矢量喇叭。对齐机制见 .word-speak 注释：inline-block + vertical-align:middle，
+   由真机字体现算 x-height 中心；尺寸用显式 rpx（不再随 em，避免随父字号漂移） */
+.spk-ico{display:inline-block;vertical-align:middle;width:32rpx;height:32rpx;background:center/contain no-repeat;background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%23176B5B'/%3E%3C/svg%3E");}
+.spk-ico--on{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%230E4C41'/%3E%3C/svg%3E");}
+.ex-speak .spk-ico{width:26rpx;height:26rpx;}
 
 /* 歌词式朗读进度：已读部分品牌绿，未读保持原色（kara-lit 放在词首 text 上） */
-.kara-lit{color:#176B5B}
+.kara-lit{color:var(--green)}
 
 /* 收藏心形：不用 ♡/♥ 字符（部分机型字体把两个都渲染成实心，形状分不出来），
-   改用 SVG 贴图——空心圆润描边 vs 实心填充，收藏前后是两个不同的形状 */
-.star-ico{width:40rpx;height:36rpx;background:center/contain no-repeat;}
-.star-ico--off{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2020.1C7.7%2016.9%204%2013.7%203%2010.7%202.1%207.8%203.8%205.1%206.6%204.6%208.5%204.3%2010.5%205.2%2012%206.9%2013.5%205.2%2015.5%204.3%2017.4%204.6%2020.2%205.1%2021.9%207.8%2021%2010.7%2020%2013.7%2016.3%2016.9%2012%2020.1Z'%20fill='none'%20stroke='%23C7D0CC'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3C/svg%3E");}
+   改用 SVG 贴图——空心圆润描边 vs 实心填充，收藏前后是两个不同的形状；
+   word-star 行内流下 vertical-align:middle 与词条同用 x-height 锚定（见 .word-speak 注释） */
+.star-ico{display:inline-block;vertical-align:middle;width:40rpx;height:36rpx;background:center/contain no-repeat;}
+.star-ico--off{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2020.1C7.7%2016.9%204%2013.7%203%2010.7%202.1%207.8%203.8%205.1%206.6%204.6%208.5%204.3%2010.5%205.2%2012%206.9%2013.5%205.2%2015.5%204.3%2017.4%204.6%2020.2%205.1%2021.9%207.8%2021%2010.7%2020%2013.7%2016.3%2016.9%2012%2020.1Z'%20fill='none'%20stroke='%23FF8A78'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3C/svg%3E");}
 .star-ico--on{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2020.1C7.7%2016.9%204%2013.7%203%2010.7%202.1%207.8%203.8%205.1%206.6%204.6%208.5%204.3%2010.5%205.2%2012%206.9%2013.5%205.2%2015.5%204.3%2017.4%204.6%2020.2%205.1%2021.9%207.8%2021%2010.7%2020%2013.7%2016.3%2016.9%2012%2020.1Z'%20fill='%23FF8A78'/%3E%3C/svg%3E");}
 
 /* ── iPad / 宽屏适配（纯追加，不影响手机端）──
    rpx 按「窗口宽度/750」换算，iPad Pro 窗口宽 1000px+ 时所有尺寸被放大约 3 倍。
    ≥700px 时改用固定 px 并把内容限宽居中，字号取手机端 ×0.5rpx 值。 */
-@media (min-width: 700px) {
-  page { font-size: 15px; padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
-  .card { max-width: 640px; margin: 12px auto; border-radius: 12px; padding: 14px; box-sizing: border-box; }
-  .section-label { font-size: 14px; margin-bottom: 7px; }
-  .btn-primary { border-radius: 22px; font-size: 15px; }
-  .btn-ghost { border-width: 1px; border-radius: 22px; font-size: 15px; }
-  .btn-fit { padding: 2px 12px; }
-  .tip-box { border-left-width: 3px; border-radius: 7px; padding: 10px 12px; margin-top: 10px; }
-  .tip-text { font-size: 13px; }
-  .muted { font-size: 12px; }
-  .brand-head { max-width: 640px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 10px 14px 2px; }
-  .brand-logo { width: 38px; height: 38px; }
-  .brand-copy { margin-left: 8px; }
-  .brand-name { font-size: 18px; }
-  .brand-sub { font-size: 11px; margin-top: 3px; }
-  .word-row { padding: 9px 0; }
-  .word-speak { width: 32px; height: 32px; font-size: 17px; margin-right: 10px; }
-  .word-en { font-size: 16px; }
-  .word-pos { font-size: 11px; margin-left: 5px; }
-  .word-zh { font-size: 13px; margin-top: 2px; }
-  .word-example { font-size: 13px; margin-top: 3px; padding-left: 2px; }
-  .word-star { width: 32px; height: 32px; font-size: 20px; }
-  .grammar-ex { padding: 7px 0; }
-  .grammar-ex-text { font-size: 14px; }
-  .ex-no { width: 18px; height: 18px; font-size: 11px; margin: 4px 7px 0 0; }
-  .ex-speak { width: 26px; height: 26px; font-size: 13px; margin-left: 8px; }
-  .checkin-btn { margin: 12px 0; }
-  .done-state { font-size: 14px; padding: 8px 0; }
-  .icon-button { width: 32px; height: 32px; border-radius: 9px; font-size: 15px; }
-  .icon-star { font-size: 17px; }
-  .icon-remove, .icon-speaker { font-size: 14px; }
-  .star-ico { width: 20px; height: 18px; }
+@media (min-width:700px) {
+  page { font-size:15px; padding-bottom:calc(66px + env(safe-area-inset-bottom)); }
+  .card { max-width:640px; margin:12px auto; border-radius:12px; padding:14px; box-sizing:border-box; }
+  .section-label { font-size:14px; margin-bottom:7px; }
+  .btn-primary { border-radius:22px; font-size:15px; }
+  .btn-ghost { border-radius:22px; font-size:15px; }
+  .ico { width:15px; height:15px; margin-right:5px; vertical-align:-4px; }
+  .btn-fit { padding:2px 10px; }
+  .tip-box { border-left-width:3px; border-radius:7px; padding:10px 12px; margin-top:10px; }
+  .tip-text { font-size:13px; }
+  .muted { font-size:12px; }
+  .brand-head { max-width:640px; margin:0 auto; width:100%; box-sizing:border-box; padding:10px 14px 2px; }
+  .brand-logo { width:38px; height:38px; }
+  .brand-copy { margin-left:8px; }
+  .brand-name { font-size:18px; }
+  .brand-sub { font-size:11px; margin-top:3px; }
+  .word-row { padding:7px 0; }
+  .word-speak { width:28px; height:28px; font-size:16px; margin-right:8px; }
+  .word-en { font-size:16px; }
+  .word-pos { font-size:11px; margin-left:5px; }
+  .word-zh { font-size:13px; margin-top:2px; }
+  .word-example { font-size:13px; margin-top:3px; padding-left:2px; }
+  .word-star { width:32px; height:32px; font-size:16px; }
+  .grammar-ex { padding:7px 0; }
+  .grammar-ex-text { font-size:14px; }
+  .ex-no { width:18px; font-size:13px; line-height:1.75; margin:0 7px 0 0; }
+  .ex-speak { width:23px; height:23px; font-size:13px; margin-left:6px; }
+  .spk-ico { width:16px; height:16px; }
+  .ex-speak .spk-ico { width:13px; height:13px; }
+  .checkin-btn { margin:12px 0; }
+  .done-state { font-size:14px; padding:8px 0; }
+  .icon-button { width:32px; height:32px; border-radius:9px; font-size:15px; }
+  .icon-star { font-size:17px; }
+  .icon-remove, .icon-speaker { font-size:14px; }
+  .star-ico { width:20px; height:18px; }
 }
+
+/* ==== darkicons:auto-start（由 tools/darkicons.js 生成，勿手改） ==== */
+.theme-dark .ico-play{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%205v14l11-7z'%20fill='%237CD6B4'/%3E%3C/svg%3E")}
+.theme-dark .ico-eye{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2%2012s3.5-6%2010-6%2010%206%2010%206-3.5%206-10%206-10-6-10-6z'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='2.6'/%3E%3C/svg%3E")}
+.theme-dark .ico-ask{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='9'/%3E%3Cpath%20d='M9.6%209.3a2.5%202.5%200%201%201%203.3%202.4c-.7.3-.9.8-.9%201.5'/%3E%3Cpath%20d='M12%2016.6h.01'/%3E%3C/svg%3E")}
+.theme-dark .ico-undo{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23E8795F'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M9%2014%204%209l5-5'/%3E%3Cpath%20d='M4%209h9.5a6%206%200%200%201%200%2012H10'/%3E%3C/svg%3E")}
+.theme-dark .ico-trash{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23E8795F'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4%207h16M9.5%207V4h5v3M6.5%207l1%2013h9l1-13'/%3E%3C/svg%3E")}
+.theme-dark .ico-up{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M12%2015V4M8%208l4-4%204%204'/%3E%3Cpath%20d='M5%2012v7h14v-7'/%3E%3C/svg%3E")}
+.theme-dark .ico-down{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M12%204v11M8%2011l4%204%204-4'/%3E%3Cpath%20d='M5%2019h14'/%3E%3C/svg%3E")}
+.theme-dark .ico-sync{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2012a8%208%200%201%201-2.4-5.7'/%3E%3Cpath%20d='M18%203v4h-4'/%3E%3C/svg%3E")}
+.theme-dark .ico-spk{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z'%20fill='%237CD6B4'/%3E%3C/svg%3E")}
+.theme-dark .ico-copy{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20x='9'%20y='9'%20width='11'%20height='11'%20rx='2'/%3E%3Cpath%20d='M5%2015V5h10'/%3E%3C/svg%3E")}
+.theme-dark .ico-merge{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M6%2015V6h12'/%3E%3Cpath%20d='M4%2018h6a4%204%200%200%200%204-4V9'/%3E%3Cpath%20d='M11%2012l3-3%203%203'/%3E%3C/svg%3E")}
+.theme-dark .ico-cover{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4%206h12v12H4z'/%3E%3Cpath%20d='M9%2018h11V7'/%3E%3C/svg%3E")}
+.theme-dark .ico-uparrow{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M6%2014l6-6%206%206'/%3E%3C/svg%3E")}
+.theme-dark .ico-stop{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20x='6.5'%20y='6.5'%20width='11'%20height='11'%20rx='2.5'%20fill='%237CD6B4'/%3E%3C/svg%3E")}
+.theme-dark .ico-check{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M4.5%2012.8l5%205L19.5%207'%20fill='none'%20stroke='%237CD6B4'%20stroke-width='2.4'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E")}
+/* ==== darkicons:auto-end ==== */

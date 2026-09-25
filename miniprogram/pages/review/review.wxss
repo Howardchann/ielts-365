@@ -1,25 +1,27 @@
 /* 开溜 · 复习页 */
-.tab-row{display:flex;background:#fff;margin:20rpx 24rpx;border-radius:44rpx;padding:8rpx}.tab{flex:1;text-align:center;font-size:28rpx;color:#8B9893;padding:14rpx 0;border-radius:40rpx}.tab--on{background:#176B5B;color:#fff;font-weight:700}.pool-info{padding:18rpx 28rpx}.random-card{text-align:center;padding:50rpx 30rpx}.random-head{display:flex;align-items:center;justify-content:center;gap:16rpx}.random-zh-ex{display:flex;align-items:center;justify-content:center;gap:14rpx;margin-top:16rpx;font-size:26rpx;color:#82908B}.random-word{font-size:56rpx;font-weight:800;color:#24332F;line-height:1.3}.random-word--playing{color:#176B5B}.random-pos{font-size:24rpx;color:#176B5B;font-style:italic;margin-top:6rpx}.random-zh{margin-top:30rpx}.random-zh-main{font-size:36rpx;color:#43504C}.random-zh-ex{font-size:26rpx;color:#82908B;margin-top:16rpx;display:flex;align-items:center;justify-content:center;gap:14rpx}.random-actions{display:flex;align-items:center;justify-content:space-between;margin-top:40rpx}.star-big{display:flex;align-items:center;gap:10rpx;font-size:28rpx;color:#5F6D68;padding:10rpx;transition:color .2s ease}
+.tab-row{display:flex;background:var(--card);margin:20rpx 24rpx;border-radius:44rpx;padding:8rpx}.tab{flex:1;text-align:center;font-size:28rpx;color:var(--muted);padding:14rpx 0;border-radius:40rpx}.tab--on{background:var(--soft);color:var(--green);font-weight:700}.pool-info{padding:18rpx 28rpx}.random-card{text-align:center;padding:50rpx 30rpx}.random-head{display:flex;align-items:baseline;justify-content:center;gap:16rpx}/* 大词行：喇叭盒 font-size 与大词一致，x-height 锚定机制才成立（见 app.wxss .word-speak 注释） */.random-head .word-speak{font-size:56rpx}.random-head .spk-ico{width:36rpx;height:36rpx}.random-zh-ex{display:flex;align-items:baseline;justify-content:center;gap:14rpx;margin-top:16rpx;font-size:26rpx;color:var(--muted2)}.random-word{font-size:56rpx;font-weight:800;color:var(--ink);line-height:1.3}.random-word--playing{color:var(--green)}.random-pos{font-size:24rpx;color:var(--green);font-style:italic;margin-top:6rpx}.random-zh{margin-top:30rpx}.random-zh-main{font-size:36rpx;color:var(--ink4)}.random-zh-ex{font-size:26rpx;color:var(--muted2);margin-top:16rpx;display:flex;align-items:baseline;justify-content:center;gap:14rpx}.random-actions{display:flex;align-items:center;justify-content:space-between;margin-top:40rpx}.star-big{display:flex;align-items:center;gap:10rpx;font-size:28rpx;color:var(--ink2);padding:10rpx;transition:color .2s ease}
 .star-big.on{color:#FF8A78;animation:star-pop .35s ease}
-@keyframes star-pop{0%{transform:scale(1)}40%{transform:scale(1.2)}100%{transform:scale(1)}}.empty-text{font-size:26rpx;color:#8B9893;line-height:1.8;margin-bottom:24rpx}/* 删除叉：浅灰圆底按钮形态（配合 wxml 里 hover-dim 按压反馈），不再是裸文字 */
-.word-remove{flex-shrink:0;width:56rpx;height:56rpx;display:flex;align-items:center;justify-content:center;color:#A6B2AD;font-size:28rpx;background:#F1F6F4;border-radius:50%;align-self:center}
+@keyframes star-pop{0%{transform:scale(1)}40%{transform:scale(1.2)}100%{transform:scale(1)}}.empty-text{font-size:26rpx;color:var(--muted);line-height:1.8;margin-bottom:24rpx}/* 删除叉：浅灰圆底按钮形态（配合 wxml 里 hover-dim 按压反馈），不再是裸文字 */
+.word-remove{flex-shrink:0;width:56rpx;height:56rpx;display:flex;align-items:center;justify-content:center;color:var(--disabled-ink);font-size:28rpx;background:transparent;border-radius:50%;align-self:center}
+.word-remove--press{color:var(--red);transform:scale(.85)}
 
-.review-result-row{display:flex;gap:20rpx;margin-top:30rpx}.review-result-btn{flex:1}
+.review-result-row{display:flex;gap:20rpx;margin-top:30rpx;justify-content:center}.review-result-btn{min-width:176rpx;white-space:nowrap;text-align:center}
 
 /* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */
-@media (min-width: 700px) {
-  .tab-row { max-width: 640px; margin: 10px auto; border-radius: 22px; padding: 4px; box-sizing: border-box; }
-  .tab { font-size: 14px; padding: 7px 0; border-radius: 20px; }
-  .pool-info { padding: 9px 14px; }
-  .random-card { padding: 25px 15px; }
-  .random-word { font-size: 28px; }
-  .random-pos { font-size: 12px; margin-top: 3px; }
-  .random-zh { margin-top: 15px; }
-  .random-zh-main { font-size: 18px; }
-  .random-zh-ex { font-size: 13px; margin-top: 8px; }
-  .random-actions { margin-top: 20px; }
-  .star-big { font-size: 14px; padding: 5px; }
-  .empty-text { font-size: 13px; margin-bottom: 12px; }
-  .word-remove { width: 28px; height: 28px; font-size: 15px; }
-  .review-result-row { gap: 10px; margin-top: 15px; }
+@media (min-width:700px) {
+  .tab-row { max-width:640px; margin:10px auto; border-radius:22px; padding:4px; box-sizing:border-box; }
+  .tab { font-size:14px; padding:7px 0; border-radius:20px; }
+  .pool-info { padding:9px 14px; }
+  .random-card { padding:25px 15px; }
+  .random-word { font-size:28px; }
+  .random-pos { font-size:12px; margin-top:3px; }
+  .random-zh { margin-top:15px; }
+  .random-zh-main { font-size:18px; }
+  .random-zh-ex { font-size:13px; margin-top:8px; }
+  .random-actions { margin-top:20px; }
+  .star-big { font-size:14px; padding:5px; }
+  .empty-text { font-size:13px; margin-bottom:12px; }
+  .word-remove { width:28px; height:28px; font-size:15px; }
+  .review-result-row { gap:10px; margin-top:15px; }
+  .review-result-btn { min-width:88px; }
 }

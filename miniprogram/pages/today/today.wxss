@@ -1,41 +1,52 @@
 /* 开溜 · 今日页 */
-.day-head{padding-bottom:16rpx}.day-nav{display:flex;align-items:center;justify-content:space-between}.nav-btn{font-size:26rpx;color:#176B5B;padding:14rpx 18rpx;border-radius:12rpx;background:#E6F4EE}
-.nav-btn--press{background:#CBE6DC;transform:scale(.94);transition:transform .08s}.day-title{text-align:center;flex:1}.day-num{font-size:44rpx;font-weight:800;color:#24332F}.day-dow{font-size:24rpx;color:#8B9893;margin-top:4rpx}.phase-line{text-align:center;font-size:25rpx;color:#176B5B;margin-top:12rpx}.is-today{text-align:center;font-size:24rpx;color:#176B5B;margin-top:10rpx;padding:8rpx}.obj-text{font-size:27rpx;color:#53605B;margin-top:6rpx}.time-text{font-size:24rpx;color:#8B9893;margin-top:8rpx}.btn-cancel{margin-top:12rpx;color:#C0392B;border-color:#E8B4AE;font-size:27rpx}.btn-cancel::after{border:none}.btn-cancel.btn-press{background:#FDECEA}.speak-all-row{margin-bottom:10rpx}.btn-speak-all{font-size:27rpx;padding:10rpx 24rpx;display:inline-block}.btn-speak-all--active{background:#176B5B;color:#fff}.word-example--playing{color:#176B5B;font-weight:700}.grammar-exp{font-size:26rpx;color:#53605B;line-height:1.75;background:#F0F7F3;border-radius:12rpx;padding:20rpx 22rpx;margin-bottom:6rpx}.practice-text{font-size:26rpx;color:#53605B;line-height:1.8;white-space:pre-line}
-.practice-line{font-size:26rpx;color:#53605B;line-height:1.8;margin-top:8rpx}
-.practice-line:first-child{margin-top:0}.prestart-card{text-align:center;padding:60rpx 30rpx}.prestart-title{font-size:40rpx;font-weight:800;color:#176B5B}.prestart-sub{font-size:28rpx;color:#66736E;margin-top:14rpx}.prestart-days{font-size:60rpx;font-weight:800;color:#24332F;margin:30rpx 0}
+.day-head{padding-bottom:16rpx}.day-nav{display:flex;align-items:center;justify-content:space-between}.nav-btn{font-size:26rpx;color:var(--green);padding:14rpx 18rpx;border-radius:12rpx}
+.nav-btn--press{transform:scale(.94);transition:transform .08s;color:var(--green-press)}.day-title{text-align:center;flex:1}.day-num{font-size:44rpx;font-weight:800;color:var(--ink)}.day-dow{font-size:24rpx;color:var(--muted);margin-top:4rpx}.phase-line{text-align:center;font-size:25rpx;color:var(--green);margin-top:12rpx}.is-today{text-align:center;font-size:24rpx;color:var(--green);margin-top:10rpx;padding:8rpx}.obj-text{font-size:27rpx;color:var(--ink3);margin-top:6rpx}.time-text{font-size:24rpx;color:var(--muted);margin-top:8rpx}.btn-cancel{margin-top:12rpx;color:var(--red);font-size:27rpx}.btn-cancel::after{border:none}.btn-cancel.btn-press{background:var(--red-soft);color:var(--red-press)}.speak-all-row{margin-bottom:10rpx}.btn-speak-all{font-size:27rpx;padding:8rpx 20rpx;display:inline-flex;align-items:center;justify-content:center}.btn-speak-all--active{background:var(--soft);color:var(--green);font-weight:700}.btn-speak-all--active.btn-press{background:var(--press-green);color:var(--green-press)}.word-example--playing{color:var(--green);font-weight:700}.grammar-exp{font-size:26rpx;color:var(--ink3);line-height:1.75;background:var(--soft);border-radius:12rpx;padding:20rpx 22rpx;margin-bottom:6rpx}.practice-text{font-size:26rpx;color:var(--ink3);line-height:1.8;white-space:pre-line}
+.practice-line{font-size:26rpx;color:var(--ink3);line-height:1.8;margin-top:8rpx}
+.prac-no{color:var(--green);font-weight:700;display:inline-block;min-width:36rpx;text-align:center;margin-right:14rpx}
+.practice-line:first-child{margin-top:0}.prestart-card{text-align:center;padding:60rpx 30rpx}.prestart-title{font-size:40rpx;font-weight:800;color:var(--green)}.prestart-sub{font-size:28rpx;color:var(--muted3);margin-top:14rpx}.prestart-days{font-size:60rpx;font-weight:800;color:var(--ink);margin:30rpx 0}
 
-/* 词汇分组标签：主题词 / 扩展词 */
+/* 词汇分组标签：主题词 / 扩展词（彩点+纯文字，去色块，与文字按钮同语言） */
 .group-tag {
-  font-size: 22rpx;
-  color: #1d9e75;
-  background: #e1f5ee;
-  border-radius: 8rpx;
-  padding: 4rpx 14rpx;
-  margin: 16rpx 16rpx 6rpx 0;
-  align-self: flex-start;
+  display:inline-block;
+  font-size:22rpx;
+  color:#1d9e75;
+  padding:4rpx 0;
+  margin:4rpx 0 2rpx;
+}
+.group-tag::before {
+  content:'';
+  display:inline-block;
+  width:10rpx;
+  height:10rpx;
+  border-radius:50%;
+  background:#1d9e75;
+  margin-right:8rpx;
+  vertical-align:2rpx;
 }
 .group-tag--extra {
-  color: #185fa5;
-  background: #e6f1fb;
+  color:#185fa5;
+}
+.group-tag--extra::before {
+  background:#85B7EB;
 }
 
 /* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */
-@media (min-width: 700px) {
-  .nav-btn { font-size: 13px; padding: 7px 9px; }
-  .day-num { font-size: 22px; }
-  .day-dow { font-size: 12px; margin-top: 2px; }
-  .phase-line { font-size: 13px; margin-top: 6px; }
-  .is-today { font-size: 12px; margin-top: 5px; padding: 4px; }
-  .obj-text { font-size: 14px; margin-top: 3px; }
-  .time-text { font-size: 12px; margin-top: 4px; }
-  .btn-cancel { margin-top: 6px; }
-  .btn-speak-all { font-size: 13px; padding: 1px 15px; }
-  .grammar-exp { font-size: 13px; padding: 10px 11px; }
-  .practice-text { font-size: 13px; }
-  .practice-line { font-size: 13px; margin-top: 4px; }
-  .prestart-card { padding: 30px 15px; }
-  .prestart-title { font-size: 20px; }
-  .prestart-sub { font-size: 14px; margin-top: 7px; }
-  .prestart-days { font-size: 30px; margin: 15px 0; }
-  .group-tag { font-size: 11px; border-radius: 4px; padding: 2px 7px; margin: 8px 0 3px; }
+@media (min-width:700px) {
+  .nav-btn { font-size:13px; padding:7px 9px; }
+  .day-num { font-size:22px; }
+  .day-dow { font-size:12px; margin-top:2px; }
+  .phase-line { font-size:13px; margin-top:6px; }
+  .is-today { font-size:12px; margin-top:5px; padding:4px; }
+  .obj-text { font-size:14px; margin-top:3px; }
+  .time-text { font-size:12px; margin-top:4px; }
+  .btn-cancel { margin-top:6px; }
+  .btn-speak-all { font-size:13px; padding:1px 10px; }
+  .grammar-exp { font-size:13px; padding:10px 11px; }
+  .practice-text { font-size:13px; }
+  .practice-line { font-size:13px; margin-top:4px; }
+  .prestart-card { padding:30px 15px; }
+  .prestart-title { font-size:20px; }
+  .prestart-sub { font-size:14px; margin-top:7px; }
+  .prestart-days { font-size:30px; margin:15px 0; }
+  .group-tag { font-size:11px; border-radius:4px; padding:2px 7px; margin:2px 0 1px; }
 }

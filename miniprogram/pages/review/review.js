@@ -1,6 +1,7 @@
 // pages/review/review.js —— 复习：随机抽查 + 重点词
 const plan = require('../../utils/data.js');
 const store = require('../../utils/store.js');
+const theme = require('../../utils/theme.js');
 const speech = require('../../utils/speech.js');
 
 Page({
@@ -15,6 +16,8 @@ Page({
   },
 
   onLoad() {
+    // 主题在首帧前应用（onLoad 的 setData 并入首次渲染），避免跳页闪屏
+    theme.applyPage(this); theme.syncTabBar(this);
     // 监听器返回取消函数，页面卸载时注销（旧实现会永久堆积回调）
     this._offSpeech = speech.onStateChange((payload) => {
       const upd = { playingWord: payload.playing ? payload.text : '' };
@@ -33,17 +36,24 @@ Page({
     this._offSpeech = null;
   },
 
+  applyTheme() { theme.applyPage(this); theme.syncTabBar(this); },
   onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: 2 });
+    theme.syncTabBar(this, 2);
+    this.applyTheme();
     store.onResume();
     this._pool = null;
     this.refreshPool();
-    this.setData({ starred: store.get('starredWords') || [] });
+    // 收藏列表同值守卫（新数组实例同值也会触发重渲染）
+    const starred = store.get('starredWords') || [];
+    const sj = JSON.stringify(starred);
+    if (sj !== this._starredJson) { this._starredJson = sj; this.setData({ starred }); }
   },
 
   refreshPool() {
     if (!this._pool) this._pool = plan.learnedWords(store.get('checkedDays'));
-    this.setData({ poolSize: this._pool.length, dueCount: store.dueWords(this._pool).length });
+    // 同值不 setData（setData 无 diff，同值也整树重渲染 → 切 tab 闪屏）
+    const p = this._pool.length, d = store.dueWords(this._pool).length;
+    if (p !== this.data.poolSize || d !== this.data.dueCount) this.setData({ poolSize: p, dueCount: d });
     return this._pool;
   },
 
@@ -52,11 +62,13 @@ Page({
     if (e.currentTarget.dataset.tab === 'due') this.onNextDue();
   },
 
+  fb() { return this.selectComponent('#fb'); },
+
   onNextDue() {
     const pool = store.dueWords(this.refreshPool());
     if (!pool.length) {
       this.setData({ current: null });
-      wx.showToast({ title: '今天没有到期词，继续学习即可', icon: 'none' });
+      this.fb().toast('今天没有到期词，继续学习即可');
       return;
     }
     const item = pool[Math.floor(Math.random() * pool.length)];
@@ -72,7 +84,7 @@ Page({
     if (!c) return;
     store.reviewWord(c.w, remembered);
     // 长文字 toast 在快速连按时反复弹出，像整个模块在闪 —— 改短文案+短时长
-    wx.showToast({ title: remembered ? '已记住' : '稍后再来', icon: 'none', duration: 800 });
+    this.fb().toast(remembered ? '已记住' : '稍后再来', 800);
     // 到期 tab：先算好下一词、一次 setData 直接切换。
     // 旧写法先 setData({current:null}) 再 onNextDue()，中间会渲染一帧
     // 「目前没有到期复习词」空状态 —— 连按闪现整个模块的真凶就是它。
@@ -110,7 +122,7 @@ Page({
     const pool = this.refreshPool();
     if (!pool.length) {
       this.setData({ current: null });
-      wx.showToast({ title: '先去打卡几天，词汇池才有内容', icon: 'none' });
+      this.fb().toast('先去打卡几天，词汇池才有内容');
       return;
     }
     const starred = store.get('starredWords') || [];
@@ -172,7 +184,7 @@ Page({
     if (i >= 0 && i < starred.length) {
       store.toggleStar(starred[i]);
       this.setData({ starred: store.get('starredWords') || [] });
-      wx.showToast({ title: '已移除', icon: 'none' });
+      this.fb().toast('已移除');
     }
   },
 });

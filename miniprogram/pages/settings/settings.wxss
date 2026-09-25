@@ -1,53 +1,98 @@
 /* 开溜 · 设置页 */
-.stat-line{font-size:30rpx;font-weight:700;color:#24332F;margin-bottom:8rpx}.picker-value{font-size:27rpx;color:#176B5B;background:#E6F4EE;border-radius:12rpx;padding:14rpx 24rpx}.btn-row{margin-top:20rpx}.btn-voice{display:inline-block;align-self:flex-start;padding:10rpx 44rpx;font-size:27rpx;white-space:nowrap}.engine-status{font-size:24rpx;margin-top:14rpx;padding:14rpx 18rpx;border-radius:10rpx}.engine-status--ok{background:#E6F4EE;color:#176B5B}.engine-status--bad{background:#FDECEA;color:#C0392B}.sync-state{display:flex;align-items:center;font-size:26rpx;color:#53605B}.sync-dot{width:16rpx;height:16rpx;border-radius:50%;background:#C7D0CC;margin-right:14rpx;flex-shrink:0}.sync-dot--ok{background:#176B5B}.sync-error{font-size:23rpx;color:#C0392B;background:#FDECEA;border-radius:10rpx;padding:12rpx 18rpx;margin-top:14rpx}.about-btn{font-size:28rpx;color:#176B5B;padding:8rpx 0}.about-ver{margin-top:4rpx}
-.sync-row{display:flex;align-items:center;justify-content:space-between}.sync-meta{font-size:24rpx;color:#7B8A84;margin-top:12rpx}
-.backup-box{margin-top:16rpx;border:1rpx solid #D6E4E0;border-radius:12rpx;background:#FBFDFC;overflow:hidden}.backup-text{width:100%;height:220rpx;padding:16rpx;box-sizing:border-box;font-size:22rpx;line-height:1.6;color:#4A5A56}.btn-plain{background:transparent!important;color:#7A8A86!important}
-.btn-ghost.btn-voice-on{background:#176B5B;color:#fff;border-color:#176B5B}
-.btn-reset{margin-top:12rpx;color:#C0392B;border-color:#E8B4AE}
+.stat-line{font-size:30rpx;font-weight:700;color:var(--ink);margin-bottom:8rpx}.picker-value{font-size:27rpx;color:var(--green);border-bottom:1rpx solid var(--line);padding:14rpx 4rpx}.btn-row{margin-top:20rpx}.btn-voice{display:inline-block;align-self:flex-start;padding:8rpx 32rpx;font-size:27rpx;white-space:nowrap}.engine-status{font-size:24rpx;margin-top:14rpx;padding:14rpx 18rpx;border-radius:10rpx}.engine-status--ok{background:var(--soft2);color:var(--green)}.engine-status--bad{background:var(--red-soft);color:var(--red)}.sync-state{display:flex;align-items:center;font-size:26rpx;color:var(--ink3)}.sync-dot{width:16rpx;height:16rpx;border-radius:50%;background:var(--star-off);margin-right:14rpx;flex-shrink:0}.sync-dot--ok{background:var(--green-solid)}.sync-error{font-size:23rpx;color:var(--red);background:var(--red-soft);border-radius:10rpx;padding:12rpx 18rpx;margin-top:14rpx}.about-btn{font-size:28rpx;color:var(--green);padding:8rpx 0}.about-ver{margin-top:4rpx}
+.sync-row{display:flex;align-items:center;justify-content:space-between}.sync-meta{font-size:24rpx;color:var(--muted4);margin-top:12rpx}
+.backup-box{margin-top:16rpx;border:1rpx solid var(--line);border-radius:12rpx;background:var(--field);overflow:hidden}.backup-text{width:100%;height:220rpx;padding:16rpx;box-sizing:border-box;font-size:22rpx;line-height:1.6;color:var(--ink3)}.btn-plain{background:transparent!important;color:var(--muted4)!important}
+.btn-ghost.btn-voice-on{background:var(--soft);color:var(--green);font-weight:700}
+.btn-reset{margin-top:12rpx;color:var(--red)}.btn-reset.btn-press{background:var(--red-soft);color:var(--red-press)}
+
+/* 自绘底部选择弹层（替代系统 picker 面板，风格统一） */
+.sheet-mask{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.45);display:flex;align-items:flex-end}
+/* sheet 底部留出自定义 tabBar 原生层的高度（112rpx+safe-area），否则最后一项被 tabBar 盖住 */
+.sheet{width:100%;background:var(--card);border-radius:28rpx 28rpx 0 0;padding:10rpx 0 calc(150rpx + env(safe-area-inset-bottom));box-sizing:border-box;max-height:78vh;overflow-y:auto}
+.sheet-title{font-size:24rpx;color:var(--muted);text-align:center;padding:18rpx 0 8rpx}
+.sheet-opt{display:flex;align-items:center;justify-content:space-between;gap:16rpx;font-size:28rpx;color:var(--ink);padding:24rpx 36rpx;border-bottom:1rpx solid var(--line)}
+.sheet-opt:last-child{border-bottom:none}
+.sheet-opt--on{color:var(--green);font-weight:700}
+.sheet-opt--press{background:var(--soft)}
+.sheet-check{color:var(--green-mid);font-weight:700}
+
+/* 自绘月历（替代系统 date picker 深色滚轮） */
+.cal-head{display:flex;align-items:center;justify-content:space-between;padding:4rpx 40rpx 12rpx}
+.cal-label{font-size:30rpx;font-weight:700;color:var(--ink)}
+.cal-nav{width:64rpx;height:64rpx;line-height:60rpx;text-align:center;font-size:40rpx;color:var(--green);border-radius:50%}
+.cal-nav--press{background:var(--soft)}
+.cal-nav--dis{color:var(--star-off)}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);padding:0 24rpx}
+.cal-week text{text-align:center;font-size:22rpx;color:var(--muted);padding:8rpx 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:0 24rpx 6rpx}
+.cal-cell{height:80rpx;display:flex;align-items:center;justify-content:center}
+.cal-day{width:64rpx;height:64rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27rpx;color:var(--ink);box-sizing:border-box}
+.cal-day--today{border:2rpx solid var(--green-mid)}
+.cal-day--sel{background:var(--green-solid);color:#fff;font-weight:700;border-color:var(--green-solid)}
+
+/* 外观三态分段选择（跟随系统/浅色/深色） */
+.seg-row{display:flex;background:var(--soft);border-radius:44rpx;padding:8rpx}
+.seg{flex:1;text-align:center;font-size:26rpx;color:var(--muted);padding:14rpx 0;border-radius:40rpx}
+.seg--on{background:var(--card);color:var(--green);font-weight:700;box-shadow:0 2rpx 10rpx rgba(0,0,0,.08)}
+.cal-day--dis{color:var(--dis2)}
+.cal-day--press{background:var(--soft)}
 
 /* picker 行改为「值 + 右侧箭头」图标指引（替代「点击修改/点击切换」文字） */
 .picker-value{display:flex;align-items:center;justify-content:space-between}
-.picker-value--press{background:#CBE6DC}.picker-arrow{width:14rpx;height:14rpx;border-right:4rpx solid #7B8A84;border-bottom:4rpx solid #7B8A84;transform:rotate(-45deg);margin-left:12rpx;flex-shrink:0}
+.picker-value--press{color:var(--green-press)}.picker-arrow{width:14rpx;height:14rpx;border-right:4rpx solid var(--muted4);border-bottom:4rpx solid var(--muted4);transform:rotate(-45deg);margin-left:12rpx;flex-shrink:0}
 
 /* 学习进度三列统计（替代一行长文字，大字体下不再折行） */
 .stat-row{display:flex;justify-content:space-around}
 .stat-item{text-align:center}
-.stat-num{font-size:40rpx;font-weight:800;color:#176B5B}
-.stat-denom{font-size:24rpx;font-weight:400;color:#8B9893}
-.stat-label{font-size:22rpx;color:#8B9893;margin-top:4rpx}
+.stat-num{font-size:40rpx;font-weight:800;color:var(--green)}
+.stat-denom{font-size:24rpx;font-weight:400;color:var(--muted)}
+.stat-label{font-size:22rpx;color:var(--muted);margin-top:4rpx}
 
-/* 按钮行固定 flex：导出/导入在长者模式/大字体下也保持并排 */
-.btn-row{display:flex;gap:16rpx}
-.btn-row .btn-half{flex:1;white-space:nowrap;padding:10rpx 0;font-size:27rpx}
+/* 按钮行：成对按钮改为内容宽+最小宽兜底（min-width 88px@375），行内居中；
+   长者模式/大字体下按钮可随文字自然变宽，不再铺满整行 */
+.btn-row{display:flex;gap:16rpx;justify-content:center}
+.btn-row .btn-half{min-width:176rpx;white-space:nowrap;padding:10rpx 20rpx;font-size:27rpx;text-align:center}
 .btn-reset{font-size:27rpx}
 
 /* 设置页按钮统一规格：同字号同高（line-height 由 app 层统一）；
-   独立按钮挂 btn-fit 收窄居中，成对按钮（btn-half）保持等宽两列。
+   独立按钮挂 btn-fit 收窄居中，成对按钮（btn-half）内容宽+min-width 兜底。
    试听按钮（btn-voice）保持自适应宽度 */
 .btn-ghost{font-size:27rpx}
 .btn-voice{width:auto;padding:10rpx 24rpx}
 
 /* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */
-@media (min-width: 700px) {
-  .stat-line { font-size: 15px; margin-bottom: 4px; }
-  .picker-value { font-size: 14px; border-radius: 6px; padding: 7px 12px; }
-  .btn-row { margin-top: 10px; }
-  .btn-half { padding: 2px 20px; font-size: 14px; }
-  .btn-ghost { font-size: 14px; }
-  .btn-voice { width: auto; padding: 2px 20px; }
-  .engine-status { font-size: 12px; margin-top: 7px; padding: 7px 9px; border-radius: 5px; }
-  .sync-state { font-size: 13px; }
-  .sync-dot { width: 8px; height: 8px; margin-right: 7px; }
-  .sync-error { font-size: 12px; border-radius: 5px; padding: 6px 9px; margin-top: 7px; }
-  .sync-meta { font-size: 12px; margin-top: 6px; }
-  .about-btn { font-size: 14px; padding: 4px 0; }
-  .backup-box { margin-top: 8px; border-radius: 6px; }
-  .backup-text { height: 110px; padding: 8px; font-size: 11px; }
-  .picker-arrow { width: 7px; height: 7px; border-width: 2px; margin-left: 6px; }
-  .stat-row { justify-content: space-around; }
-  .stat-num { font-size: 20px; }
-  .stat-denom { font-size: 12px; }
-  .stat-label { font-size: 11px; margin-top: 2px; }
-  .btn-row { gap: 8px; }
-  .btn-reset { font-size: 14px; }
+@media (min-width:700px) {
+  .stat-line { font-size:15px; margin-bottom:4px; }
+  .picker-value { font-size:14px; padding:7px 2px; }
+  .btn-row { margin-top:10px; justify-content:center; }
+  .btn-half { min-width:88px; padding:2px 20px; font-size:14px; }
+  .btn-ghost { font-size:14px; }
+  .btn-voice { width:auto; padding:2px 20px; }
+  .engine-status { font-size:12px; margin-top:7px; padding:7px 9px; border-radius:5px; }
+  .sync-state { font-size:13px; }
+  .sync-dot { width:8px; height:8px; margin-right:7px; }
+  .sync-error { font-size:12px; border-radius:5px; padding:6px 9px; margin-top:7px; }
+  .sync-meta { font-size:12px; margin-top:6px; }
+  .about-btn { font-size:14px; padding:4px 0; }
+  .backup-box { margin-top:8px; border-radius:6px; }
+  .backup-text { height:110px; padding:8px; font-size:11px; }
+  .picker-arrow { width:7px; height:7px; border-width:2px; margin-left:6px; }
+  .stat-row { justify-content:space-around; }
+  .stat-num { font-size:20px; }
+  .stat-denom { font-size:12px; }
+  .stat-label { font-size:11px; margin-top:2px; }
+  .btn-row { gap:8px; }
+  .btn-reset { font-size:14px; }
+  .sheet { border-radius:14px 14px 0 0; padding:5px 0 calc(75px + env(safe-area-inset-bottom)); max-height:80vh; }
+  .sheet-title { font-size:12px; padding:9px 0 4px; }
+  .sheet-opt { font-size:14px; padding:12px 18px; }
+  .sheet-check { font-size:13px; }
+  .cal-head { padding:2px 20px 6px; }
+  .cal-label { font-size:15px; }
+  .cal-nav { width:32px; height:32px; line-height:30px; font-size:20px; }
+  .cal-week { padding:0 12px; }
+  .cal-week text { font-size:11px; padding:4px 0; }
+  .cal-grid { padding:0 12px 3px; }
+  .cal-cell { height:40px; }
+  .cal-day { width:32px; height:32px; font-size:14px; }
 }

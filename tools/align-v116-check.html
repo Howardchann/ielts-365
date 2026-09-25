@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>v1.1.6 对齐机制自检</title>
+<style>
+  /* ===== 从 app.wxss 按 1rpx=0.5px 折算（375px 视口），只取对齐相关规则 ===== */
+  html { background:#F3F8EF; }
+  body { max-width:420px; margin:0 auto; background:#F3F8EF; color:#24332F; font-size:14px; line-height:1.6;
+         font-family:-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+  .card { background:#fff; border-radius:12px; padding:14px; margin:10px 12px; }
+  .section-label { font-size:13px; font-weight:700; color:#176B5B; margin-bottom:7px; }
+
+  /* 文字按钮 flex 化 */
+  .btn-ghost { background:transparent; color:#176B5B; border:none; border-radius:22px; font-size:15px;
+               display:inline-flex; align-items:center; justify-content:center; line-height:1.3; padding:4px 10px;
+               font-family:inherit; cursor:pointer; }
+  .btn-primary { background:#F0F7F3; color:#176B5B; border:none; border-radius:22px; font-size:15px; font-weight:700;
+                 display:inline-flex; align-items:center; justify-content:center; line-height:1.3; padding:4px 10px;
+                 font-family:inherit; cursor:pointer; }
+  .btn-fit { margin-left:auto; margin-right:auto; }
+  .center { text-align:center; }
+  .ico { display:inline-block; width:15px; height:15px; background:center/contain no-repeat; margin-right:5px; vertical-align:-4px; }
+  .ico-check { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.8l5 5L19.5 7' fill='none' stroke='%23176B5B' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  .ico-up { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23176B5B' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V4M8 8l4-4 4 4'/%3E%3Cpath d='M5 12v7h14v-7'/%3E%3C/svg%3E"); }
+
+  /* word 行 baseline 机制 */
+  .word-row { display:flex; align-items:baseline; padding:7px 0; border-bottom:1px solid #E9F0EC; }
+  .word-row:last-child { border-bottom:none; }
+  .word-speak { flex-shrink:0; width:28px; height:28px; font-size:16px; text-align:center; margin-right:8px; }
+  .word-speak::before, .ex-speak::before, .word-star::before { content:'\200B'; }
+  .word-main { flex:1; min-width:0; }
+  .word-en { font-size:16px; font-weight:700; }
+  .word-pos { font-size:11px; color:#176B5B; font-style:italic; margin-left:5px; }
+  .word-zh { font-size:13px; color:#5F6D68; margin-top:2px; }
+  .word-example-row { display:flex; align-items:baseline; }
+  .word-example { font-size:12.5px; color:#82908B; margin-top:3px; padding-left:2px; }
+  .word-example-row .word-example { flex:1; min-width:0; }
+  .word-star { flex-shrink:0; width:32px; height:32px; font-size:16px; text-align:center; color:#C7D0CC; }
+  .spk-ico { display:inline-block; vertical-align:middle; width:16px; height:16px; background:center/contain no-repeat;
+             background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9v6h4l5 5V4L7 9H3z M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z' fill='%23176B5B'/%3E%3C/svg%3E"); }
+  .ex-speak .spk-ico { width:13px; height:13px; }
+  .star-ico { display:inline-block; vertical-align:middle; width:20px; height:18px; background:center/contain no-repeat;
+              background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20.1C7.7 16.9 4 13.7 3 10.7 2.1 7.8 3.8 5.1 6.6 4.6 8.5 4.3 10.5 5.2 12 6.9 13.5 5.2 15.5 4.3 17.4 4.6 20.2 5.1 21.9 7.8 21 10.7 20 13.7 16.3 16.9 12 20.1Z' fill='none' stroke='%23C7D0CC' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+
+  /* 语法区 */
+  .grammar-ex { display:flex; align-items:baseline; padding:7px 0; border-bottom:1px solid #E9F0EC; }
+  .grammar-ex-text { flex:1; min-width:0; font-size:13.5px; line-height:1.75; color:#43504C; }
+  .ex-no { flex-shrink:0; width:18px; color:#176B5B; font-weight:700; font-size:13px; line-height:1.75; text-align:center; margin:0 7px 0 0; }
+  .ex-speak { flex-shrink:0; width:23px; height:23px; font-size:13px; text-align:center; margin-left:6px; }
+
+  /* 复习页大词行 */
+  .random-head { display:flex; align-items:baseline; justify-content:center; gap:8px; }
+  .random-head .word-speak { font-size:28px; }
+  .random-head .spk-ico { width:18px; height:18px; }
+  .random-word { font-size:28px; font-weight:800; line-height:1.3; }
+  .random-zh-ex { display:flex; align-items:baseline; justify-content:center; gap:7px; margin-top:8px; font-size:13px; color:#82908B; }
+
+  /* 自检辅助：给喇叭盒画细框，肉眼检查图标是否落在盒中心 */
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="section-label">词条行（无降部 / 有降部 / 混合）</div>
+    <div class="word-row">
+      <div class="word-speak"><span class="spk-ico"></span></div>
+      <div class="word-main">
+        <span class="word-en">Go</span><span class="word-pos">v.</span>
+        <div class="word-zh">去；走</div>
+        <div class="word-example-row">
+          <div class="word-example">Go to school by bus every day.</div>
+          <div class="ex-speak"><span class="spk-ico"></span></div>
+        </div>
+      </div>
+      <div class="word-star"><span class="star-ico"></span></div>
+    </div>
+    <div class="word-row">
+      <div class="word-speak"><span class="spk-ico"></span></div>
+      <div class="word-main">
+        <span class="word-en">playing</span><span class="word-pos">n.</span>
+        <div class="word-zh">比赛；演奏（含降部 p/g）</div>
+        <div class="word-example-row">
+          <div class="word-example">The children are playing happily in the park.</div>
+          <div class="ex-speak"><span class="spk-ico"></span></div>
+        </div>
+      </div>
+      <div class="word-star"><span class="star-ico"></span></div>
+    </div>
+    <div class="word-row dbg">
+      <div class="word-speak"><span class="spk-ico"></span></div>
+      <div class="word-main">
+        <span class="word-en">hello</span><span class="word-pos">int.</span>
+        <div class="word-zh">你好（本行喇叭盒带虚线框自检）</div>
+      </div>
+      <div class="word-star"><span class="star-ico"></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">语法区（序号 + 例句 + 喇叭）</div>
+    <div class="grammar-ex">
+      <div class="ex-no">1.</div>
+      <div class="grammar-ex-text">She goes to work by subway every morning.</div>
+      <div class="ex-speak"><span class="spk-ico"></span></div>
+    </div>
+    <div class="grammar-ex">
+      <div class="ex-no">2.</div>
+      <div class="grammar-ex-text">They are playing football on the playground after school, which makes them really happy.</div>
+      <div class="ex-speak"><span class="spk-ico"></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">文字按钮（flex 居中图标）</div>
+    <div class="center">
+      <button class="btn-primary btn-fit">完成打卡<span class="ico ico-check" style="margin-left:3px;margin-right:0"></span></button>
+    </div>
+    <div class="center" style="margin-top:6px">
+      <button class="btn-ghost btn-fit"><span class="ico ico-check"></span>取消打卡</button>
+    </div>
+    <div class="center" style="margin-top:6px">
+      <button class="btn-ghost btn-fit"><span class="ico ico-up"></span>导出备份</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">复习页大词行</div>
+    <div class="random-head">
+      <span class="random-word">Go</span>
+      <div class="word-speak"><span class="spk-ico"></span></div>
+    </div>
+    <div class="random-zh-ex">
+      <span>He goes to school early.</span>
+      <div class="ex-speak"><span class="spk-ico"></span></div>
+    </div>
+  </div>
+</body>
+</html>

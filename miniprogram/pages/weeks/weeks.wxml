@@ -1,3 +1,5 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="page-root {{dark ? 'theme-dark' : ''}}">
 <!-- 学习计划总览（78 周 / 18 个月） -->
 <view class="card stat-card">
   <view class="stat-row">
@@ -16,12 +18,18 @@
   </view>
 </view>
 
-<view class="phase-block" wx:for="{{phases}}" wx:key="p" wx:for-item="phase">
-  <view class="phase-title" data-p="{{phase.p}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onPhaseTap">
-    <text>{{phase.name}}</text>
-    <text class="phase-arrow {{openPhase === phase.p ? 'phase-arrow--open' : ''}}"></text>
+<!-- 方案C：四阶段 2×2 磁贴总览（收起态），点磁贴展开该阶段周列表 -->
+<view class="phase-grid">
+  <view class="phase-tile {{openPhase === phase.p ? 'phase-tile--open' : ''}} {{phase.isCurrentPhase ? 'phase-tile--cur' : ''}}"
+        wx:for="{{phases}}" wx:key="p" wx:for-item="phase"
+        data-p="{{phase.p}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onPhaseTap">
+    <view class="tile-name">{{phase.shortName}}</view>
+    <view class="tile-meta">第 {{phase.range}} 周 · {{phase.doneCount}}/{{phase.totalWeeks}} 周</view>
+    <view class="tile-bar"><view class="tile-fill" style="width:{{phase.percent}}%"></view></view>
   </view>
+</view>
 
+<block wx:for="{{phases}}" wx:key="p" wx:for-item="phase">
   <block wx:if="{{openPhase === phase.p}}">
     <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}}"
           wx:for="{{phase.weeks}}" wx:key="w" wx:for-item="week"
@@ -41,4 +49,5 @@
       </view>
     </view>
   </block>
+</block>
 </view>

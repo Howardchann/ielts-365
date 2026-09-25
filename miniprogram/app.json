@@ -6,12 +6,14 @@
     "pages/settings/settings"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#176B5B",
+    "navigationBarBackgroundColor": "@navBg",
     "navigationBarTitleText": "开溜6.5",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#F3F8EF",
+    "navigationBarTextStyle": "@navTxt",
+    "backgroundColor": "@winBg",
     "backgroundTextStyle": "dark"
   },
+  "darkmode": true,
+  "themeLocation": "theme.json",
   "tabBar": {
     "custom": true,
     "color": "#8B9893",
