@@ -73,8 +73,22 @@ Page({
     store.reviewWord(c.w, remembered);
     // 长文字 toast 在快速连按时反复弹出，像整个模块在闪 —— 改短文案+短时长
     wx.showToast({ title: remembered ? '已记住' : '稍后再来', icon: 'none', duration: 800 });
+    // 到期 tab：先算好下一词、一次 setData 直接切换。
+    // 旧写法先 setData({current:null}) 再 onNextDue()，中间会渲染一帧
+    // 「目前没有到期复习词」空状态 —— 连按闪现整个模块的真凶就是它。
+    if (this.data.tab === 'due') {
+      const pool = store.dueWords(this.refreshPool());
+      if (pool.length) {
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        const next = Object.assign({}, item, { starred: store.isStarred(item.w) });
+        this._lastWord = item.w;
+        this.setData({ current: next, showZh: false });
+        speech.speak(next.w, { ai: next.ai, kind: 'w' });
+        return;
+      }
+    }
+    // 真正没有下一词（到期答完 / 随机 tab）才显示空状态卡片
     this.setData({ current: null, showZh: false });
-    if (this.data.tab === 'due') this.onNextDue();
   },
 
   // 抽一个词：优先重点词（30%），并尽量避开上一次抽到的词
