@@ -54,17 +54,15 @@
             hover-class="speak-hover" hover-stay-time="120"
             data-text="{{item.w}}" data-ai="{{item.ai}}" data-kind="w" bindtap="onSpeakWord">🔊</view>
       <view class="word-main">
-        <view><text class="word-en">{{item.w}}</text><text class="word-pos">{{item.p}}</text></view>
+        <view><text class="word-en"><text wx:if="{{playingText === item.w}}" class="kara-lit">{{karaLit}}</text>{{playingText === item.w ? karaRest : item.w}}</text><text class="word-pos">{{item.p}}</text></view>
         <view class="word-zh">{{item.m}}</view>
-        <view class="play-bar" wx:if="{{playingText === item.w}}"><view class="play-bar-fill" style="width:{{playPct}}%"></view></view>
         <view class="word-example-row">
-          <view class="word-example {{playingText === item.e ? 'word-example--playing' : ''}}"
-                data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">{{item.e}}</view>
+          <view class="word-example"
+                data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord"><text wx:if="{{playingText === item.e}}" class="kara-lit">{{karaLit}}</text>{{playingText === item.e ? karaRest : item.e}}</view>
           <view class="ex-speak {{playingText === item.e ? 'playing' : ''}}"
                 hover-class="speak-hover" hover-stay-time="120"
                 data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">🔊</view>
         </view>
-        <view class="play-bar" wx:if="{{playingText === item.e}}"><view class="play-bar-fill" style="width:{{playPct}}%"></view></view>
       </view>
       <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onStar"><view class="star-ico {{item.starred ? 'star-ico--on' : 'star-ico--off'}}"></view></view>
     </view>
@@ -76,7 +74,7 @@
     <view class="grammar-exp">{{dayData.g.exp}}</view>
     <view class="grammar-ex" wx:for="{{dayData.g.ex}}" wx:key="*this">
       <view class="ex-no">{{index + 1}}</view>
-      <text class="grammar-ex-text {{playingText === item ? 'word-example--playing' : ''}}">{{item}}</text>
+      <text class="grammar-ex-text"><text wx:if="{{playingText === item}}" class="kara-lit">{{karaLit}}</text>{{playingText === item ? karaRest : item}}</text>
       <view class="ex-speak {{playingText === item ? 'playing' : ''}}"
             hover-class="speak-hover" hover-stay-time="120"
             data-text="{{item}}" data-kind="g" bindtap="onSpeakWord">🔊</view>

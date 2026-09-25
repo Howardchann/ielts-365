@@ -6,7 +6,7 @@
 .phase-arrow--open{transform:rotate(135deg)}
 
 /* 日签与周信息左对齐（让出 80rpx 进度环宽度），整卡成两列网格 */
-.week-days{margin-left:100rpx}.day-chip{flex:1;text-align:center;font-size:22rpx;color:#8B9893;background:#F3F8EF;border-radius:8rpx;padding:8rpx 0}.day-chip--done{background:#E6F4EE;color:#176B5B;font-weight:700}
+.week-days{margin-left:0}.day-chip{flex:1;text-align:center;font-size:22rpx;color:#8B9893;background:#F3F8EF;border-radius:8rpx;padding:8rpx 0}.day-chip--done{background:#E6F4EE;color:#176B5B;font-weight:700}
 .week-words{font-size:22rpx;color:#8B9893;margin-top:4rpx}
 
 /* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */
@@ -25,6 +25,6 @@
   .progress-bar { height: 5px; border-radius: 3px; }
   .progress-text { font-size: 10px; margin-left: 6px; }
   .week-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; }
-  .week-days { margin-top: 9px; margin-left: 50px; gap: 5px; }
+  .week-days { margin-top: 9px; margin-left: 0; gap: 5px; }
   .day-chip { font-size: 11px; border-radius: 4px; padding: 4px 0; }
 }

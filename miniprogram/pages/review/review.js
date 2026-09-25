@@ -17,7 +17,13 @@ Page({
   onLoad() {
     // 监听器返回取消函数，页面卸载时注销（旧实现会永久堆积回调）
     this._offSpeech = speech.onStateChange((payload) => {
-      this.setData({ playingWord: payload.playing ? payload.text : '', playPct: Math.round((payload.progress || 0) * 100) });
+      const upd = { playingWord: payload.playing ? payload.text : '' };
+      if (payload.playing && payload.text) {
+        const lit = Math.round((payload.progress || 0) * payload.text.length);
+        upd.karaLit = payload.text.slice(0, lit);
+        upd.karaRest = payload.text.slice(lit);
+      } else { upd.karaLit = ''; upd.karaRest = ''; }
+      this.setData(upd);
     });
   },
 

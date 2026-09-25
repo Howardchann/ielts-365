@@ -32,7 +32,14 @@ Page({
     speech.setEngine(store.get('engine'));
     speech.setEngineMode(store.get('engineMode') || 'auto');
     this._offSpeech = speech.onStateChange((payload) => {
-      this.setData({ playingText: payload.playing ? payload.text : '', playingMode: payload.mode, playPct: Math.round((payload.progress || 0) * 100) });
+      const upd = { playingText: payload.playing ? payload.text : '', playingMode: payload.mode };
+      // 歌词式进度：按朗读进度把当前文本切成「已读/未读」两段，已读染绿
+      if (payload.playing && payload.text) {
+        const lit = Math.round((payload.progress || 0) * payload.text.length);
+        upd.karaLit = payload.text.slice(0, lit);
+        upd.karaRest = payload.text.slice(lit);
+      } else { upd.karaLit = ''; upd.karaRest = ''; }
+      this.setData(upd);
     });
     this.setData({ pluginOk: ok });
   },

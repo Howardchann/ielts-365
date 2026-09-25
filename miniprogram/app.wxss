@@ -62,19 +62,22 @@ page {
 .icon-remove{font-size:28rpx;color:#A6B2AD;}
 .icon-speaker{font-size:28rpx;}
 
-/* 全局按压反馈（hover-class 挂这些类）：缩放 + 变暗/降透明，两点叠加才够"按下去"的手感 */
+/* 全局按压反馈（hover-class 挂这些类）：
+   原生按钮统一「背景变色 + 轻缩放」（不再用透明度——有的按钮看得见有的看不见）；
+   文字/图标类（无背景）用变暗 + 缩放 */
 .hover-dim{opacity:.55;transform:scale(.96)}
-.btn-press{opacity:.8;transform:scale(.96)}
+.btn-press{transform:scale(.96)}
+.btn-primary.btn-press{background:#0E4C41}
+.btn-ghost.btn-press{background:#EAF5F0}
+.btn-ghost.btn-voice-on.btn-press{background:#0E4C41;color:#fff}
+/* 歌词式朗读进度：已读部分品牌绿，未读保持原色（kara-lit 放在词首 text 上） */
+.kara-lit{color:#176B5B}
 
 /* 收藏心形：不用 ♡/♥ 字符（部分机型字体把两个都渲染成实心，形状分不出来），
    改用 SVG 贴图——空心圆润描边 vs 实心填充，收藏前后是两个不同的形状 */
 .star-ico{width:40rpx;height:36rpx;background:center/contain no-repeat;}
 .star-ico--off{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2020.1C7.7%2016.9%204%2013.7%203%2010.7%202.1%207.8%203.8%205.1%206.6%204.6%208.5%204.3%2010.5%205.2%2012%206.9%2013.5%205.2%2015.5%204.3%2017.4%204.6%2020.2%205.1%2021.9%207.8%2021%2010.7%2020%2013.7%2016.3%2016.9%2012%2020.1Z'%20fill='none'%20stroke='%23C7D0CC'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3C/svg%3E");}
 .star-ico--on{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2020.1C7.7%2016.9%204%2013.7%203%2010.7%202.1%207.8%203.8%205.1%206.6%204.6%208.5%204.3%2010.5%205.2%2012%206.9%2013.5%205.2%2015.5%204.3%2017.4%204.6%2020.2%205.1%2021.9%207.8%2021%2010.7%2020%2013.7%2016.3%2016.9%2012%2020.1Z'%20fill='%23FF8A78'/%3E%3C/svg%3E");}
-
-/* 朗读进度条：播放中在词条/例句下方出现的细进度（跟唱歌的歌词进度同款视觉） */
-.play-bar{height:6rpx;background:#E9F0EC;border-radius:3rpx;margin-top:14rpx;overflow:hidden}
-.play-bar-fill{height:100%;background:#176B5B;border-radius:3rpx;transition:width .25s linear}
 
 /* ── iPad / 宽屏适配（纯追加，不影响手机端）──
    rpx 按「窗口宽度/750」换算，iPad Pro 窗口宽 1000px+ 时所有尺寸被放大约 3 倍。
@@ -110,5 +113,4 @@ page {
   .icon-star { font-size: 17px; }
   .icon-remove, .icon-speaker { font-size: 14px; }
   .star-ico { width: 20px; height: 18px; }
-  .play-bar { height: 3px; border-radius: 2px; margin-top: 7px; }
 }
