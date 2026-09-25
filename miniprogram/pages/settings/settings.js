@@ -70,7 +70,7 @@ Page({
     const eng=speech.getEngineInfo(),pre=eng.engine==='pregen';
     const MODES={auto:['自动（当前云端音频可用，优先预生成）','优先播预生成高清音频（美音），失败自动切在线 TTS。在线音色与预生成不同，属正常现象。'],pregen:['仅预生成高清音频','只用预生成音频（美音），不连网朗读。若某条失败会直接提示，不再切在线。'],online:['仅在线 TTS（有道 / 百度）','全部走在线朗读。音色与预生成不同；口音切换（英/美）只在这个音源下生效。']};
     const m=MODES[engineMode]||MODES.auto;
-    this.setData({startDate:store.get('startDate')||plan.DEFAULT_START,rate,rateText:Number(rate).toFixed(2)+'×',accent,accentIndex:Math.max(0,ACCENTS.indexOf(accent)),engineIndex:Math.max(0,this.data.engineOptions.findIndex(o=>o.value===engineMode)),totalChecked:store.checkedCount(),totalDays:plan.TOTAL_DAYS,starredCount:(store.get('starredWords')||[]).length,reviewCount:Object.keys(store.get('reviewStats')||{}).length,
+    this.setData({startDate:store.get('startDate')||plan.DEFAULT_START,rate,rateText:Number(rate).toFixed(2)+'×',accent,accentIndex:Math.max(0,ACCENTS.indexOf(accent)),engineIndex:Math.max(0,this.data.engineOptions.findIndex(o=>o.value===engineMode)),totalChecked:store.checkedCount(),totalDays:plan.TOTAL_DAYS,starredCount:(store.get('starredWords')||[]).length,reviewCount:store.activeReviewCount(),
       engineLabel:m[0],
       engineHint:(pre?'':'⚠️ 云端音频不可用，预生成将自动降级在线。')+m[1]});this.refreshCloud();},
   onEngineMode(e){const m=this.data.engineOptions[Number(e.detail.value)].value;store.set('engineMode',m);speech.setEngineMode(m);this.refresh();},
@@ -83,6 +83,7 @@ Page({
   onHideBackup(){this.setData({showBackup:false});},onShowImport(){this.setData({showImport:true,showBackup:false,importText:''});},onHideImport(){this.setData({showImport:false,importText:''});},onImportInput(e){this.setData({importText:e.detail.value});},
   doImport(mode){const text=(this.data.importText||'').trim();if(!text){wx.showToast({title:'请先粘贴备份内容',icon:'none'});return;}let r;try{r=store.importBackup(text,mode);}catch(e){wx.showModal({title:'导入失败',content:e.message||String(e),showCancel:false});return;}this.setData({showImport:false,importText:''});this.refresh();const head=mode==='merge'?'合并完成':'覆盖完成';const detail=mode==='merge'?('新增 '+r.addedDays+' 天打卡、'+r.addedWords+' 个重点词\n合并后共 '+r.totalDays+' 天、'+r.totalWords+' 个重点词\n已恢复 '+r.reviewWords+' 个复习记录'):('已替换为备份中的 '+r.totalDays+' 天打卡、'+r.totalWords+' 个重点词、'+r.reviewWords+' 个复习记录');wx.showModal({title:head,content:detail,showCancel:false});},
   onImportMerge(){this.doImport('merge');},onImportReplace(){this.doImport('replace');},
+  onResetProgress(){wx.showModal({title:'清除学习记录',content:'将清空全部打卡、收藏与复习记录，云端一并清除，其他设备同步后同样清空，无法撤销。建议先「导出备份」。确定从0开始吗？',confirmText:'清除',confirmColor:'#C0392B',success:(r)=>{if(!r.confirm)return;store.resetProgress();this.refresh();wx.showToast({title:'已清除，重新开始',icon:'none',duration:2500});}});},
   // 云同步状态：只更新这一小块，避免每次 store 变更都整页 refresh
   refreshCloud(){
     const sr=store.cloudStatus();const p=n=>String(n).padStart(2,'0');

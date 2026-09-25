@@ -351,6 +351,51 @@ function dump(id) { const c = DB.progress; return c ? c.get(id) : undefined; }
     '重复上送不再返回 patch（旧设备重传不会逼其他设备回全量）',
     resDup.result && resDup.result.reviewPatch);
 
+  console.log('\n【15】清除学习记录（从0开始）：墓碑/零记录压制，两台设备都收敛到空');
+  use(d1); await sleep(5);
+  // 造进度：打卡 + 收藏 + 复习（复用前面章节已同步的部分进度，如 apple/hello）
+  d1.store.toggleCheck(3, 1); d1.store.toggleCheck(3, 2);
+  d1.store.toggleStar({ w: 'resetword', m: '重置词', p: 'n.', e: 'Reset word.' });
+  d1.store.reviewWord('resetword', true);
+  await d1.store.syncNow(); await sleep(10);
+  ok(d1.store.checkedCount() > 0 && d1.store.isStarred('resetword'),
+    '起点：设备1 有打卡 ' + d1.store.checkedCount() + ' 天且有收藏/复习记录');
+  // 清除
+  const resetAt = d1.store.getReviewStats('resetword').lastReviewedAt;
+  d1.store.resetProgress();
+  ok(d1.store.checkedCount() === 0, '重置后本地打卡数 = 0');
+  ok(!d1.store.isStarred('resetword'), '重置后本地收藏已清空');
+  const zr = d1.store.getReviewStats('resetword');
+  ok(zr.correct === 0 && zr.wrong === 0 && zr.lastReviewedAt >= resetAt,
+    '重置后复习记录变为零记录（压制云端用）', zr);
+  ok(d1.store.activeReviewCount() === 0, '有效复习计数 = 0（纯零记录不计入）');
+  // 上云（可能需要多轮：墓碑+零记录都走 dirty 通道）
+  await new Promise(res => { let n = 0; const tick = () => { if (d1.store.cloudStatus().pending === 0 || ++n > 60) return res(); setTimeout(tick, 150); }; tick(); });
+  const allRs = {};
+  [...DB.progress.values()].filter(d => d.kind === 'rs').forEach(d => Object.assign(allRs, d.stats || {}));
+  const nonZero = Object.keys(allRs).filter(w => (allRs[w].correct || 0) + (allRs[w].wrong || 0) > 0);
+  ok(nonZero.length === 0, '云端所有复习记录都被零记录压平（非零记录 ' + nonZero.length + ' 条）', nonZero.slice(0, 5));
+  const coreDoc = [...DB.progress.values()].find(d => d.kind === 'core');
+  const checkedKeys = Object.keys((coreDoc && coreDoc.checkedDays) || {});
+  const uncheckedWins = checkedKeys.filter(k => {
+    const c = (coreDoc.checkedDays[k] || 0), u = (coreDoc.uncheckedDays || {})[k] || 0;
+    return c > u;   // 仍有"打卡时间晚于取消时间"的天 = 未压住
+  });
+  ok(uncheckedWins.length === 0, '云端所有打卡都被取消墓碑压住', uncheckedWins.slice(0, 5));
+  // 设备2 同步 → 收敛到空
+  use(d2); await sleep(10);
+  await d2.store.syncNow(); await sleep(50); await d2.store.syncNow(); await sleep(10);
+  ok(d2.store.checkedCount() === 0, '设备2 同步后打卡数也归 0');
+  ok(!d2.store.isStarred('resetword'), '设备2 同步后收藏也清空');
+  const d2r = d2.store.getReviewStats('resetword');
+  ok(d2r.correct === 0 && d2r.wrong === 0, '设备2 同步后复习记录也归零', d2r);
+  ok(d2.store.activeReviewCount() === 0, '设备2 有效复习计数 = 0');
+  // 重置后重新打卡要能正常工作（墓碑被更晚的时间戳压过）
+  use(d1); await sleep(5);
+  d1.store.toggleCheck(1, 1); await d1.store.syncNow(); await sleep(10);
+  use(d2); await sleep(5); await d2.store.syncNow(); await sleep(10);
+  ok(d1.store.isChecked(1, 1) && d2.store.isChecked(1, 1), '重置后重新打卡，两台设备都正常生效');
+
   console.log('\n============================');
   console.log('通过 ' + pass + ' 项，失败 ' + fail + ' 项');
   console.log('============================\n');

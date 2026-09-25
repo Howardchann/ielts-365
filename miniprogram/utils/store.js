@@ -551,10 +551,49 @@ function importBackup(text, mode) {
   };
 }
 
+// 「清除学习记录」用的有效计数：纯零记录（重置压制品，correct/wrong 全 0）不算复习记录
+function activeReviewCount() {
+  const rs = data.reviewStats || {};
+  let n = 0;
+  Object.keys(rs).forEach(w => {
+    const s = rs[w] || {};
+    if ((Number(s.correct) || 0) + (Number(s.wrong) || 0) > 0) n++;
+  });
+  return n;
+}
+
+// 清除学习记录（从0开始）。
+// ⚠️ 云函数只有 merge 动作（只增不删），直接清空本地会被云端旧值复活——
+//    必须用既有时间戳规则把云端"压下去"：
+//    · 打卡   → 每个已打卡天写一条 uncheckedDays 墓碑（ts=now，晚于原打卡，永远胜出）
+//    · 收藏   → 每个收藏词写一条 unstarredWords 墓碑（同理）
+//    · 复习   → 每个有记录的词写一条 lastReviewedAt=now 的零记录（云端按 lastReviewedAt 新者胜）
+//    墓碑/零记录走常规 dirty 通道分轮上送；其他设备下次同步会一并收敛到空。
+//    之后重新打卡/收藏/复习都从零开始累计（旧墓碑被更晚的时间戳自然压过，无需清理）。
+//    startDate 回到默认（下一个周一，进准备期）；语速/口音/朗读方式等偏好保留。
+function resetProgress() {
+  const now = Date.now();
+  Object.keys(data.checkedDays || {}).forEach(k => { data.uncheckedDays[k] = now; });
+  data.checkedDays = {};
+  (data.starredWords || []).forEach(it => { if (it && it.w) data.unstarredWords[it.w] = now; });
+  data.starredWords = [];
+  const zero = {};
+  Object.keys(data.reviewStats || {}).forEach(w => {
+    zero[w] = { correct: 0, wrong: 0, level: 0, nextReviewAt: 0, lastReviewedAt: now };
+  });
+  data.reviewStats = zero;
+  data.reviewDirty = {};
+  Object.keys(zero).forEach(w => { data.reviewDirty[w] = 1; });
+  data.startDate = plan.DEFAULT_START;
+  data.settingsAt = now;            // startDate 走 settingsAt 更晚者胜的合并规则
+  data.updatedAt = now;
+  saveLocal(); schedulePush(); emit();
+}
+
 module.exports = {
   init, onResume, flush, onChange, get, set,
   isChecked, toggleCheck, checkedCount, firstUnfinishedDay, weekCheckedCount, weekCheckedMap,
-  isStarred, toggleStar, reviewWord, getReviewStats, dueWords,
+  isStarred, toggleStar, reviewWord, getReviewStats, dueWords, activeReviewCount, resetProgress,
   sync, syncNow, setSyncEnabled, cloudStatus,
   exportBackup, importBackup
 };
