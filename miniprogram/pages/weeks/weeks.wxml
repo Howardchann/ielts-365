@@ -19,7 +19,7 @@
 <view class="phase-block" wx:for="{{phases}}" wx:key="p" wx:for-item="phase">
   <view class="phase-title" data-p="{{phase.p}}" bindtap="onPhaseTap">
     <text>{{phase.name}}</text>
-    <text class="phase-toggle">{{openPhase === phase.p ? '收起' : '展开'}}</text>
+    <text class="phase-arrow {{openPhase === phase.p ? 'phase-arrow--open' : ''}}"></text>
   </view>
 
   <block wx:if="{{openPhase === phase.p}}">

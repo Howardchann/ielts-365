@@ -63,7 +63,7 @@ Page({
     engineOptions:[{value:'auto',label:'自动（推荐）：优先预生成，失败切在线'},{value:'pregen',label:'仅预生成高清音频'},{value:'online',label:'仅在线 TTS（有道/百度）'}],engineIndex:0,
     totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:buildLabel(),aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音',
     cloudOn:true,cloudMeta:'',cloudErr:'',cloudTip:'',syncing:false},
-  onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?('朗读中…'+(p.source?'（'+p.source+'）':'')+' 点击停止'):'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
+  onLoad(){const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?'停止朗读':'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}if(this._offStore){this._offStore();this._offStore=null;}},
   onShow(){if (typeof this.getTabBar === 'function' && this.getTabBar()) this.getTabBar().setData({ active: 3 });this.refresh();},
   refresh(){const rate=store.get('rate')||0.9,accent=store.get('accent')||'us',engineMode=store.get('engineMode')||'auto';speech.setRate(rate);speech.setEngineMode(engineMode);speech.setAccent(accent);
