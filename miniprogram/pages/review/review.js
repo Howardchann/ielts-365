@@ -17,7 +17,7 @@ Page({
   onLoad() {
     // 监听器返回取消函数，页面卸载时注销（旧实现会永久堆积回调）
     this._offSpeech = speech.onStateChange((payload) => {
-      this.setData({ playingWord: payload.playing ? payload.text : '' });
+      this.setData({ playingWord: payload.playing ? payload.text : '', playPct: Math.round((payload.progress || 0) * 100) });
     });
   },
 

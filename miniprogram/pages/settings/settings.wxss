@@ -1,5 +1,5 @@
 /* 开溜 · 设置页 */
-.stat-line{font-size:30rpx;font-weight:700;color:#24332F;margin-bottom:8rpx}.picker-value{font-size:30rpx;color:#176B5B;background:#E6F4EE;border-radius:12rpx;padding:18rpx 24rpx}.btn-row{margin-top:20rpx}.btn-half{display:inline-block;padding:4rpx 40rpx;font-size:27rpx}.engine-status{font-size:24rpx;margin-top:14rpx;padding:14rpx 18rpx;border-radius:10rpx}.engine-status--ok{background:#E6F4EE;color:#176B5B}.engine-status--bad{background:#FDECEA;color:#C0392B}.sync-state{display:flex;align-items:center;font-size:26rpx;color:#53605B}.sync-dot{width:16rpx;height:16rpx;border-radius:50%;background:#C7D0CC;margin-right:14rpx;flex-shrink:0}.sync-dot--ok{background:#176B5B}.sync-error{font-size:23rpx;color:#C0392B;background:#FDECEA;border-radius:10rpx;padding:12rpx 18rpx;margin-top:14rpx}.about-btn{font-size:28rpx;color:#176B5B;padding:8rpx 0}.about-ver{margin-top:4rpx}
+.stat-line{font-size:30rpx;font-weight:700;color:#24332F;margin-bottom:8rpx}.picker-value{font-size:30rpx;color:#176B5B;background:#E6F4EE;border-radius:12rpx;padding:18rpx 24rpx}.btn-row{margin-top:20rpx}.btn-voice{display:inline-block;align-self:flex-start;padding:10rpx 44rpx;font-size:27rpx;white-space:nowrap}.engine-status{font-size:24rpx;margin-top:14rpx;padding:14rpx 18rpx;border-radius:10rpx}.engine-status--ok{background:#E6F4EE;color:#176B5B}.engine-status--bad{background:#FDECEA;color:#C0392B}.sync-state{display:flex;align-items:center;font-size:26rpx;color:#53605B}.sync-dot{width:16rpx;height:16rpx;border-radius:50%;background:#C7D0CC;margin-right:14rpx;flex-shrink:0}.sync-dot--ok{background:#176B5B}.sync-error{font-size:23rpx;color:#C0392B;background:#FDECEA;border-radius:10rpx;padding:12rpx 18rpx;margin-top:14rpx}.about-btn{font-size:28rpx;color:#176B5B;padding:8rpx 0}.about-ver{margin-top:4rpx}
 .sync-row{display:flex;align-items:center;justify-content:space-between}.sync-meta{font-size:24rpx;color:#7B8A84;margin-top:12rpx}
 .backup-box{margin-top:16rpx;border:1rpx solid #D6E4E0;border-radius:12rpx;background:#FBFDFC;overflow:hidden}.backup-text{width:100%;height:220rpx;padding:16rpx;box-sizing:border-box;font-size:22rpx;line-height:1.6;color:#4A5A56}.btn-plain{background:transparent!important;color:#7A8A86!important}
 .btn-ghost.btn-voice-on{background:#176B5B;color:#fff;border-color:#176B5B}
@@ -18,7 +18,7 @@
 
 /* 按钮行固定 flex：导出/导入在长者模式/大字体下也保持并排 */
 .btn-row{display:flex;gap:16rpx}
-.btn-row .btn-half{flex:1;white-space:nowrap;padding:10rpx 0}
+.btn-row .btn-half{flex:1;white-space:nowrap;padding:10rpx 0;font-size:27rpx}
 .btn-reset{font-size:27rpx}
 
 /* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */

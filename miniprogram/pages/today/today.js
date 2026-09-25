@@ -32,7 +32,7 @@ Page({
     speech.setEngine(store.get('engine'));
     speech.setEngineMode(store.get('engineMode') || 'auto');
     this._offSpeech = speech.onStateChange((payload) => {
-      this.setData({ playingText: payload.playing ? payload.text : '', playingMode: payload.mode });
+      this.setData({ playingText: payload.playing ? payload.text : '', playingMode: payload.mode, playPct: Math.round((payload.progress || 0) * 100) });
     });
     this.setData({ pluginOk: ok });
   },
@@ -114,7 +114,7 @@ Page({
     const info = plan.dayInfo(this.data.viewDay);
     const now = store.toggleCheck(info.wIdx + 1, info.k);
     this.setData({ checked: now });
-    if (now) wx.showToast({ title: '打卡成功', icon: 'success' });
+    if (now) wx.showToast({ title: '打卡成功', icon: 'success', duration: 1200 });
   },
 
   // ---- 朗读 ----

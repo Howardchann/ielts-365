@@ -45,8 +45,8 @@ function setEngineMode(m) {
   return state.engineMode;
 }
 function setAccent(accent) { if (accent === 'uk' || accent === 'us') state.accent = accent; }
-function notify(text, playing, mode) {
-  const p = { text: text || '', playing: !!playing, source: usedSource || '', mode: mode || (state.queueMode ? 'queue' : (playing ? 'single' : 'idle')) };
+function notify(text, playing, mode, progress) {
+  const p = { text: text || '', playing: !!playing, source: usedSource || '', mode: mode || (state.queueMode ? 'queue' : (playing ? 'single' : 'idle')), progress: typeof progress === 'number' ? progress : 0 };
   state.listeners.slice().forEach(fn => { try { fn(p); } catch (e) {} });
 }
 
@@ -163,7 +163,18 @@ function playSrc(src, isFile, onResult, timeoutMs, rate) {
     if (token !== playToken || started) return;
     failNotes.push(host + ' 未出声'); cleanup(); state.playing = false; onResult(false);
   }, timeoutMs || 6000);
-  audio.onPlay(() => { if (token !== playToken) return; started = true; state.playing = true; });
+  audio.onPlay(() => { if (token !== playToken) return; started = true; state.playing = true; lastPct = 0; });
+  // 朗读进度：InnerAudioContext 时序回调 → 通知订阅方（页面画细进度条）。≥3% 才推，避免刷屏
+  let lastPct = 0;
+  audio.onTimeUpdate(() => {
+    if (token !== playToken || !state.playing) return;
+    const dur = audio.duration || 0;
+    if (!dur) return;
+    const pct = Math.min(1, audio.currentTime / dur);
+    if (pct - lastPct < 0.03 && pct < 1) return;
+    lastPct = pct;
+    notify(state.playingText, true, null, pct);
+  });
   audio.onEnded(() => { if (token !== playToken) return; cleanup(); state.playing = false; onResult(true); });
   audio.onError(err => {
     if (token !== playToken) return;

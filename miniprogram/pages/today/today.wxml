@@ -56,6 +56,7 @@
       <view class="word-main">
         <view><text class="word-en">{{item.w}}</text><text class="word-pos">{{item.p}}</text></view>
         <view class="word-zh">{{item.m}}</view>
+        <view class="play-bar" wx:if="{{playingText === item.w}}"><view class="play-bar-fill" style="width:{{playPct}}%"></view></view>
         <view class="word-example-row">
           <view class="word-example {{playingText === item.e ? 'word-example--playing' : ''}}"
                 data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">{{item.e}}</view>
@@ -63,8 +64,9 @@
                 hover-class="speak-hover" hover-stay-time="120"
                 data-text="{{item.e}}" data-ai="{{item.ai}}" data-kind="s" bindtap="onSpeakWord">🔊</view>
         </view>
+        <view class="play-bar" wx:if="{{playingText === item.e}}"><view class="play-bar-fill" style="width:{{playPct}}%"></view></view>
       </view>
-      <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onStar">{{item.starred ? '♥' : '♡'}}</view>
+      <view class="word-star {{item.starred ? 'on' : ''}}" data-index="{{index}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onStar"><view class="star-ico {{item.starred ? 'star-ico--on' : 'star-ico--off'}}"></view></view>
     </view>
   </view>
 
