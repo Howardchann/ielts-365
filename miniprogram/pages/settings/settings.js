@@ -120,9 +120,9 @@ Page({
         if(rp&&rp.data){
           if(rp.data.tab===tab){go();return;}
           let done=false;const once=()=>{if(done)return;done=true;go();};
-          // 盖罩（v1.1.31）：改 tab 与罩纯背景罩合并一次 setData——渲染完成后才 switchTab，
-          // 且切换瞬间合成器补出的任何旧帧都只是背景色，旧 tab 内容无帧可现（灭瞬移的根本法）
-          rp.setData({tab,veil:true},once);setTimeout(once,400);
+          // v1.1.32：罩已由 review.onHide 在页面被盖住时就上好（隐藏期间合成器早已入帧），
+          // 这里只改 tab；残帧必然是罩（纯背景色），onShow 里原子「换tab+撤罩」
+          rp.setData({tab},once);setTimeout(once,400);
           return;
         }
       }
