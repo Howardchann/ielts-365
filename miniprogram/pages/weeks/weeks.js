@@ -25,6 +25,8 @@ Page({
     theme.syncTabBar(this, 1);
     this.applyTheme();
     store.onResume();
+    // 标题兜底：今日页动态设过「Day N · 周X」后，未设过标题的 tab 页原生标题可能为空
+    try { wx.setNavigationBarTitle({ title: '18个月计划总览' }); } catch (e) {}
     this.refresh();
   },
 

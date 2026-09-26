@@ -144,6 +144,7 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 - **today 的 `viewDay` 必须初始化为 0**（v1.1.15 修的老 bug）：初始化为真值会让**冷启动首次 onShow 就命中"保持浏览位置"分支**——准备期用户永远看到 Day 1。清除记录（onResetProgress）与改日期（pickDay）两条路径都必须 `getCurrentPages().forEach(p => p.resetView && p.resetView())`。
 - **周计划页准备期横幅**：`daysToStart/startDateText` 已 Math.max(0,·) 钳制；`_weeksSig` 含 startDate。
 - **Day 1 / Day 564 边界**：前一天/后一天按钮置灰（`.nav-btn--dis`，opacity .35），不隐藏——保三段布局对称。
+- **原生导航标题管理（v1.1.17 定稿）**：标题走 `today._setTitle(day)` 统一出口——浏览学习日 → 「Day N · 周X」，准备期 → 「今日计划」；**准备期 onShow 默认路径不调 renderDay**（它会把标题改成 Day 1，渲染数据反正被 wx:if 盖住）；`backToPrep` 必须同步 `_setTitle(null)`。⚠️ 微信已知行为：**tab 页 A 动态 `setNavigationBarTitle` 后，切到从未动态设过标题的 tab 页，其原生标题可能为空**——防御修法 = 四个 tab 页 onShow 各自设一次自己 json 里的标题兜底（weeks/settings/review 已加，新增 tab 页照做）。
 - **行内图标简写禁令**：`.ico-inline` 只能用 `background-position/size/repeat` 长写——简写 `background:center/contain no-repeat` 会把 `.ico-spk` 的 background-image 重置为 none（同优先级后者胜），浅色模式图标消失（v1.1.16 修的实机 bug）。
 
 ### 2.5 云同步：**2026-09-23 按用户决策恢复**（只在 `cloud-sync` 分支生效）

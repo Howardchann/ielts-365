@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-09-26（晚 5）· 原生导航标题错乱修复（v1.1.17）
+
+**现象（真机）**：①准备期今日页顶部标题残留「Day 1 · 周一」；②周计划/设置页顶部标题文字消失；③准备期从周计划跳到 Day 2 后点「返回准备期」，标题仍是「Day 2 · 周二」。
+
+**根因**：`renderDay` 每次都 `wx.setNavigationBarTitle('Day N · 周X')`，而①准备期 onShow 默认路径也会调 `renderDay(1)`（渲染内容被 wx:if 盖住、标题却已改掉）；③`backToPrep` 只改 data 不恢复标题；②微信已知行为——tab 页 A 动态设过标题后，切到**从未动态设过标题**的 tab 页（weeks/settings），其原生标题可能为空。
+
+**修复**：①today 新增 `_setTitle(day)` 统一出口（null → 「今日计划」），renderDay 两处改走它；②onShow 默认路径准备期**不调 renderDay**、直接 `_setTitle(null)` 返回；③backToPrep 补 `_setTitle(null)`；④weeks/settings/review 三页 onShow 各自设一次自己 json 里的标题兜底（新增 tab 页照此办理）。
+
+---
+
 ## 2026-09-26（晚 4）· 浅色喇叭消失 + 重点词磁贴 + 日期规则只向后 + 准备期禁打卡（v1.1.16）
 
 1. **浅色模式喇叭图标看不见（bug 修复）**：`.ico-inline` 用了简写 `background:center/contain no-repeat`——**简写会把 `background-image` 重置为 none**，且它在 `.ico-spk` 之后、同优先级后来居上 → 浅色图标消失；深色能显示只因 `.theme-dark .ico-spk` 优先级更高。修复 = 改长写三属性。**教训入 AI-CONTEXT：行内图标类禁用 background 简写**。

@@ -44,6 +44,8 @@ Page({
     theme.syncTabBar(this, 2);
     this.applyTheme();
     store.onResume();
+    // 标题兜底：今日页动态设过「Day N · 周X」后，未设过标题的 tab 页原生标题可能为空
+    try { wx.setNavigationBarTitle({ title: '复习巩固' }); } catch (e) {}
     this._pool = null;
     this.refreshPool();
     // 收藏列表同值守卫（新数组实例同值也会触发重渲染）

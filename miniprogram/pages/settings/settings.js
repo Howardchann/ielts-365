@@ -64,7 +64,7 @@ Page({
     dark:theme.isDark(),pageStyle:theme.isDark()?'background-color:#0E1618;':''},
   onLoad(){theme.applyPage(this);theme.syncTabBar(this);const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?'停止朗读':'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}if(this._offStore){this._offStore();this._offStore=null;}},
-  onShow(){theme.syncTabBar(this,3);this.applyTheme();theme.sameSet(this,{appearanceMode:theme.mode()});this.refresh();},
+  onShow(){theme.syncTabBar(this,3);this.applyTheme();theme.sameSet(this,{appearanceMode:theme.mode()});try{wx.setNavigationBarTitle({title:'设置'});}catch(e){}this.refresh();},
   applyTheme(){theme.applyPage(this);theme.syncTabBar(this);},
   /* 外观三态：跟随系统 / 浅色 / 深色。切换后通知栈内所有页面 + tabBar 即时换肤 */
   onAppearance(e){const m=e.currentTarget.dataset.mode;if(!m||m===theme.mode())return;theme.setMode(m);this.setData({appearanceMode:m});getCurrentPages().forEach(p=>{if(p.applyTheme)p.applyTheme();});},

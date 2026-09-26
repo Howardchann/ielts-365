@@ -73,10 +73,14 @@ Page({
     }
     // 默认落点 = 第一个未完成的学习日（打卡驱动）：没学/没学完，第二天仍停在这一天；
     // 全部完成时回退自然日 todayNum。从周表跳转（jump）或手动翻页不受影响。
+    const preStart = todayNum === 0 && !jump;
+    theme.sameSet(this, { todayNum, preStart, daysToStart: this._daysToStart() });
+    // 准备期不渲染日内容：renderDay 会把原生标题改成「Day N · 周X」，
+    // 准备期标题应保持「今日计划」；日数据由「先看看 Day 1」入口按需渲染
+    if (preStart) { this._setTitle(null); return; }
     let viewDay = jump || store.firstUnfinishedDay() || todayNum || 1;
     if (viewDay < 1) viewDay = 1;
     if (viewDay > plan.TOTAL_DAYS) viewDay = plan.TOTAL_DAYS;
-    theme.sameSet(this, { todayNum, preStart: todayNum === 0 && !jump, daysToStart: this._daysToStart() });
     this.renderDay(viewDay);
   },
 
@@ -84,6 +88,14 @@ Page({
     speech.stop();
     if (this._offSpeech) this._offSpeech();
     this._offSpeech = null;
+  },
+
+  // 原生导航标题统一出口：day=null → 「今日计划」（准备期）；否则「Day N · 周X」。
+  // 微信已知行为：tab 页 A 动态设过标题后，切到从未设过标题的 tab 页，其原生标题可能为空
+  // ——所以四个 tab 页 onShow 都各自设一次自己的标题兜底（见 weeks/settings/review）。
+  _setTitle(day) {
+    const t = day ? 'Day ' + day + ' · ' + plan.DOW[plan.dayInfo(day).k - 1] : '今日计划';
+    try { wx.setNavigationBarTitle({ title: t }); } catch (e) {}
   },
 
   _daysToStart() {
@@ -108,7 +120,7 @@ Page({
     // 微信 setData 不做深度 diff，同值也会整树重渲染 —— 这就是切 tab 回页「闪一下像重新渲染」的根源
     const sig = [day, store.isChecked(info.wIdx + 1, info.k) ? 1 : 0, list.map(v => v.starred ? 1 : 0).join('')].join('|');
     if (sig === this._daySig) {
-      wx.setNavigationBarTitle({ title: 'Day ' + day + ' · ' + plan.DOW[info.k - 1] });
+      this._setTitle(day);
       return;
     }
     this._daySig = sig;
@@ -127,7 +139,7 @@ Page({
       extraCount: list.length - coreCount,
       checked: store.isChecked(info.wIdx + 1, info.k),
     });
-    wx.setNavigationBarTitle({ title: 'Day ' + day + ' · ' + plan.DOW[info.k - 1] });
+    this._setTitle(day);
     // 后台把当天音频预拉进本地缓存（静默，失败不影响播放）
     if (list.length) {
       const items = [];
@@ -160,6 +172,7 @@ Page({
     speech.stop();
     this._daySig = null;
     this.setData({ preStart: true, viewDay: 0 });
+    this._setTitle(null); // 原生标题同步回「今日计划」，否则残留「Day N · 周X」
   },
 
   fb() { return this.selectComponent('#fb'); },
