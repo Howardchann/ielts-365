@@ -17,10 +17,14 @@ function enc(s) {
 }
 
 const icons = {
+  // 选中态：红指针接管分针位（V8.5 全长），绿针只留时针——绿分针垫在红针下会从红针头顶露出一段绿
+  // （红描边盖不住绿描边的抗锯齿边缘，真机呈"红指针带绿色像素块"），旧版 PNG 的红针也是独立一根。
   clock: (main, red) => svg(
     `<circle cx='12' cy='13' r='8' ${SW} stroke='${main}'/>` +
-    `<path d='M12,13V8.5M12,13l3,2' ${SW} stroke='${main}' stroke-linecap='round'/>` +
-    (red ? `<path d='M12,13V9' ${SW} stroke='${RED}' stroke-linecap='round'/>` : '') +
+    (red
+      ? `<path d='M12,13l3,2' ${SW} stroke='${main}' stroke-linecap='round'/>` +
+        `<path d='M12,13V8.5' ${SW} stroke='${RED}' stroke-linecap='round'/>`
+      : `<path d='M12,13V8.5M12,13l3,2' ${SW} stroke='${main}' stroke-linecap='round'/>`) +
     `<path d='M9,3h6' ${SW} stroke='${main}' stroke-linecap='round'/>`
   ),
   cal: (main, red) => svg(
