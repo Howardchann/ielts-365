@@ -1,5 +1,6 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="page-root {{dark ? 'theme-dark' : ''}}">
+<nav-bar title="{{navTitle}}" />
 <!-- 今日学习计划 -->
 <!-- 准备期：计划尚未开始 -->
 <view class="card prestart-card" wx:if="{{preStart}}">

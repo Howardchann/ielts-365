@@ -4,24 +4,28 @@
 >
 > 它记录了本项目中几个「看起来奇怪但刻意如此」的设计。这些决定都踩过坑，如果你不理解背景就"顺手优化"，很可能把修好的 bug 改回去。完整变更历史见 [CHANGELOG.md](./CHANGELOG.md)。
 >
-> **最后更新：2026-09-26 晚**（当日 v1.1.14~v1.1.32 共 19 版：文案定稿/行内图标/三类白闪/周磁贴按压四轮/喇叭删除键定稿/设置页跳转/deep-link 盖罩/图标对齐统一；已推送 GitHub e894bfe。下一步：自定义导航栏改造，见下方快照）
+> **最后更新：2026-09-26 晚**（当日 v1.1.14~v1.1.33 共 20 版：文案定稿/行内图标/三类白闪/周磁贴按压四轮/喇叭删除键定稿/设置页跳转/deep-link 盖罩/图标对齐统一/**自定义导航栏第一版**；v1.1.33 待真机验收后推送。下一步：v1.1.34 周计划/复习页接入 + theme.js 瘦身，见下方快照）
 
 ---
 
-## ⚡ 当前进度快照（2026-09-26 18:40，动大手术前存档）
+## ⚡ 当前进度快照（2026-09-26 19:10，v1.1.33 已改完待真机验收）
 
-**已推送**：v1.1.14~v1.1.32 全部 19 版已推 GitHub（cloud-sync 分支，提交 e894bfe），此后代码可随时回滚到「改造前」基线。
+**基线**：v1.1.14~v1.1.32 已推 GitHub（e894bfe）。**v1.1.33（自定义导航栏第一版）已改完、未推**——上传体验版后等用户真机验收，过了再推。
 
-**今日定稿且已落地的**：文案 6 节全量、单词喇叭 0.9em / 大词 1.1em / 例句 0.85em、删除键 30rpx+64rpx 热区锚点补偿、周磁贴按压 v1.1.25 终稿（手动按压态+跳转前清态）、周卡纯展示日格唯一跳转、设置页进度数字跳转（方案B 箭头 + 重点词直落 starred tab + 跨栈预切换）、按钮图标 em 化统一（.ico 1em / btn-voice 归一 flex / star-ico 正方盒）。
+**v1.1.33 内容**：
+1. **`components/nav-bar/`（新增）**：官方 awesome-skyline navigation-bar 裁剪版（tabBar 页形态：无返回键/标题直传）。关键差异：几何计算**模块加载期同步**（首帧即正确、零 setData，官方是 attached 异步）；颜色一律 `var(--nav-bg/--nav-fg)`（app.wxss page 块浅色 + .theme-dark 深色组），**不跟 prefers-color-scheme**（三态主题下媒体查询会错）。
+2. **today/settings 两页切 `navigationStyle:custom`**：json 加 `navigationBarTextStyle:"white"`（状态栏前景，两主题恒白成立）；data 加 `navCustom:true` + `navTitle`；today `_setTitle` 改 `sameSet({navTitle})`（标题 data 化，换 tab 不串）；v1.1.17 的原生标题兜底只剩 weeks/review 需要。
+3. **theme.js nativeBars**：`page.data.navCustom` 为真 → 跳过 setNavigationBarColor（**darkmode+手切打架的根因 API**），setBackgroundColor 保留。
+4. **`.ico-inline` em 化收口**：26rpx→1em、-4rpx→-.125em；宽屏 13px/-2px→1em/-.125em（容器 13px，完全等值）。图标三元组普查全部收敛，该遗留清零。
 
 **遗留问题（已知、未根治、有缓解）**：
-1. **deep-link 瞬移**（设置页→复习页换 tab）：盖罩法 v1.1.32 后真机仍残留极短旧内容闪现，根因=合成器层残帧（JS 赌不赢，录屏逐帧实锤）。**社区结论：官方 tab 机制无完美解，唯一根治=SPA 单页容器**（四页改组件、变量切 tab、switchTab 退役）——大重构，单独立项未拍板。
-2. **`.ico-inline` / `.stat-arrow` 低风险遗留**：同为"固定 rpx+魔法数"模式，但容器字号单一无症状；改文案字号时必须同步（AI-CONTEXT 图标铁律已标）。
-3. **主题切换后页面背景首帧**：闪白主根因（darkmode+手切冲突）待自定义导航栏方案解决，若改造后仍有内容区闪白，需复查 backgroundColorContent 变量。
+1. **deep-link 瞬移**：盖罩法 v1.1.32 后极短残帧仍在（合成器层，JS 赌不赢）。唯一根治=SPA 单页容器，大重构未拍板。
+2. **weeks/review 仍原生栏**（v1.1.34 接入 + theme.js nativeBars 瘦身）：手动模式下原生栏链路在这两页仍在，闪白只在切到这两页可能残留。
+3. 主题切换瞬间 tabBar 1 帧错位：合成器级，用户已接受。
 
-**下一步规划（已定案未动工）**：
-- **v1.1.33~34 自定义导航栏改造**：照官方 wechat-miniprogram/awesome-skyline 的 navigation-bar 组件裁剪（源码 189 行，已抓取研读；核心=几何计算替代 API + 主题走 CSS 属性选择器同帧渲染 + 零 setNavigationBarColor）。我们全部 4 页为 tabBar 页无返回键，只需状态栏占位+标题绑定。收益：闪白根治、标题错乱类 bug 土壤清除、theme.js 原生栏同步约 40 行退役。分两版：①组件+今日/设置页 ②周计划/复习页+theme.js 瘦身。
-- **SPA 化（远期）**：根治 deep-link 瞬移的唯一解，页面→组件生命周期改造，单独立项。
+**下一步规划**：
+- **v1.1.34**：weeks/review 接入 nav-bar（weeks 标题「18个月计划总览」、review「复习巩固」都改 data 化）+ theme.js nativeBars 只剩 setBackgroundColor（甚至整段退役）+ app.json window 导航栏配置/theme.json 的 navBg、navTxt 随之清理（winBg、bgContent 保留）。
+- **SPA 化（远期）**：根治 deep-link 瞬移的唯一解，单独立项。
 - **GitHub 攒批惯例不变**：本地提交，用户说"推"才推。
 
 ---
@@ -296,6 +300,13 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 **已知平台限制（别再试图代码修复）**：主题切换瞬间 tabBar/内容可能错位 1 帧（≈42ms，18 次中约 4 次）= 合成器级（两个渲染层不同 vsync 上屏），JS 层无法消除。页面级切页白闪由 v1.1.11（backgroundColorContent）+ v1.1.12（页面 data 初始化 dark）双修复，**别把两类白闪混为一谈**。**清除记录/大数据变更后偶发闪白**（09-26 用户两次反馈、无法稳定复现）= 同族后台页延迟重绘的合成器级缓存帧，原生底色已随 v1.1.13 按页修正，用户已定性为"经典老问题"接受——**除非拿到录屏逐帧定位，别再盲修**。
 
 **第三类白闪（v1.1.13 修复，2026-09-26）**：「手动切色系后，每个页面的**首次**进入闪白光、再进不闪」。根因 = `theme.js nativeBars` 的 `lastNav/lastWin` 去重是**模块级全局**，而 `setNavigationBarColor/setBackgroundColor` **只作用于当前页**——主题切换遍历后台页时只有第一页真正生效，其余页面原生窗口底色停在旧主题；后台页 setData 渲染被微信延迟到首次显示，webview 重绘瞬间露出旧色底。修复 = 去重标记改**按页存**（`page.__nav/__win`）+ 只对当前页调 API，后台页在自己 onShow 首次补设（duration 0）。**改 nativeBars 时三条铁律**：① 去重状态绝不能放模块级变量；② 后台页调原生栏 API 无效，必须等 onShow；③ `mode()==='auto'` 直接 return（交给 theme.json），别加逻辑。
+
+**自定义导航栏（v1.1.33 起，components/nav-bar）**：today/settings 已切 custom，weeks/review 待 v1.1.34。铁律：
+1. 栏色**只走 `var(--nav-bg/--nav-fg)`**（app.wxss page 块 + .theme-dark 组），**禁止写死颜色、禁止 prefers-color-scheme**（三态主题下手切深色系统可能浅色，媒体查询必错）；
+2. **几何在组件模块加载期同步计算**（getMenuButtonBoundingClientRect），别改回 attached+异步——首帧高度必须正确、零 setData；
+3. 自定义导航页 data 必须有 `navCustom:true`（theme.js nativeBars 靠它跳过 setNavigationBarColor——**这个 API 与 darkmode+theme.json 打架就是闪白根因**，自定义页绝不能再调）；`setBackgroundColor`（下拉露底）仍归 theme.js；
+4. 页面 json：`"navigationStyle":"custom"` + `"navigationBarTextStyle":"white"`（状态栏前景色，两主题栏底皆深色系故恒白）；
+5. 标题 = 页面 data 的 `navTitle` 绑定 `<nav-bar title>`，经 sameSet 守卫；自定义页不要再调 setNavigationBarTitle（无效且误导）。
 
 **tabBar 结构**：`custom-tab-bar` 已从 cover-view 改 view + SVG data-URI（8 张 PNG 弃用但文件仍在 images/），dark 状态经 `syncTabBar` 同步。
 

@@ -30,7 +30,11 @@ function nativeBars(dark, page) {
   if (page && cur && cur !== page) return; // 后台页：跳过，等它 onShow 时再补
   const nav = dark ? '#0E1618' : '#176B5B';
   const win = dark ? '#0E1618' : '#F3F8EF';
-  if (!page || page.__nav !== nav) {
+  // 自定义导航页（v1.1.33 today/settings）：栏色由 CSS 变量 var(--nav-bg) 随 .theme-dark
+  // 同帧切换，绝不能再调 setNavigationBarColor（darkmode+手切打架 = 首帧闪白的根因）；
+  // 窗口背景（下拉露底）仍归本函数管。
+  const customNav = page && page.data && page.data.navCustom;
+  if (!customNav && (!page || page.__nav !== nav)) {
     if (page) page.__nav = nav;
     try { wx.setNavigationBarColor({ frontColor: '#ffffff', backgroundColor: nav, animation: { duration: 0, timingFunc: 'linear' } }); } catch (e) {}
   }

@@ -1,0 +1,30 @@
+/* 自定义导航栏：颜色一律走 var()（浅色 token 在 app.wxss page 块，深色覆盖在 .theme-dark），
+   禁止写死颜色 —— 与页面换肤同帧渲染，这是本组件存在的意义 */
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 1000;
+  background: var(--nav-bg, #176B5B);
+  color: var(--nav-fg, #FFFFFF);
+}
+.nav-bar__inner {
+  display: flex;
+  align-items: center;
+  width: 100vw;
+  box-sizing: border-box; /* 官方同款：height 含 padding-top（状态栏） */
+}
+.nav-bar__left { flex-shrink: 0; }
+.nav-bar__center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  overflow: hidden;
+}
+.nav-bar__title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* 占位：导航栏 fixed，占位把页面内容推到栏下方（高度=inner 总高，含状态栏） */
+.nav-bar__placeholder { width: 100vw; }

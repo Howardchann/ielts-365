@@ -9,6 +9,8 @@ page {
   --disabled-bg: #EDF3F0; --disabled-ink: #A6B2AD; --star-off: #C7D0CC; --dis2: #D5DDD9;
   --red: #C0392B; --red-press: #A93226; --red-soft: #FDECEA;
   --line: #E9F0EC; --cur-line: #9ED8C5; --cur-bg: #F8FCF9; --field: #FBFDFC;
+  /* 自定义导航栏（v1.1.33 components/nav-bar）：与原生栏 theme.json 同色（浅 #176B5B/白字） */
+  --nav-bg: #176B5B; --nav-fg: #FFFFFF;
   --ico-gap: 10rpx; /* 图标-文字统一间距：所有 .ico / 图标在后的按钮一律引用此 token */
   background:var(--bg);
   color:var(--ink);
@@ -31,6 +33,7 @@ page {
   --disabled-bg: #1A2729; --disabled-ink: #5E7370; --star-off: #556964; --dis2: #445854;
   --red: #E8795F; --red-press: #F19485; --red-soft: #34211C;
   --line: #223430; --cur-line: #2E5B4F; --cur-bg: #14211F; --field: #101B1D;
+  --nav-bg: #0E1618; --nav-fg: #FFFFFF;
 }
 /* 深色下的特殊覆盖（data-URI 图标 / 语义色点 / 状态块，走不了变量） */
 .theme-dark .group-tag { color:#3FC79B; }
@@ -63,8 +66,10 @@ page {
 /* 提示强调块统一为「淡绿底 + 圆角、无左边框」（与语法讲解块同语言）；学习提示卡不再双层accent */
 .tip-box { background:var(--soft); border-radius:14rpx; padding:20rpx 24rpx; margin-top:20rpx; }
 .tip-text { color:var(--ink3); font-size:26rpx; }
-/* 行内小图标（文案里指代真实控件，替代"小喇叭/♡"文字）：与正文字号同缩放基准，无机型畸变 */
-.ico-inline { display:inline-block; width:26rpx; height:26rpx; vertical-align:-4rpx; margin:0 4rpx; background-position:center; background-size:contain; background-repeat:no-repeat; }
+/* 行内小图标（文案里指代真实控件，替代"小喇叭/♡"文字）：em 跟随容器字号
+   （v1.1.33 收口：26rpx→1em、-4rpx→-.125em，与 FontAwesome -0.125em 同值；
+   容器字号两处均为 26rpx（tip-text/empty-text），观感零变化。图标铁律：禁"固定 rpx+魔法数"） */
+.ico-inline { display:inline-block; width:1em; height:1em; vertical-align:-.125em; margin:0 4rpx; background-position:center; background-size:contain; background-repeat:no-repeat; }
 /* ⚠️ 这里绝不能用简写 background:center/contain no-repeat —— 简写会把 .ico-spk 已设的
    background-image 重置为 none（同优先级后来居上），浅色模式图标直接消失；
    深色能显示只是因为 .theme-dark .ico-spk 优先级更高。09-26 用户实测踩坑 */
@@ -176,7 +181,7 @@ page {
   .btn-fit { padding:2px 10px; }
   .tip-box { border-radius:7px; padding:10px 12px; margin-top:10px; }
   .tip-text { font-size:13px; }
-  .ico-inline { width:13px; height:13px; vertical-align:-2px; }
+  .ico-inline { width:1em; height:1em; vertical-align:-.125em; } /* 宽屏容器 13px → 1em=13px，与旧定值完全等值 */
   .muted { font-size:12px; }
   .brand-head { max-width:640px; margin:0 auto; width:100%; box-sizing:border-box; padding:10px 14px 2px; }
   .brand-logo { width:38px; height:38px; }

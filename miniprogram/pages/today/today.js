@@ -10,6 +10,10 @@ Page({
     // onLoad 的 setData 实测晚 1-3 帧才上屏（09-26 录屏 f103/116/128 白光根因）
     dark: theme.isDark(),
     pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
+    // 自定义导航栏（v1.1.33）：标题走 data 绑定 <nav-bar title>，不再调 setNavigationBarTitle；
+    // navCustom=true 让 theme.js 手动模式跳过 setNavigationBarColor（栏色由 CSS 变量管）
+    navCustom: true,
+    navTitle: '今日计划',
     // ⚠️ 必须初始化为 0（falsy）：首次 onShow 才会走「默认落点」分支（准备期倒计时卡/
     // 第一个未完成日）。若是 1，冷启动直接命中「保持浏览位置」分支，准备期用户永远
     // 看到 Day 1——09-26 用户实测清除记录/改日期后仍显示 Day 1 的根因之一
@@ -75,7 +79,7 @@ Page({
     // 全部完成时回退自然日 todayNum。从周表跳转（jump）或手动翻页不受影响。
     const preStart = todayNum === 0 && !jump;
     theme.sameSet(this, { todayNum, preStart, daysToStart: this._daysToStart() });
-    // 准备期不渲染日内容：renderDay 会把原生标题改成「Day N · 周X」，
+    // 准备期不渲染日内容：renderDay 会把标题改成「Day N · 周X」，
     // 准备期标题应保持「今日计划」；日数据由「先看看 Day 1」入口按需渲染
     if (preStart) { this._setTitle(null); return; }
     let viewDay = jump || store.firstUnfinishedDay() || todayNum || 1;
@@ -90,12 +94,12 @@ Page({
     this._offSpeech = null;
   },
 
-  // 原生导航标题统一出口：day=null → 「今日计划」（准备期）；否则「Day N · 周X」。
-  // 微信已知行为：tab 页 A 动态设过标题后，切到从未设过标题的 tab 页，其原生标题可能为空
-  // ——所以四个 tab 页 onShow 都各自设一次自己的标题兜底（见 weeks/settings/review）。
+  // 导航标题统一出口（v1.1.33 起为自定义导航栏）：day=null → 「今日计划」（准备期）；
+  // 否则「Day N · 周X」。标题是 data 字段，经 sameSet 同值守卫绑定到 <nav-bar>，
+  // 换 tab 不会串（旧「原生标题为空」防御只对仍在用原生栏的 weeks/review 有意义）。
   _setTitle(day) {
     const t = day ? 'Day ' + day + ' · ' + plan.DOW[plan.dayInfo(day).k - 1] : '今日计划';
-    try { wx.setNavigationBarTitle({ title: t }); } catch (e) {}
+    theme.sameSet(this, { navTitle: t });
   },
 
   _daysToStart() {
@@ -172,7 +176,7 @@ Page({
     speech.stop();
     this._daySig = null;
     this.setData({ preStart: true, viewDay: 0 });
-    this._setTitle(null); // 原生标题同步回「今日计划」，否则残留「Day N · 周X」
+    this._setTitle(null); // 标题同步回「今日计划」，否则残留「Day N · 周X」
   },
 
   fb() { return this.selectComponent('#fb'); },

@@ -10,6 +10,31 @@
 
 ---
 
+## 2026-09-26（晚 14）· 自定义导航栏第一版：组件 + 今日/设置页；.ico-inline em 化收口（v1.1.33）
+
+**改造对象**：官方 wechat-miniprogram/awesome-skyline 的 navigation-bar 组件（examples/address-book，194 行）裁剪为 tabBar 页形态——无返回键、无 slot、标题直传，四件套落在 `components/nav-bar/`。
+
+**与官方版的关键差异（都是刻意的）**：
+1. **几何计算放模块加载期同步执行**（官方在 attached 里 wx.getSystemInfo 异步回调，首帧可能拿到 undefined 高度导致内容跳动）；同步算好进 data，**首帧即正确高度、零 setData**——不给残帧/跳动任何机会；
+2. 背景放外层 fixed 节点（状态栏区域也要有底色）+ 等高占位 view 把内容推下去；
+3. 左侧留与右 padding 等宽的空 view，标题真正屏幕居中（官方 leftWidth 原本给返回键用）；
+4. **颜色不写死、不跟 prefers-color-scheme**（本项目三态主题，手切深色时系统可能仍浅色，媒体查询会错）——一律 `var(--nav-bg/--nav-fg)`，继承页面根 `.theme-dark` token，与换肤同帧渲染。
+
+**页面接入（第一批：today/settings）**：
+- 两页 json 加 `"navigationStyle":"custom"` + `"navigationBarTextStyle":"white"`（状态栏前景色静态白色，两主题栏底都是深色系，恒成立）；
+- 两页 data 新增 `navCustom:true` + `navTitle`；today 的 `_setTitle` 改为 `theme.sameSet(this,{navTitle})`——标题变 data 字段，换 tab 不串（v1.1.17 的「原生标题为空」防御只剩 weeks/review 需要，原样保留）；
+- **theme.js nativeBars**：`page.data.navCustom` 为真时跳过 `setNavigationBarColor`（darkmode+手切打架 = 首帧闪白的根因就在这个 API），`setBackgroundColor`（下拉露底）保留。
+
+**收益**：这两页手动模式主题切换不再碰原生栏 API；标题错乱类 bug 土壤清除。**遗留**：weeks/review 仍是原生栏（v1.1.34 接入 + theme.js 瘦身），手动模式下原生栏链路仍在——所以本版真机重点验收：①浅/深两态 today/settings 栏颜色与原生页一致；②手动切主题瞬间这两页不再闪白；③今日页 Day N 标题、准备期「今日计划」标题正确随数据切换；④iPad 宽屏栏布局正常。
+
+**.ico-inline em 化收口（图标铁律清零最后一项）**：`26rpx→1em、-4rpx→-.125em`（与 FontAwesome 同值）；宽屏 `13px/-2px → 1em/-.125em`（容器 13px → 完全等值，观感零变化）。三元组普查至此全部收敛为 em 机制。注意 `.ico-inline` 的 background 长写禁令不变（简写会重置 .ico-spk 的 background-image，v1.1.16 实机坑）。
+
+**涉及**：`components/nav-bar/`（新增 4 文件）、today 三件套、settings 三件套、`utils/theme.js`（nativeBars 4 行）、`app.wxss`（nav token 2 行 + .ico-inline 2 处）。
+**改动量**：既有文件 +34/-13 行，新增组件 4 文件约 100 行。
+
+---
+
+
 ## 2026-09-26（晚 13）· deep-link 瞬移四轮：盖罩前移到 onHide，残帧必然是底色（v1.1.32）
 
 **录屏实锤**（17:41 录屏逐帧，s128 连拍）：设置页(126-127) → **128 帧 = 复习页上次离开时的重点词列表原样闪现** → 129+ 才是目标 tab。证明「渲染回调 ≠ 合成器已出帧」：隐藏页 DOM 已换、回调已触发，但 switchTab 瞬间合成器补出的仍是 setData 前的旧帧——残帧在合成器层，JS 时序赌不赢（v1.1.28/29/31 三轮同因）。用户观察「底部导航切换不闪」反证机制：普通切 tab 目标页内容不变，残帧=正确内容。

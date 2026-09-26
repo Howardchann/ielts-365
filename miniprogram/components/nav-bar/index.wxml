@@ -1,0 +1,7 @@
+<view class="nav-bar {{extClass}}">
+  <view class="nav-bar__inner" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;{{innerPaddingRight}}">
+    <view class="nav-bar__left" style="{{leftWidth}}"></view>
+    <view class="nav-bar__center"><text class="nav-bar__title">{{title}}</text></view>
+  </view>
+</view>
+<view class="nav-bar__placeholder" style="height:{{navBarHeight}}px"></view>
