@@ -7,7 +7,7 @@
   <view class="prestart-sub">计划开始日前，可先熟悉操作</view>
   <view class="prestart-days">还有 {{daysToStart}} 天正式开学</view>
   <view class="tip-box">
-    <view class="tip-text">可以提前浏览 Day 1 的内容，先熟悉操作：点小喇叭听发音，点 ♡ 收藏重点词。</view>
+    <view class="tip-text">可以提前浏览 Day 1 的内容，先熟悉操作：点<view class="ico-inline ico-spk"></view>听发音，点<view class="ico-inline ico-heart"></view>收藏重点词</view>
   </view>
   <button class="btn-primary btn-fit" hover-class="btn-press" bindtap="backToToday" style="margin-top:24rpx;">先看看 Day 1</button>
 </view>

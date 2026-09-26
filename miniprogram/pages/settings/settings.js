@@ -59,7 +59,9 @@ Page({
     accentOptions:[{value:'us',label:'美式发音（默认）'},{value:'uk',label:'英式发音'}],accentIndex:0,
     engineOptions:[{value:'auto',label:'自动（推荐）：优先预生成，失败切在线'},{value:'pregen',label:'仅预生成高清音频'},{value:'online',label:'仅在线 TTS（有道/百度）'}],engineIndex:0,
     totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:buildLabel(),aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音',
-    cloudOn:true,cloudMeta:'',cloudErr:'',cloudTip:'',syncing:false,sheet:{show:false,title:'',options:[],index:0,key:''},cal:{show:false,y:0,m:0,label:'',grid:[],canPrev:true,canNext:true}},
+    cloudOn:true,cloudMeta:'',cloudErr:'',cloudTip:'',syncing:false,sheet:{show:false,title:'',options:[],index:0,key:''},cal:{show:false,y:0,m:0,label:'',grid:[],canPrev:true,canNext:true},
+    // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
+    dark:theme.isDark(),pageStyle:theme.isDark()?'background-color:#0E1618;':''},
   onLoad(){theme.applyPage(this);theme.syncTabBar(this);const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?'停止朗读':'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}if(this._offStore){this._offStore();this._offStore=null;}},
   onShow(){theme.syncTabBar(this,3);this.applyTheme();theme.sameSet(this,{appearanceMode:theme.mode()});this.refresh();},
@@ -93,7 +95,7 @@ Page({
   onHideBackup(){this.setData({showBackup:false});},onShowImport(){this.setData({showImport:true,showBackup:false,importText:''});},onHideImport(){this.setData({showImport:false,importText:''});},onImportInput(e){this.setData({importText:e.detail.value});},
   doImport(mode){const text=(this.data.importText||'').trim();if(!text){this.fb().toast('请先粘贴备份内容');return;}let r;try{r=store.importBackup(text,mode);}catch(e){this.fb().modal({title:'导入失败',content:e.message||String(e),showCancel:false});return;}this.setData({showImport:false,importText:''});this.refresh();const bs=this.backupSummaryOf(text);const head=mode==='merge'?'合并完成':'覆盖完成';const detail=(bs?('该备份：'+bs+'\n\n'):'')+(mode==='merge'?('新增 '+r.addedDays+' 天打卡、'+r.addedWords+' 个重点词\n合并后共 '+r.totalDays+' 天、'+r.totalWords+' 个重点词\n已恢复 '+r.reviewWords+' 个复习记录'):('已替换为备份中的 '+r.totalDays+' 天打卡、'+r.totalWords+' 个重点词、'+r.reviewWords+' 个复习记录'));this.fb().modal({title:head,content:detail,showCancel:false});},
   onImportMerge(){this.doImport('merge');},onImportReplace(){this.doImport('replace');},
-  onResetProgress(){this.fb().modal({title:'清除学习记录',content:'将清空全部打卡、收藏与复习记录，云端一并清除，其他设备同步后同样清空，无法撤销。建议先「导出备份」。确定从0开始吗？',confirmText:'清除',danger:true,onConfirm:()=>{store.resetProgress();this.refresh();this.fb().toast('已清除，重新开始',1500);}});},
+  onResetProgress(){this.fb().modal({title:'清除学习记录',content:'将清空全部打卡、收藏与复习记录，云端一并清除，其他设备同步后同样清空——无法撤销。建议先「导出备份」，确定从 0 开始吗？',confirmText:'清除',danger:true,onConfirm:()=>{store.resetProgress();this.refresh();this.fb().toast('已清除，重新开始',1500);}});},
   // 云同步状态：只更新这一小块，避免每次 store 变更都整页 refresh
   refreshCloud(){
     const sr=store.cloudStatus();const p=n=>String(n).padStart(2,'0');
@@ -106,10 +108,10 @@ Page({
       meta='上次同步：'+(same?'今天 ':(p(d.getMonth()+1)+'-'+p(d.getDate())+' '))+p(d.getHours())+':'+p(d.getMinutes());}
     if(sr.enabled&&sr.pending>0) meta+='，待同步 '+sr.pending+' 条复习记录';
     theme.sameSet(this,{cloudOn:sr.enabled,syncing:!!sr.syncing,cloudMeta:meta,cloudErr:sr.error||'',
-      cloudTip:sr.enabled?'进度自动同步，多台设备共用同一份进度。':'开启后进度自动同步，多台设备共用同一份进度。'});
+      cloudTip:sr.enabled?'进度自动同步，多台设备共用一份进度':'开启后进度自动同步，多台设备共用一份进度'});
   },
   fb(){return this.selectComponent('#fb');},
   onCloudToggle(e){const on=!!e.detail.value;this.setData({cloudOn:on});store.setSyncEnabled(on).then(r=>{this.refreshCloud();this.fb().toast((r&&r.ok)?(on?'云同步已开启':'云同步已关闭'):((r&&r.msg)||'操作失败'),2200);});},
-  onSyncNow(){if(this.data.syncing)return;this.setData({syncing:true});store.syncNow().then(r=>{this.refreshCloud();this.fb().modal({title:r.ok?'同步完成':'同步失败',content:r.ok?('进度已与云端对齐。\n'+(r.msg||'')):((r.msg||'未知错误')+'\n\n本地进度不受影响，可稍后点「立即同步」重试。'),showCancel:false});});},
+  onSyncNow(){if(this.data.syncing)return;this.setData({syncing:true});store.syncNow().then(r=>{this.refreshCloud();const extra=(r.msg&&r.msg!=='已同步')?('——'+r.msg):'';this.fb().modal({title:r.ok?'同步完成':'同步失败',content:r.ok?('进度已与云端对齐'+extra):((r.msg||'未知错误')+'——本地进度不受影响，可稍后点「立即同步」重试'),showCancel:false});});},
   onAbout(){this.fb().modal({title:ABOUT_MODAL_TITLE,content:ABOUT_TEXT,showCancel:false});}
 });

@@ -5,6 +5,9 @@ const theme = require('../../utils/theme.js');
 
 Page({
   data: {
+    // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
+    dark: theme.isDark(),
+    pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
     phases: [],       // [{p, name, shortName, range, doneCount, totalWeeks, percent, isCurrentPhase, weeks:[...]}]
     todayNum: 0,
     currentWeek: 0,

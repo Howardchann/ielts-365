@@ -6,6 +6,9 @@ const speech = require('../../utils/speech.js');
 
 Page({
   data: {
+    // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
+    dark: theme.isDark(),
+    pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
     poolSize: 0,
     dueCount: 0,
     current: null,      // {w, m, p, e, starred}
@@ -16,7 +19,7 @@ Page({
   },
 
   onLoad() {
-    // 主题在首帧前应用（onLoad 的 setData 并入首次渲染），避免跳页闪屏
+    // 同值守卫：data 已初始化为主题值，此处通常 0 次 setData
     theme.applyPage(this); theme.syncTabBar(this);
     // 监听器返回取消函数，页面卸载时注销（旧实现会永久堆积回调）
     this._offSpeech = speech.onStateChange((payload) => {

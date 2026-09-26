@@ -226,8 +226,19 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 | v1.1.5 | 同值守卫（`sameSet`/`syncTabBar`/签名位串）消除"同值 setData 整树重渲染" | 消掉一层，仍有残留 |
 | v1.1.7 | （另一 AI）tabBar dark 进组件 data 初始化 + 浅色也显式设窗口背景 | 压掉 tabBar 首帧先亮后暗 |
 | **v1.1.11** | **`app.json` window.`backgroundColorContent: "@bgContent"`**（theme.json 加 bgContent 浅 #F3F8EF/深 #0E1618） | **治本**——原生容器层属性，页面创建第一帧底色即正确，区别于 page-meta 的 JS 前端层注入（首帧后才生效） |
+| **v1.1.12** | **4 个页面 data 初始化 `dark: theme.isDark()`**（与 tabBar v1.1.7 同款）。09-26 下午用户指出普通切页仍有白光，录屏按尖峰检测重扫（`tools/_flash-scan.py`）抓到 **6 处整页浅色闪现**（各 1-3 帧，全部是深色下首次进入 tab 页）——根因是页面 data 无 dark 声明，首帧浅色，onLoad 的 setData 晚 1-3 帧 | 页面首帧即深色；applyPage 同值守卫发现同值自动跳过，零开销 |
+
+**⚠️ 两类白闪是两条链路，别混**：①主题切换瞬间 tabBar 1 帧错位（合成器级，接受）；②切页整页浅色闪现（页面 data 未初始化，v1.1.12 修复，待真机复测）。f76/f640 那两帧"tabBar 白 1 帧"属①，修后复测确认。
 
 **验收结论**（用户 27s 真机录屏，`tools/rec-flicker-scan.py` 逐帧扫描）：深色稳态 0 白闪、切 tab 0 颜色突变；残留仅主题切换瞬间 tabBar/内容错位 **18 次中 4 次、每次恰 1 帧（42ms）**——合成器级（页面渲染层与 tabBar 组件层不同 vsync 上屏），**JS 层无法再压，用户接受，别再当待办修**。
+
+**文案与标点规范（2026-09-26 定稿，全量落地于 v1.1.12，方案全文见 `tools/copy-deck-20260926.html`）**：
+1. UI 独立短说明句末**不加句号**；教学成段文字（tip/obj/exp/pr）保留句号。
+2. "判断→展开"衔接与空态句用**破折号——**，不硬切两句；教学文案已按锚点改了 80 处。
+3. 数字/英文与中文之间**半角空格**（教学文案已全量套用 3300+ 处，占位符 `{D}`/`{W}` 两侧同样加）。
+4. 引号一律**「」**（弯引号、`\"`、单引号引中文已清零）。
+5. toast/按钮 ≤12 字无句末标点。
+6. 文案里指代真实控件用**行内真图标**（`.ico-inline` + `ico-spk`/`ico-heart`），替代"小喇叭/♡"文字——仅限静态 wxml；data.js 字符串嵌不了。**提示强调块统一"淡绿底+圆角、无左边框"**（.tip-box 的 border-left 已删，与语法讲解块同语言）。
 
 **图标-文字间距**：全局 token `--ico-gap: 10rpx`（app.wxss page 变量组），`.ico` 的 margin-right 及"图标在文字后"的按钮（today 完成打卡/今日已完成内联 style）一律引用它，**禁止再写散装 margin 值**；宽屏媒体查询里 `.ico` 是 `margin-right:5px` 刻意保留 px 定值（宽屏 rpx 缩放不同，5px 为等值），别"统一"成 var。
 
@@ -251,7 +262,7 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 
 ⚠️ **Edge 无头截图的窗宽钳制伪影**：`--window-size` 宽度小于 ~500px 会被钳到 ~500 布局再裁成请求宽 → **右侧元素看似"溢出"其实是截图伪影**。自检页用"宽窗口 + 固定 max-width:375px 内容列"的写法规避。
 
-**已知平台限制（别再试图代码修复）**：主题切换瞬间 tabBar/内容可能错位 1 帧（≈42ms，18 次中约 4 次）= 合成器级（两个渲染层不同 vsync 上屏），JS 层无法消除。页面级白闪已由 v1.1.11 `backgroundColorContent` 根治（见"频闪问题终局"），**别把这两者混为一谈**。
+**已知平台限制（别再试图代码修复）**：主题切换瞬间 tabBar/内容可能错位 1 帧（≈42ms，18 次中约 4 次）= 合成器级（两个渲染层不同 vsync 上屏），JS 层无法消除。页面级切页白闪由 v1.1.11（backgroundColorContent）+ v1.1.12（页面 data 初始化 dark）双修复，**别把两类白闪混为一谈**。
 
 **tabBar 结构**：`custom-tab-bar` 已从 cover-view 改 view + SVG data-URI（8 张 PNG 弃用但文件仍在 images/），dark 状态经 `syncTabBar` 同步。
 

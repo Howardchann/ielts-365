@@ -6,6 +6,10 @@ const speech = require('../../utils/speech.js');
 
 Page({
   data: {
+    // 主题在 data 初始化阶段就确定（与 tabBar v1.1.7 同款）：首帧即正确深浅，
+    // onLoad 的 setData 实测晚 1-3 帧才上屏（09-26 录屏 f103/116/128 白光根因）
+    dark: theme.isDark(),
+    pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
     viewDay: 1,
     todayNum: 0,
     preStart: false,
@@ -27,7 +31,7 @@ Page({
   },
 
   onLoad() {
-    // 主题在首帧前应用：onLoad 里的 setData 会并入首次渲染，避免「先浅后深」闪屏
+    // 同值守卫：data 已初始化为主题值，此处通常 0 次 setData
     theme.applyPage(this); theme.syncTabBar(this);
     const ok = speech.initPlugin();
     speech.setRate(store.get('rate'));

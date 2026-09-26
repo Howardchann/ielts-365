@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>开溜 · 全应用文案定稿方案 v1</title>
+<style>
+:root{--indigo:#4F46E5;--indigo-soft:#EEF2FF;--green:#0E9F6E;--green-soft:#ECFDF5;--ink:#111827;--ink2:#374151;--ink3:#6B7280;--line:#E5E7EB;--bg:#F8FAFC;--card:#FFFFFF;--red:#DC2626;--red-soft:#FEF2F2;--amber:#B45309;--amber-soft:#FFFBEB;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;padding:32px 16px 80px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.sub{color:var(--ink3);font-size:14px;margin:6px 0 28px}
+h2{font-size:19px;font-weight:800;margin:40px 0 6px;display:flex;align-items:center;gap:10px}
+h2 .no{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:var(--indigo);color:#fff;font-size:14px;flex-shrink:0}
+.desc{color:var(--ink3);font-size:13.5px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:12px;color:var(--ink3);font-weight:600;padding:8px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.loc{font-size:12px;color:var(--ink3);white-space:nowrap}
+.old{color:var(--ink3);text-decoration:line-through;text-decoration-color:#cbd5e1}
+.old,.new{display:block;margin:2px 0}
+.new{color:var(--ink);font-weight:600}
+.dash{color:var(--green);font-weight:800}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;margin-right:6px}
+.tag-del{background:var(--red-soft);color:var(--red)}
+.tag-add{background:var(--green-soft);color:var(--green)}
+.tag-chg{background:var(--indigo-soft);color:var(--indigo)}
+.rule{display:flex;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.rule:last-child{border-bottom:none}
+.rule .k{flex-shrink:0;font-weight:800;color:var(--indigo);font-size:13px;width:56px}
+.rule .v{font-size:14px}
+.rule .v small{display:block;color:var(--ink3);font-size:12.5px;margin-top:2px}
+.note{background:var(--amber-soft);border:1px solid #FDE68A;border-radius:10px;padding:12px 16px;font-size:13px;color:var(--amber);margin-top:12px}
+.demo{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:10px}
+.demo .bar{background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:10px 16px}
+.demo .bd{padding:16px;background:#F3F8EF}
+.demo .bd.dark{background:#0E1618}
+.demo .label{font-size:14px;font-weight:800;color:#176B5B;margin-bottom:8px}
+.demo .tip-old{font-size:13.5px;color:#4B5563;background:#E2EFE4;border-left:5px solid #2E8B72;border-radius:10px;padding:14px 16px}
+.demo .tip-new{font-size:13.5px;color:#4B5563;background:#E2EFE4;border-radius:10px;padding:14px 16px}
+.demo .cap{font-size:11.5px;color:var(--ink3);text-align:center;padding:6px;background:#fff}
+code{background:var(--indigo-soft);color:var(--indigo);border-radius:5px;padding:1px 6px;font-size:12.5px;font-family:Consolas,monospace}
+.ok{color:var(--green);font-weight:700}
+.no-chg{color:var(--ink3);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>开溜 · 全应用文案定稿方案</h1>
+<div class="sub">2026-09-26 · 覆盖标点规范 / 学习提示区样式 / 弹窗与提示语 / 教学内容批量规范 —— 你定稿后我再改代码 → 传体验版 → 你确认 → 同步仓库</div>
+
+<h2><span class="no">1</span>标点与排版规范（6 条，适用全应用）</h2>
+<div class="desc">你指出的"句号该不该用、该不该用破折号"，我定为以下规则，后续所有文字按此执行：</div>
+<div class="card">
+<div class="rule"><div class="k">R1 句末</div><div class="v">UI 独立说明句（设置页灰色说明、空态、预备期提示）<b>句末一律不加句号</b><small>例："跟随系统时，切到夜间会自动换成深色，无需手动操作" —— 界面短说明不是文章，去句号更轻。</small></div></div>
+<div class="rule"><div class="k">R2 破折号</div><div class="v">"总起判断 → 由此展开"的衔接用 <span class="dash">——</span>，不硬切两句；空态句的"现状——怎么办"同样用破折号<small>例："零基础最大的敌人是不敢开口<span class="dash">——</span>从今天起……"；"暂无到期词汇<span class="dash">——</span>学过的词到复习周期后会自动出现在这里"。<b>不滥用</b>：并列事实仍用句号/分号。</small></div></div>
+<div class="rule"><div class="k">R3 空格</div><div class="v">阿拉伯数字、英文与中文之间加半角空格<small>"至少15分钟"→"至少 15 分钟"；"用今天的{D}个新词"→"{D} 个新词"（第 3 周起的新文案已是此风格，第 1-2 周旧文案全量补齐）。</small></div></div>
+<div class="rule"><div class="k">R4 引号</div><div class="v">统一用直角引号「」，替换现存的弯引号 " "<small>例："持续在场"→「持续在场」。与第 3 周起文案的既有风格对齐。</small></div></div>
+<div class="rule"><div class="k">R5 成段</div><div class="v">教学成段文字（学习提示 / 目标 / 语法讲解 / 自检）<b>保留句号</b>——成段阅读需要句读；弹窗长文案同此<small>所以不是"把句号全删"，而是"短说明去句号、成段保留"。</small></div></div>
+<div class="rule"><div class="k">R6 轻反馈</div><div class="v">toast / 按钮 / 状态行：无句末标点，≤12 字优先<small>"已复制""导出失败""同步中…"维持现状。</small></div></div>
+</div>
+
+<h2><span class="no">2</span>学习提示区样式统一</h2>
+<div class="desc">现状：语法讲解块 = 淡绿底 + 圆角、<b>无</b>左边框；学习提示卡 = 白卡内再套"淡绿底 + <b>绿色左边框</b>"，两处强调块语言不一致，且白卡+色块双层内边距显得厚重。统一方案：强调块一律"淡绿底 + 圆角、无左边框"（改动仅 <code>app.wxss</code> 的 <code>.tip-box</code> 去掉 <code>border-left</code> 一处，全应用生效）。</div>
+<div class="card">
+<div class="demo">
+<div class="bar">学习提示</div>
+<div class="bd">
+<div class="tip-old">零基础最大的敌人是不敢开口。从今天起，每天必须大声朗读至少15分钟，读错也无所谓，嘴巴先动起来。</div>
+</div>
+<div class="cap">改前 —— 绿色左边框 + 句号切句 + "15分钟"无空格</div>
+</div>
+<div class="demo">
+<div class="bar">学习提示</div>
+<div class="bd">
+<div class="tip-new">零基础最大的敌人是不敢开口<span class="dash">——</span>从今天起，每天大声朗读至少 15 分钟，读错也无所谓，嘴巴先动起来。</div>
+</div>
+<div class="cap">改后 —— 与语法讲解块同语言（纯色块无边框）+ 破折号衔接 + 空格规范</div>
+</div>
+</div>
+
+<h2><span class="no">3</span>弹窗与提示语逐条修订（UI 静态文案）</h2>
+<div class="desc">共 17 处。<span class="tag tag-chg">改写</span>表达重写 <span class="tag tag-del">去句号</span>只去句末标点 <span class="tag tag-add">破折号</span>句式改衔接</div>
+<div class="card">
+<table>
+<tr><th>位置</th><th>现文 → 拟文</th><th>类型</th></tr>
+<tr><td class="loc">同步成功弹窗<br>(settings.js 113)</td><td><span class="old">进度已与云端对齐。\n已同步</span><span class="new">进度已与云端对齐</span><span class="no-chg">msg 只有"已同步"这类冗余词时不再拼接；若返回附加信息则拼为"进度已与云端对齐——{信息}"。弹窗只剩一行，不再重复。</span></td><td><span class="tag tag-chg">改写</span></td></tr>
+<tr><td class="loc">同步失败弹窗<br>(settings.js 113)</td><td><span class="old">{原因}\n\n本地进度不受影响，可稍后点「立即同步」重试。</span><span class="new">{原因}——本地进度不受影响，可稍后点「立即同步」重试</span></td><td><span class="tag tag-add">破折号</span></td></tr>
+<tr><td class="loc">清除学习记录弹窗<br>(settings.js 96)</td><td><span class="old">将清空全部打卡、收藏与复习记录，云端一并清除，其他设备同步后同样清空，无法撤销。建议先「导出备份」。确定从0开始吗？</span><span class="new">将清空全部打卡、收藏与复习记录，云端一并清除，其他设备同步后同样清空——无法撤销。建议先「导出备份」，确定从 0 开始吗？</span></td><td><span class="tag tag-add">破折号</span></td></tr>
+<tr><td class="loc">外观说明<br>(settings.wxml 5)</td><td><span class="old">跟随系统时，系统切到夜间会自动换成深色，无需手动操作。</span><span class="new">跟随系统时，切到夜间会自动换成深色，无需手动操作</span><span class="no-chg">"系统"连续出现两次，删一个；去句号。</span></td><td><span class="tag tag-del">去句号</span></td></tr>
+<tr><td class="loc">开始日期说明<br>(settings.wxml 7)</td><td><span class="old">选了非周一的日期会自动对齐到当周周一。</span><span class="new">选择非周一的日期会自动对齐到当周周一</span></td><td><span class="tag tag-del">去句号</span></td></tr>
+<tr><td class="loc">口音说明<br>(settings.wxml 10)</td><td><span class="old">口音切换仅对「在线 TTS」音源生效。</span><span class="new">口音切换仅对「在线 TTS」音源生效</span></td><td><span class="tag tag-del">去句号</span></td></tr>
+<tr><td class="loc">备份说明<br>(settings.wxml 11)</td><td><span class="old">导出文本自行保存，换手机或换微信号时用来恢复；清除记录连云端一起清空，不可撤销。</span><span class="new">导出文本自行保存，换手机或微信号时用于恢复；清除记录会连云端一起清空，不可撤销</span></td><td><span class="tag tag-chg">改写</span></td></tr>
+<tr><td class="loc">复制失败提示<br>(settings.wxml 12)</td><td><span class="old">没复制上？长按上方框内文字手动全选复制。</span><span class="new">没复制上？长按上方文本手动全选复制</span></td><td><span class="tag tag-del">去句号</span></td></tr>
+<tr><td class="loc">导入说明<br>(settings.wxml 13)</td><td><span class="old">合并：保留现有进度并补上备份内容；覆盖：以备份为准。</span><span class="new">合并：保留现有进度并补上备份内容；覆盖：以备份为准</span></td><td><span class="tag tag-del">去句号</span></td></tr>
+<tr><td class="loc">云同步说明<br>(settings.js 109)</td><td><span class="old">进度自动同步，多台设备共用同一份进度。 / 开启后进度自动同步，多台设备共用同一份进度。</span><span class="new">进度自动同步，多台设备共用一份进度 / 开启后进度自动同步，多台设备共用一份进度</span><span class="no-chg">"同一份进度"与前面"进度"重复，简化。</span></td><td><span class="tag tag-chg">改写</span></td></tr>
+<tr><td class="loc">预备期提示<br>(today.wxml 10)</td><td><span class="old">可以提前浏览 Day 1 的内容，先熟悉操作：点小喇叭听发音，点 ♡ 收藏重点词。</span><span class="new">可以提前浏览 Day 1 的内容，先熟悉操作：点小喇叭听发音，点 ♡ 收藏重点词</span></td><td><span class="tag tag-del">去句号</span></td></tr>
+<tr><td class="loc">随机抽查空态<br>(review.wxml 18)</td><td><span class="old">从已学词汇中随机抽一个，先自己回忆，再点「显示释义」对照</span><span class="new">（不变，本就无句号）</span></td><td><span class="no-chg">✓ 已合规</span></td></tr>
+<tr><td class="loc">到期复习空态<br>(review.wxml 29)</td><td><span class="old">暂无到期词汇。学过的词到复习周期后会自动出现在这里</span><span class="new">暂无到期词汇——学过的词到复习周期后会自动出现在这里</span></td><td><span class="tag tag-add">破折号</span></td></tr>
+<tr><td class="loc">重点词空态<br>(review.wxml 32)</td><td><span class="old">还没有重点词。在学习页点词右侧的 ♡ 即可收藏，随机抽查会优先复习它们</span><span class="new">还没有重点词——在学习页点词右侧的 ♡ 即可收藏，随机抽查会优先复习它们</span></td><td><span class="tag tag-add">破折号</span></td></tr>
+<tr><td class="loc">到期池说明<br>(review.wxml 21)</td><td><span class="old">今日到期 {N} 词，答完自动进入下一个</span><span class="new">（不变）</span></td><td><span class="no-chg">✓ 已合规</span></td></tr>
+<tr><td class="loc">朗读失败<br>(speech.js 320)</td><td><span class="old">朗读失败，请检查网络</span><span class="new">（不变）</span></td><td><span class="no-chg">✓ 已合规</span></td></tr>
+<tr><td class="loc">关于弹窗<br>(settings.js 20-22)</td><td><span class="old">2026 年 9 月 21 日开始开发。初衷：……再上强度。\n……</span><span class="new">（不变——成段文字按 R5 保留句号，已用破折号与「」，合规）</span></td><td><span class="no-chg">✓ 已合规</span></td></tr>
+</table>
+</div>
+
+<h2><span class="no">4</span>教学内容批量规范（data-p1 ~ p6 + data.js，546 天全量）</h2>
+<div class="desc">教学文案存在两代风格：第 1-2 周为紧凑旧风格（"15分钟"、"保存按钮"弯引号），第 3 周起为新风格（" 15 分钟"、「」、——）。按第 1 节规则<b>脚本全量套用 + 逐条人工抽查</b>：</div>
+<div class="card">
+<table>
+<tr><th>规则</th><th>处理方式</th><th>示例（改前 → 改后）</th></tr>
+<tr><td><b>R3 空格</b></td><td>脚本正则全量：数字/英文与中文之间加半角空格</td><td><span class="old">大声朗读各10遍</span><span class="new">大声朗读各 10 遍</span>　<span class="old">掌握0-100的基数词</span><span class="new">掌握 0-100 的基数词</span></td></tr>
+<tr><td><b>R4 引号</b></td><td>脚本全量：弯引号 " " → 「」</td><td><span class="old">靠的是"持续在场"而非"每天高强度"</span><span class="new">靠的是「持续在场」而非「每天高强度」</span></td></tr>
+<tr><td><b>R2 破折号</b></td><td>人工逐条：判断句+展开句的衔接改 ——（仅改明显割裂处，预计 20 条左右）</td><td><span class="old">每周日的自检是记忆的"保存按钮"。错词抄3遍，下周继续滚动复习。</span><span class="new">每周日的自检是记忆的「保存按钮」——错词抄 3 遍，下周继续滚动复习。</span></td></tr>
+<tr><td><b>R5 句号</b></td><td>成段文字句号保留不动</td><td class="no-chg">教学段落（tip/obj/exp/pr）不改句末标点</td></tr>
+<tr><td><b>SATURDAY 常量</b></td><td>人工修订（data.js 110-115）</td><td><span class="old">3) 休息：只做10分钟随机复习，其余放空。三选一即可，休息不丢人。</span><span class="new">3) 休息：只做 10 分钟随机复习，其余放空。三选一即可，休息不丢人。</span></td></tr>
+</table>
+<div class="note">范围说明：语法讲解里的英文例句、词性标注（v./n.）不动；占位符 {D}{W} 前后按 R3 处理（如 "{D} 个新词"）。改动只涉及文案字符串，不碰任何逻辑代码。</div>
+</div>
+
+<h2><span class="no">5</span>另：录屏闪白的补充说明</h2>
+<div class="card" style="font-size:14px">
+昨天 652 帧扫描覆盖的是<b>主题切换瞬间</b>（42ms 合成器级错位，已定性接受）。你这次说的是<b>普通切页时的白光</b>——这是另一条链路：未加载过的页面首次进入时新建 webview，原生窗口底色先上屏。v1.1.11 的 <code>backgroundColorContent</code> 理论上已把首帧底色修正，但我会把你的录屏再按"切页事件"重跑一次逐帧扫描（复用 <code>rec-flicker-scan.py</code>，按切页时刻分段），结果随本轮文案改动一起给你。若确有残留，属于下一轮待修项，不混入本轮文案改动。
+</div>
+
+<div class="sub" style="margin-top:36px">—— 以上 1-4 节请逐条定稿：可整体回复"全部同意"，或指出条目号（如"3-5 保留原句"）。定稿后我一次性改完 → 传体验版 → 你真机确认 → 同步仓库。</div>
+</div>
+</body>
+</html>
