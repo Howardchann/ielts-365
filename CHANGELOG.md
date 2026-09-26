@@ -10,6 +10,28 @@
 
 ---
 
+## 2026-09-26（晚 11）· 按钮图标对齐统一：em 化 + 机制归一 flex + 爱心盒正方化（v1.1.30）
+
+**背景**：用户指出「两个停止播放按钮一个偏下一个正常」，且图标中心应对齐**词墨上下沿中点**。普查（15 处按钮）实锤根因 = 机制分裂：
+
+| 按钮字号 | 数量 | 图标对齐机制 |
+|---|---|---|
+| 30rpx | 10 | flex 居中（vertical-align 失效） |
+| 27rpx（btn-voice 试听） | 1 | **inline-block 基线魔法数 -8rpx**（按 30rpx 字调的） |
+| 27rpx（btn-speak-all 等） | 3 | flex 居中 |
+| 28rpx（done-state） | 1 | flex 居中（图标 30rpx 比字大） |
+
+**改动（F1+F2+R3，用户点选定稿）**：
+1. **F1** app.wxss `.ico`：`30rpx` 固定 → **`1em`**，`vertical-align:-8rpx` → `-.12em`（兜底 inline 场景）；宽屏断点只留 margin-right——图标随按钮字号缩放，魔法数退役，done-state 自动匹配；
+2. **F2** settings.wxss `.btn-voice`：移除 `display:inline-block` 覆盖（恢复 btn-ghost 的 flex）——对齐机制全应用归一为 flex 居中 = 行盒中心 ≈ CJK 词墨中心（偏差 <0.5px），满足词墨标准；
+3. **R3** app.wxss `.star-ico`：盒 40×36 → 36×36（宽屏 20×18 → 18×18）——图形 contain 居中本就正方，观感零变化，纯卫生。
+
+**普查遗留（低风险，暂不动）**：`.ico-inline`（26rpx 固定 + -4rpx 魔法数，容器仅 26rpx 一档）、`.stat-arrow`（12rpx + 4rpx 魔法数，仅 40rpx 一处）——均为"固定 rpx + 魔法数"同模式，但容器字号单一不发作；改字号时须同步。铁律已入 AI-CONTEXT：图标 = 1em + flex 居中，排查方法 = 三元组普查（尺寸单位/对齐机制/容器字号）。
+
+**验证**：grep 复核 4 处编辑落盘；`node --check` 不涉及 JS。
+
+---
+
 ## 2026-09-26（晚 10）· deep-link 瞬移二轮：setData 完成回调起跳（v1.1.29）
 
 **用户反馈（v1.1.28 真机）**：重点词 ↔ 复习记录反复来回切，瞬移闪现**依旧可见**。
