@@ -10,6 +10,37 @@
 
 ---
 
+## 2026-09-26 · UI 统一大轮：按钮双方案 + SVG tab 图标 + 夜间模式三态 + 同值守卫 + 对齐机制重构（v1.0.4→v1.1.6，13 次上传）
+
+> **范围**：纯 UI/交互轮，不动数据与音频链路。版本链 v1.0.4→v1.1.6 全部经 `tools/stamp-build.js` 盖章后 CLI 上传成功；
+> **GitHub 未推**（攒批约定，本地已提交 `96e2d67`）。
+>
+> **① 文字按钮双方案**（用户选型）：重要按钮=按压浮**淡绿底**（`.btn-primary` #F0F7F3，红变体 #FDECEA），次级=按压**字变色**（#0F4A3E）；均保留透明 padding 热区。批量统一：删除按钮红变体、`.done-state`、`.btn-fit` 等全部归入此体系。
+>
+> **② 风格统一两批**：黑弹窗→`components/feedback/`（轻提示 tabBar 上方 + 白卡弹窗，3 页共用）；下拉框/引擎口音选择→自绘 sheet；日期→自绘月历（周一开头）；序号统一（语法区 `123` / 练习区 `1)`，ex-no 裸数字绿、prac-no `inline-block min-width:36rpx` 居中，间距统一 ≈23rpx）；主按钮淡底深字（#F0F7F3 + #176B5B）。
+>
+> **③ SVG tab 图标**：`custom-tab-bar` 从 8 张 PNG 换成 `tools/gen-tabicons.js` 生成的 **data-URI**（注入 index.wxss 标记区）；选中态=红点缀+主体深绿、未选中全灰；红色点缀全镂空；设置图标白块扣除；view 替换 cover-view。原版备份 `D:\idea\_tabicon_backup_0926\`。图标仿 Material Icons（Apache 2.0 可商用改仿）。
+> 🔴 **碎弧教训（用户截图抓到已落盘的坏图标）**：复习图标外圈弧的 `sweep` 标志写反 → 300° 大弧在设定圆心数学无解 → SVG 自动换候选圆心画出碎块+漂浮箭头。**口算弧线必错，任何弧形 flag 改动必须走渲染验证**（`tools/check-tabicons.js` 抽落盘 wxss 生成自检页 + Edge 无头截图）。⚠️ `url()` 内单引号必须 `%27` 转义，否则 data-URI 被截断。
+>
+> **④ 夜间模式三态**（用户确认做）：`utils/theme.js`，storage key `appearance`，**auto（跟随系统，默认）/ 浅色 / 深色**手动两态：
+> - `theme.json` + `app.json darkmode:true` → 原生导航栏/窗口背景 auto 模式自动切换（@navBg/@navTxt/@winBg 变量）；
+> - **auto 模式不碰原生栏 API**（避免与系统切换打架）；手动模式才 `setNavigationBarColor`，且**仅值变化时调用**（`lastNav` 缓存 + `duration:0` 防动画闪烁）；
+> - **page 元素够不到 page 背景** → 4 页 wxml 首行 `<page-meta page-style="{{pageStyle}}"/>` 动态注入；`.theme-dark` 类挂在根 view；
+> - `app.wxss` token 化：page 挂 ~24 个浅色 CSS 变量 + `.theme-dark` 覆盖组；`tools/darkicons.js` 批量生成 13 个深色图标变体；`tools/themize.js` 批量替换硬编码色（data-URI 保护）。
+>
+> **⑤ 同值守卫（频闪根治**）**：微信 setData 无深度 diff，同值也整树重渲染。`theme.js` 新增 **`sameSet(page, patch)`**（逐 key JSON 比对，变了才 setData）+ **`syncTabBar(page, active)`**（tabBar 组件 dark/active 双守卫）。覆盖 today（`_daySig` 位串守卫 renderDay + onShow 裸 setData）、review（refreshPool/starred 比对）、weeks（`_weeksSig`）、settings（refresh/refreshCloud/appearanceMode 全守卫）+ 4 页 onShow 的 tabBar active。**规则：今后所有 onShow 类 setData 必须走 sameSet，不再逐个打补丁。**
+>
+> **⑥ 对齐机制重构（v1.1.6）**：喇叭/按钮图标此前靠手调 margin/vertical-align 常量——**常量法跨机型必漂移**（桌面浏览器字体度量 ≠ 真机苹方，v1.1.2 桌面测的数值真机矫枉过正）。终版机制：
+> - 文字按钮：`.btn-primary/.btn-ghost/.btn-fit/.done-state` 全改 **flex 垂直居中**（`.btn-speak-all` 的 `inline-block` 会覆盖 flex → 改 `inline-flex`）；图标不再依赖 vertical-align 猜数；
+> - 喇叭：行容器 `align-items:baseline` + 喊叭盒内零宽空格 strut + 图标 `vertical-align:middle`（渲染引擎现算 x-height 中心，有无降部词、任何机型通用）；`.ico` 独立校准 -8rpx（CJK 墨水中心锚点稳定）。
+> - **测量工具链**：`tools/icon-align.js`（canvas 墨水盒 12 上下文）、`tools/measure-screenshot.py`（PIL 对真机截图逐像素测量，1px=750/1440rpx）、`tools/align-v116-check.html`（Edge 无头渲染自检）。
+>
+> **⑦ 频闪定性收尾**：同值守卫消除了"同值重渲染"层（已验证）；**残留频闪 = 微信平台级首帧**——切 tab 重建页面渲染层，JS 注入的主题变量首帧后生效，代码层修不掉。用户确认接受。最后未试的点：手动模式把 windowBg 写死进 theme.json（收益有限，未做）。
+>
+> **真机验收状态**：v1.1.2 五项通过；v1.1.6 用户反馈频闪残留（见⑦）、图标对齐不再逐项核验（视为通过）。
+
+---
+
 ## 2026-09-25 · 备份顶部人读摘要 + 区块更名「备份与重置」+ 文案精简
 
 > 用户反馈（体验导向）：① 导出的备份文本顶部应有人读摘要——导出日期、学到哪天、量化进度；

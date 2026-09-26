@@ -4,7 +4,7 @@
 >
 > 它记录了本项目中几个「看起来奇怪但刻意如此」的设计。这些决定都踩过坑，如果你不理解背景就"顺手优化"，很可能把修好的 bug 改回去。完整变更历史见 [CHANGELOG.md](./CHANGELOG.md)。
 >
-> **最后更新：2026-09-24**（云同步在途竞态修复 + 测试台入仓 + 真机实测清单 + 真机 A 组回归通过）
+> **最后更新：2026-09-26**（UI 统一大轮收尾：夜间模式三态 + 同值守卫 + SVG tab 图标 + 对齐机制重构，v1.1.6；云同步在途竞态修复 + 测试台入仓见 09-24 节）
 
 ---
 
@@ -191,6 +191,46 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 - **备份合并幂等**：`mergeReviewStats()` 按 `lastReviewedAt` 取较新者，**同一份备份重复导入不会把次数重复累加**（备份是快照，不是增量日志）。
 - **设置页文案分工（2026-09-24 精简后定稿）**：「学习进度」卡片讲**同步**（自动、多端一致）；「进度备份」卡片讲**备份**（手动、导出自保存、换微信号 / 云端异常时恢复），一句话用"自动 / 手动"对照即可看出分工——**别再写回两段长说明**，用户反馈太啰嗦。备份卡片**不放统计行**（"已完成 / 收藏 / 复习记录"与上方「学习进度」卡片重复，删过一次，别加回来）。
 
+### 2.7 UI / 主题（**2026-09-26 定稿，改界面前必读**）
+
+> 完整变更叙事见 CHANGELOG 09-26 节。这里只写"哪些做法是机制、别退回老路"。
+
+**夜间模式三态**（`utils/theme.js`，storage key `appearance`）：
+
+| 态 | 行为 |
+|---|---|
+| `auto`（默认） | **不碰原生栏 API**——完全交给 `theme.json` + `app.json darkmode:true`（@navBg/@navTxt/@winBg 自动跟随系统） |
+| 手动浅 / 深 | 才调 `setNavigationBarColor`，**仅值变化时调**（`lastNav` 缓存），`duration:0` 防动画闪烁 |
+
+- **page 元素够不到 page 背景**：深色 page 背景必须靠 4 页 wxml 首行 `<page-meta page-style="{{pageStyle}}"/>` 动态注入；`.theme-dark` 类挂在页面根 view。新页面要支持深色，这两样缺一不可。
+- `app.wxss` 已 token 化（page 挂 ~24 个浅色 CSS 变量 + `.theme-dark` 覆盖组）。**新增样式禁止写死颜色**，一律 `var(--…)`，否则深色模式下出现白块/漏网（踩过多轮）。深色图标变体由 `tools/darkicons.js` 生成，别手改。
+- **同值守卫是硬规则**：微信 `setData` 无深度 diff，**同值也整树重渲染**（切 tab 频闪的根源）。今后所有 onShow 类 `setData` 一律走 `theme.sameSet(page, patch)`（逐 key JSON 比对）+ `theme.syncTabBar(page, active)`（tabBar dark/active 双守卫）；页面级大数据渲染用签名位串守卫（today `_daySig` / weeks `_weeksSig` / review 比对模式）。**不要退回裸 setData。**
+
+**对齐（图标 vs 文字）**：**禁止手调 margin/vertical-align 常量**——常量法跨机型必漂移（桌面浏览器字体度量 ≠ 真机苹方，v1.1.2~v1.1.5 反复修不准的根因）。机制（v1.1.6 定稿）：
+
+| 场景 | 机制 |
+|---|---|
+| 文字按钮内图标 | 按钮 **flex 垂直居中**（`.btn-primary/.btn-ghost/.btn-fit/.done-state`；注意 `.btn-speak-all` 必须 `inline-flex`，写 `inline-block` 会覆盖 flex） |
+| 行内喇叭（词/例句/语法/大词行） | 行容器 `align-items:baseline` + 喇叭盒零宽空格 strut + 图标 `vertical-align:middle`（渲染引擎现算 x-height 中心，有无降部词通用） |
+| 宽屏媒体查询 | 与主规则同步改，别只改一处 |
+
+**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）。原版 PNG 备份在 `D:\idea\_tabicon_backup_0926\`。
+
+**UI 验证工具链**（改 UI 前后用，别靠肉眼/口算）：
+
+| 工具 | 用途 |
+|---|---|
+| `tools/check-tabicons.js` / `preview-tabicons.js` | 抽落盘 wxss 的 data-URI 生成自检页 → Edge 无头截图看图标真容 |
+| `tools/icon-align.js` | canvas 墨水盒测量（12 个上下文），量图标在容器内的光学偏移 |
+| `tools/measure-screenshot.py` | PIL 对**真机截图**逐像素测量（1px=750/1440rpx；深色模式按检测色定位元素） |
+| `tools/align-v116-check.html` | 对齐机制回归页（baseline/middle/flex 按钮） |
+
+⚠️ **Edge 无头截图的窗宽钳制伪影**：`--window-size` 宽度小于 ~500px 会被钳到 ~500 布局再裁成请求宽 → **右侧元素看似"溢出"其实是截图伪影**。自检页用"宽窗口 + 固定 max-width:375px 内容列"的写法规避。
+
+**已知平台限制（别再试图代码修复）**：切 tab 时残留的轻微频闪 = **微信首帧问题**（切 tab 重建渲染层，JS 注入主题变量在首帧后生效），同值守卫只能消除"同值重渲染"层。用户已确认接受。最后可试未试的点：手动模式把 windowBg 也写进 theme.json（收益有限）。
+
+**tabBar 结构**：`custom-tab-bar` 已从 cover-view 改 view + SVG data-URI（8 张 PNG 弃用但文件仍在 images/），dark 状态经 `syncTabBar` 同步。
+
 ---
 
 ## 3. 已修复的坑（改回去会出事）
@@ -222,6 +262,9 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 | 15 | 练习任务区 | `pr` 是 `"1) … 2) …"` 无换行的整段 → 挤成一大坨 | `today.js` 用 `split(/(?=\d\)\s)/)` 拆成 `prLines` 数组，wxml 逐条渲染 + `.practice-line` |
 | 16 | `settings.wxml` 「关于」卡片 | 模板里写死 `v` 前缀，用户把版本号写成 `版本V1.0` → 屏幕显示 `…暂未发布。 v版本V1.0`（重复 v） | 改为两行：`{{aboutTitle}}` 主文案 + 独立 `<view class="about-ver">{{appVersion}}</view>`，用户写什么都不会和模板打架 |
 | 29 | `today.wxml` 单词例句 | 例句只能点文本播放、无任何可视入口 → 用户的朋友以为"句子读不了" | 例句行改 `.word-example-row`（文本 `flex:1;min-width:0`）+ 右侧 `.ex-speak` 播放按钮，复用语法区样式（含 `playing` 反色与 `speak-hover` 按下反馈） |
+| 42 | SVG 图标弧线（tab 图标复习外圈） | 弧 `sweep` 标志写反 → 300° 大弧在设定圆心**数学无解** → SVG 静默换候选圆心画出碎弧+漂浮箭头，**已随图标落盘**（用户截图抓到） | 弧线 flag **必须渲染验证**（`tools/check-tabicons.js` + Edge 无头截图），禁止口算交付；图标改 `gen-tabicons.js` 重生成，别手改 wxss 里的 data-URI |
+| 43 | 图标对齐 | 手调 margin/vertical-align 常量**跨机型必漂移**（桌面字体度量≠真机苹方，v1.1.2~v1.1.5 反复修不准） | v1.1.6 机制化：按钮 flex 居中（`.btn-speak-all` 须 `inline-flex`）、喇叭行 `baseline + vertical-align:middle`（x-height 锚定）；细节见 §2.7 |
+| 44 | Edge 无头截图 | 窗宽 <~500px 被钳制 → 右侧元素看似"溢出"（伪影，排查了半天） | 自检页用"宽窗口 + 固定 max-width:375px 内容列"；见 §2.7 |
 
 ### 3.3 工程 / 数据
 
@@ -294,14 +337,18 @@ ielts-365/
 │   └── sync/index.js            进度多端同步：服务端合并 + 复习记录分 8 片（见 §2.5）
 └── miniprogram/
     ├── app.js                   云开发 init（音频签名 + 进度同步；⚠️ init 必须早于 store.init）
-    ├── app.json                 页面注册 / tabBar（已移除 plugins 声明）
-    ├── app.wxss                 全局样式（含语法区 / 播放按钮 hover 规则）
+    ├── app.json                 页面注册 / tabBar / darkmode:true
+    ├── app.wxss                 全局样式（CSS 变量 token 化 + .theme-dark 覆盖组 + 按钮体系）
+    ├── theme.json               原生导航栏/窗口背景的深浅自动切换变量（配 darkmode）
+    ├── components/feedback/     轻提示 + 白卡弹窗组件（3 页共用，替代原生 modal）
+    ├── custom-tab-bar/          自绘 tabBar（SVG data-URI 图标；生成源在 tools/gen-tabicons.js）
     ├── utils/
     │   ├── data.js              78 周汇总：RAMP / CORE_CNT / DAY_OFF / getDay / learnedWords / demo
     │   ├── data-p1..p6.js       六阶段课程数据（教学内容：主题/目标/语法/练习/提示/自检）
     │   ├── words.js             8000 词表（课程顺序，每行 w\tp\tm\te\tai；字符串编码）
     │   ├── cloud.js             ENV / FILE_PREFIX / SIGN_FN / ready()
     │   ├── speech.js            朗读引擎：三套音频路径、签名、缓存、播放链、prefetch
+    │   ├── theme.js             夜间模式三态：sameSet/syncTabBar 同值守卫 + applyPage/pageStyle
     │   ├── build-info.js        ⚙️ 由 tools/stamp-build.js 生成（sha / branch / dirty / builtAt）；缺失时自动降级
     │   └── store.js             进度：本地存储 + 云端同步 + SRS + 备份导出导入
     └── pages/
@@ -495,3 +542,4 @@ ielts-365/
 > `utils/data-p*.js` 是 H5 版迁移来的教学内容，除非明确要改课程，否则别动；
 > `utils/words.js` 是字符串编码的 8000 词表，格式别改（改了就爆主包）；
 > 云同步（`cloud-sync` 分支）**只走 `wx.cloud.callFunction({name:'sync'})`** —— 别在客户端直接用 `wx.cloud.database()`，也别把同步做成"必需"：设置页有关闭开关，**本地必须永远能独立工作**。
+> 改 UI 前读 §2.7：深色样式只用 `var(--…)` 不写死颜色；onShow 类 setData 必须走 `sameSet`；对齐用 flex/baseline 机制不手调常量；SVG 图标改 `gen-tabicons.js` 重生成、弧线 flag 必须渲染验证。
