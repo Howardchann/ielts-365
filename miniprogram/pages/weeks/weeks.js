@@ -37,7 +37,7 @@ Page({
     if (todayNum === 0) {
       const sd = new Date(startDate + 'T00:00:00');
       const now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      daysToStart = Math.ceil((sd - today) / 86400000);
+      daysToStart = Math.max(0, Math.ceil((sd - today) / 86400000));
       startDateText = (sd.getMonth() + 1) + ' 月 ' + sd.getDate() + ' 日';
     }
     // 默认只展开当前周所属阶段，避免一次性渲染 546 个节点

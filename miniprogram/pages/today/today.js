@@ -90,7 +90,7 @@ Page({
     const sd = new Date((store.get('startDate') || plan.DEFAULT_START) + 'T00:00:00');
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    return Math.ceil((sd - today) / 86400000);
+    return Math.max(0, Math.ceil((sd - today) / 86400000));
   },
 
   renderDay(day) {
@@ -165,6 +165,8 @@ Page({
   fb() { return this.selectComponent('#fb'); },
 
   onCheckin() {
+    // 准备期只预览不打卡：打卡会把「还没开学的日子」记成已完成，进度与云同步全乱
+    if (this.data.todayNum === 0) { this.fb().toast('开学后才能打卡', 1200); return; }
     const info = plan.dayInfo(this.data.viewDay);
     const now = store.toggleCheck(info.wIdx + 1, info.k);
     this.setData({ checked: now });

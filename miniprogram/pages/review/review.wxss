@@ -25,3 +25,13 @@
   .review-result-row { gap:10px; margin-top:15px; }
   .review-result-btn { min-width:88px; }
 }
+/* 重点词磁贴化（09-26 用户定稿）：一个词一张卡，替代原「单卡+分割线」 */
+.star-list { margin: 20rpx 24rpx; }
+.star-tile { background: var(--card); border-radius: 24rpx; padding: 20rpx 28rpx; }
+.star-tile + .star-tile { margin-top: 20rpx; }
+.star-tile .word-row { border-bottom: none; padding: 2rpx 0; }
+@media (min-width: 700px) {
+  .star-list { margin: 12px auto; max-width: 640px; }
+  .star-tile { border-radius: 12px; padding: 10px 14px; }
+  .star-tile + .star-tile { margin-top: 10px; }
+}

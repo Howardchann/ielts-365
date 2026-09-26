@@ -64,7 +64,10 @@ page {
 .tip-box { background:var(--soft); border-radius:14rpx; padding:20rpx 24rpx; margin-top:20rpx; }
 .tip-text { color:var(--ink3); font-size:26rpx; }
 /* 行内小图标（文案里指代真实控件，替代"小喇叭/♡"文字）：与正文字号同缩放基准，无机型畸变 */
-.ico-inline { display:inline-block; width:26rpx; height:26rpx; vertical-align:-4rpx; margin:0 4rpx; background:center/contain no-repeat; }
+.ico-inline { display:inline-block; width:26rpx; height:26rpx; vertical-align:-4rpx; margin:0 4rpx; background-position:center; background-size:contain; background-repeat:no-repeat; }
+/* ⚠️ 这里绝不能用简写 background:center/contain no-repeat —— 简写会把 .ico-spk 已设的
+   background-image 重置为 none（同优先级后来居上），浅色模式图标直接消失；
+   深色能显示只是因为 .theme-dark .ico-spk 优先级更高。09-26 用户实测踩坑 */
 .ico-heart { background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2020.1C7.7%2016.9%204%2013.7%203%2010.7%202.1%207.8%203.8%205.1%206.6%204.6%208.5%204.3%2010.5%205.2%2012%206.9%2013.5%205.2%2015.5%204.3%2017.4%204.6%2020.2%205.1%2021.9%207.8%2021%2010.7%2020%2013.7%2016.3%2016.9%2012%2020.1Z'%20fill='none'%20stroke='%23FF8A78'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3C/svg%3E"); }
 .muted { color:var(--muted); font-size:24rpx; }
 .brand-head { display:flex; align-items:center; padding:20rpx 28rpx 4rpx; }

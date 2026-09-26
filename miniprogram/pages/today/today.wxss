@@ -50,3 +50,8 @@
   .prestart-days { font-size:30px; margin:15px 0; }
   .group-tag { font-size:11px; border-radius:4px; padding:2px 7px; margin:2px 0 1px; }
 }
+/* 准备期预览提示条（09-26）：day-head 上方常驻，比纯文字链接直观 */
+.prep-back { margin: 20rpx 24rpx 0; color: var(--green); font-size: 26rpx; padding: 8rpx 4rpx; }
+/* 准备期打卡按钮置灰（JS 拦截 + 提示） */
+.btn-primary.btn-primary--dis { background: var(--disabled-bg); color: var(--disabled-ink); }
+.btn-primary.btn-primary--dis .ico { opacity: .5; }

@@ -83,15 +83,15 @@ Page({
   onStartDate(){this.openCal();},
   /* 自绘月历弹层（替代系统 date picker 深色滚轮）：周一开头，范围 2025-01 ~ 2028-12，选非周一对齐当周周一 */
   openCal(){const d=(this.data.startDate||plan.DEFAULT_START).split('-').map(Number);const y=d[0],m=d[1]-1;const g=this._buildCal(y,m);this.setData({cal:{show:true,y,m,label:g.label,grid:g.grid,canPrev:g.canPrev,canNext:g.canNext}});},
-  _buildCal(y,m){const first=new Date(y,m,1),lead=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();const p=n=>('0'+n).slice(-2);const t=new Date(),tIso=t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate());const grid=[];for(let i=0;i<lead;i++)grid.push({blank:true,iso:'b'+i});for(let d=1;d<=days;d++){const iso=y+'-'+p(m+1)+'-'+p(d);grid.push({d,iso,dis:iso<'2025-01-01'||iso>'2028-12-31',sel:iso===this.data.startDate,today:iso===tIso});}return{grid,label:y+' 年 '+(m+1)+' 月',canPrev:!(y===2025&&m===0),canNext:!(y===2028&&m===11)};},
+  _buildCal(y,m){const first=new Date(y,m,1),lead=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();const p=n=>('0'+n).slice(-2);const t=new Date(),tIso=t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate());const grid=[];for(let i=0;i<lead;i++)grid.push({blank:true,iso:'b'+i});for(let d=1;d<=days;d++){const iso=y+'-'+p(m+1)+'-'+p(d);grid.push({d,iso,dis:iso<tIso||iso>'2028-12-31',sel:iso===this.data.startDate,today:iso===tIso});}return{grid,label:y+' 年 '+(m+1)+' 月',canPrev:!(y===2025&&m===0),canNext:!(y===2028&&m===11)};},
   shiftMonth(e){const dir=Number(e.currentTarget.dataset.dir);let{y,m}=this.data.cal;m+=dir;if(m<0){m=11;y--;}if(m>11){m=0;y++;}if((dir<0&&(y===2025&&m===0))||(dir>0&&(y===2028&&m===11))){return;}const g=this._buildCal(y,m);this.setData({'cal.y':y,'cal.m':m,'cal.label':g.label,'cal.grid':g.grid,'cal.canPrev':g.canPrev,'cal.canNext':g.canNext});},
   closeCal(){this.setData({'cal.show':false});},
-  pickDay(e){const ds=e.currentTarget.dataset;if(ds.dis==='true'||ds.dis===true)return;const iso=ds.iso;let d=new Date(iso+'T00:00:00');const off=(d.getDay()+6)%7;if(off)d.setDate(d.getDate()-off);
-  // 对齐后的周一若已过去 → 顺延到下周周一：避免「开学第一天已过期 N 天」的补课怪状态；
-  // 直接选过去某个完整周的周一（off=0）仍保留，供有意从某周补课的用户使用
-  const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());let moved='';
-  if(off&&d<today){d.setDate(d.getDate()+7);moved='next';}
-  const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);getCurrentPages().forEach(p=>{if(p.resetView)p.resetView();});this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(moved==='next'?'已顺延到下周周一 '+ms:(off?'已对齐到周一 '+ms:'开始日期已更新'));},
+  pickDay(e){const ds=e.currentTarget.dataset;if(ds.dis==='true'||ds.dis===true)return;const iso=ds.iso;let d=new Date(iso+'T00:00:00');const off=(d.getDay()+6)%7;
+  // 09-26 定稿：非周一 → 顺延到「所选日期之后的第一个周一」（只向后、不回退）。
+  // 日历已禁选今天之前的日期，startDate 恒 ≥ 今天，倒计时天数恒 ≥ 0，
+  // 不再有「还有 -5 天开学」的负数态；补课语义随之废除（过去的周一已选不到）。
+  if(off)d.setDate(d.getDate()+(7-off));
+  const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);getCurrentPages().forEach(pg=>{if(pg.resetView)pg.resetView();});this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(off?'已顺延到周一 '+ms:'开始日期已更新');},
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
   backupSummaryOf(text){try{const o=JSON.parse(text);return (o&&typeof o.summary==='string')?o.summary:'';}catch(e){return '';}},
