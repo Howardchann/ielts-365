@@ -70,34 +70,4 @@ function syncTabBar(page, active) {
   if (Object.keys(patch).length) bar.setData(patch);
 }
 
-// Transition / bridge 页面使用的兼容辅助函数。
-// 保持与现有 applyPage 的单一实现一致，避免 transition 自己维护另一套主题逻辑。
-function pageStyle() {
-  return isDark() ? 'background-color:#0E1618;' : 'background-color:#F3F8EF;';
-}
-
-function navHeight() {
-  try {
-    const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
-    return (info.statusBarHeight || 0) + 44;
-  } catch (e) {
-    return 44;
-  }
-}
-
-function bind(page) {
-  if (!page || page.__themeBound) return;
-  page.__themeBound = true;
-  applyPage(page);
-  if (mode() === 'auto' && typeof wx.onThemeChange === 'function') {
-    page.__themeChangeHandler = () => applyPage(page);
-    wx.onThemeChange(page.__themeChangeHandler);
-  }
-}
-
-function sync(page) {
-  if (!page) return;
-  applyPage(page);
-}
-
-module.exports = { mode, setMode, isDark, applyPage, syncTabBar, sameSet, pageStyle, navHeight, bind, sync };
+module.exports = { mode, setMode, isDark, applyPage, syncTabBar, sameSet };

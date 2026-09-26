@@ -1,2 +1,0 @@
-<page-meta page-style="{{pageStyle}}"></page-meta>
-<view class="transition-page" style="background:{{dark ? '#0E1618' : '#F3F8EF'}}"></view>
