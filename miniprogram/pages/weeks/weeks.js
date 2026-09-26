@@ -101,11 +101,14 @@ Page({
   // ① 原生 hover 会沿节点链激活——点日格连父级周卡一起亮（「整个周磁贴按压反馈」）；
   // ② switchTab 跳转时 hover 清理不可靠，返回周计划后按压底色残留（实机翻车）。
   // touchmove 也清：在磁贴上起手滑动（滚动列表）时不该亮按压态。
-  // ⚠️ v1.1.21 补两条（真机仍残留的根因）：
-  // ③ 日格 touch 冒泡会把 pressed 覆盖成父级周卡的 pk（亮的是整卡不是日格）→ 日格改 catchtouch* 断开冒泡；
+  // v1.1.21 补（真机仍残留的根因）：
   // ④ touchend 的清除 setData 可能来不及在页面隐藏前刷到渲染层，回来时 webview 恢复旧 DOM
   //    （数据已清、DOM 还带 tint）→ onShow 兜底清除异步生效 = 「先看到残留再弹起」的竞态。
   //    修 = 跳转前同步清 pressed + 延迟 100ms 再 switchTab（保证清除渲染先落），onHide 再兜底一次。
+  // v1.1.22 收口（用户定稿）：周卡整块退化为纯展示、不再跳转——日格已覆盖一周每一天，
+  //    整卡跳转多余。这同时让冒泡覆盖（③：子级 touch 冒泡把 pressed 覆盖成父级 pk）从
+  //    结构上根除：周卡不再绑 touch handler，日格恢复 bindtouch*（v1.1.21 曾改 catchtouch*
+  //    断冒泡，但 catch 会吞掉派生的 tap——日格点不动，已回退）。现仅阶段磁贴+日格有按压态。
   onTileDown(e) {
     const k = e.currentTarget.dataset.pk;
     if (this.data.pressed !== k) this.setData({ pressed: k });
@@ -134,13 +137,7 @@ Page({
     setTimeout(() => { wx.switchTab({ url: '/pages/today/today' }); }, 100);
   },
 
-  // 点某周 → 查看该周周一（Day = (w-1)*7+1）
-  onWeekTap(e) {
-    const w = Number(e.currentTarget.dataset.w);
-    this.jumpToDay((w - 1) * 7 + 1);
-  },
-
-  // 点某周的某天
+  // 点某周的某天（v1.1.22：周卡整块不再跳转，日格是唯一跳转入口）
   onDayTap(e) {
     const w = Number(e.currentTarget.dataset.w);
     const k = Number(e.currentTarget.dataset.k);

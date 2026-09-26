@@ -37,9 +37,10 @@
 
 <block wx:for="{{phases}}" wx:key="p" wx:for-item="phase">
   <block wx:if="{{openPhase === phase.p}}">
-    <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}} {{pressed === 'w' + week.w ? 'hover-tint' : ''}}"
-          wx:for="{{phase.weeks}}" wx:key="w" wx:for-item="week"
-          data-w="{{week.w}}" data-pk="w{{week.w}}" bindtouchstart="onTileDown" bindtouchend="onTileUp" bindtouchcancel="onTileUp" bindtouchmove="onTileUp" bindtap="onWeekTap">
+    <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}}"
+          wx:for="{{phase.weeks}}" wx:key="w" wx:for-item="week">
+      <!-- 周卡整块纯展示、不可点（09-26 用户定稿）：日格已覆盖一周每一天，整卡跳转多余；
+           这同时让日格 touch 冒泡失去父级 handler，v1.1.19 的「点日格整卡亮」从结构上根除 -->
       <view class="week-line">
         <view class="week-ring" style="background: conic-gradient(#176B5B {{week.checked / 7 * 100}}%, #E9F0EC 0)"><view class="week-ring-num {{week.isCurrent ? 'week-ring-num--current' : (week.isPast ? 'week-ring-num--past' : '')}}">{{week.w}}</view></view>
         <view class="week-info">
@@ -51,7 +52,7 @@
       <view class="week-days">
         <view class="day-chip {{item.done ? 'day-chip--done' : ''}} {{pressed === 'd' + week.w + 'k' + item.k ? 'hover-tint' : ''}}"
               wx:for="{{week.days}}" wx:key="k"
-              data-w="{{week.w}}" data-k="{{item.k}}" data-pk="d{{week.w}}k{{item.k}}" catchtouchstart="onTileDown" catchtouchend="onTileUp" catchtouchcancel="onTileUp" catchtouchmove="onTileUp" catchtap="onDayTap">{{item.k}}</view>
+              data-w="{{week.w}}" data-k="{{item.k}}" data-pk="d{{week.w}}k{{item.k}}" bindtouchstart="onTileDown" bindtouchend="onTileUp" bindtouchcancel="onTileUp" bindtouchmove="onTileUp" catchtap="onDayTap">{{item.k}}</view>
       </view>
     </view>
   </block>
