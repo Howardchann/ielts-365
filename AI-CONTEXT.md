@@ -214,7 +214,15 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 | 行内喇叭（词/例句/语法/大词行） | 行容器 `align-items:baseline` + 喇叭盒零宽空格 strut + 图标 `vertical-align:middle`（渲染引擎现算 x-height 中心，有无降部词通用） |
 | 宽屏媒体查询 | 与主规则同步改，别只改一处 |
 
-**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）。原版 PNG 备份在 `D:\idea\_tabicon_backup_0926\`。
+**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）。改版前的 8 张原版 PNG 存档在仓库 `assets/tabicon-original-20260926/`（含 README；`D:\idea\_tabicon_backup_0926\` 为仓库外同源备份）。
+
+**最终妥协（2026-09-26 用户确认收尾，不是遗留 bug，别再当待办修）**：
+
+| 项 | 定性 |
+|---|---|
+| 切 tab 残留频闪 | 同值守卫已消除"同值重渲染"层；残留 = **微信平台首帧**（切 tab 重建渲染层，JS 主题变量首帧后生效），代码层无法根除。用户明确接受。最后可试未试：手动模式把 windowBg 写进 theme.json（收益有限，未做） |
+| 图标/喇叭居中 | 机制已定稿（flex 按钮 + baseline/middle，Edge 渲染自检 12 上下文全过），但**真机未逐项像素复核**——v1.1.6 后用户反馈个别按钮图标仍偏高，选择不再逐个核验（"当成功了吧"）。若日后重启此项，用 `tools/measure-screenshot.py` 对真机截图测量，别回手调常量老路 |
+| GitHub 推送弹窗 | 系统级 `credential.helper = helper-selector` 曾导致每次推送弹三选项选择器窗口。已在全局 `.gitconfig` 用**空 helper 清空累积列表**再直挂 GCM（凭据已存，username=Howardchann），`git credential fill` 实测静默返回——**推送全程无窗口** |
 
 **UI 验证工具链**（改 UI 前后用，别靠肉眼/口算）：
 
