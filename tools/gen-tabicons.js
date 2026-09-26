@@ -17,13 +17,13 @@ function enc(s) {
 }
 
 const icons = {
-  // 选中态：绿针保持主针位（竖直向上 V8.5，与未选中态同形），红点缀挪到右下短针（时针位）——
-  // 红是点缀不抢主位；两针仍不同轴不叠画（同轴叠画会从底层针顶端露边，已翻车两次）。
+  // 选中态：红针依旧指 12 点（V8.5），绿针右下；**绿针后画**——中心尾部绿圆头压在红针尾部上面
+  // （红色从绿针底下伸出）。红线若垫绿线会出现"红针露绿帽"（已翻车），故顺序必须是红先绿后。
   clock: (main, red) => svg(
     `<circle cx='12' cy='13' r='8' ${SW} stroke='${main}'/>` +
     (red
-      ? `<path d='M12,13V8.5' ${SW} stroke='${main}' stroke-linecap='round'/>` +
-        `<path d='M12,13l3,2' ${SW} stroke='${RED}' stroke-linecap='round'/>`
+      ? `<path d='M12,13V8.5' ${SW} stroke='${RED}' stroke-linecap='round'/>` +
+        `<path d='M12,13l3,2' ${SW} stroke='${main}' stroke-linecap='round'/>`
       : `<path d='M12,13V8.5M12,13l3,2' ${SW} stroke='${main}' stroke-linecap='round'/>`) +
     `<path d='M9,3h6' ${SW} stroke='${main}' stroke-linecap='round'/>`
   ),
