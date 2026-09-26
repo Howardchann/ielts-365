@@ -3,7 +3,8 @@
     "pages/today/today",
     "pages/weeks/weeks",
     "pages/review/review",
-    "pages/settings/settings"
+    "pages/settings/settings",
+    "pages/transition/transition"
   ],
   "window": {
     "navigationBarTitleText": "开溜6.5",
