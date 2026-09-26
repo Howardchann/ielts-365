@@ -116,6 +116,37 @@ Page({
   onTileUp() {
     if (this.data.pressed) this.setData({ pressed: '' });
   },
+  // —— 日格「按压-确认」模式（v1.1.24，用户定稿）——
+  // 按住亮按压色不灭、松手才跳转（tint 保持到页面真正切走）、按住滑动 >10px = 取消（灭灯且不跳）。
+  // 与阶段磁贴（onTileDown/onTileUp，松手即灭）分开实现：日格跳转靠 tap 派发，touchend 不能
+  // 提前灭灯，否则出现「灭灯→100ms 空窗→才切页」的反馈断裂（v1.1.23 真机「显示时间很短」观感）；
+  // 且小幅度移动灭灯后 tap 照样跳——与「移动=取消」语义矛盾，用 _chipCancel 标记拦截。
+  onChipDown(e) {
+    const k = e.currentTarget.dataset.pk;
+    const t = e.touches && e.touches[0];
+    this._chipStart = t ? { x: t.clientX, y: t.clientY } : null;
+    this._chipCancel = false;
+    if (this.data.pressed !== k) this.setData({ pressed: k });
+  },
+  onChipMove(e) {
+    if (this._chipCancel) return;
+    const t = e.touches && e.touches[0], s = this._chipStart;
+    if (t && s && (Math.abs(t.clientX - s.x) > 10 || Math.abs(t.clientY - s.y) > 10)) {
+      this._chipCancel = true;
+      if (this.data.pressed) this.setData({ pressed: '' });
+    }
+  },
+  onChipEnd() {
+    // 不灭灯：tap 紧随其后触发跳转，tint 保持到 switchTab 切页为止。
+    // 兜底：若 tap 未派发（被系统判为滚动等），350ms 后自行灭灯
+    clearTimeout(this._chipTimer);
+    this._chipTimer = setTimeout(() => { if (this.data.pressed) this.setData({ pressed: '' }); }, 350);
+  },
+  onChipCancel() {
+    this._chipCancel = true;
+    clearTimeout(this._chipTimer);
+    if (this.data.pressed) this.setData({ pressed: '' });
+  },
   onHide() {
     // 离开本页即清按压态：switchTab 期间 touchend 可能没跑，数据层不留脏状态
     if (this.data.pressed) this.setData({ pressed: '' });
@@ -127,18 +158,20 @@ Page({
     this.setData({ openPhase: this.data.openPhase === p ? 0 : p });
   },
 
-  // 跳转到某一天：today 是 tabBar 页面，必须用 switchTab（旧实现用 navigateTo，必然失败）
-  // 先清按压态并延迟 100ms 再跳：让「清除 tint」的渲染先于页面隐藏落到渲染层，
-  // 否则回来时 webview 恢复带 tint 的旧 DOM，出现「残留一下才弹起」的竞态闪现（v1.1.21）
+  // 跳转到某一天：today 是 tabBar 页面，必须用 switchTab（旧实现用 navigateTo，必然失败）。
+  // v1.1.24：不再提前清 pressed——tint 保持到切页为止（按压-确认模式的反馈闭环）；
+  // 清理由 onHide（页面隐藏时数据层清，渲染层随后刷掉）+ onShow 第一行兜底接管。
+  // 100ms 延迟保留：亮灯状态稳定落一帧再切；若返回时 DOM 带回 tint，onShow 兜底灭灯
+  // （v1.1.21 的防残留双兜底机制不变）。
   jumpToDay(day) {
     const app = getApp();
-    if (this.data.pressed) this.setData({ pressed: '' });
     if (app && app.globalData) app.globalData.jumpDay = day;
     setTimeout(() => { wx.switchTab({ url: '/pages/today/today' }); }, 100);
   },
 
   // 点某周的某天（v1.1.22：周卡整块不再跳转，日格是唯一跳转入口）
   onDayTap(e) {
+    if (this._chipCancel) { if (this.data.pressed) this.setData({ pressed: '' }); return; }
     const w = Number(e.currentTarget.dataset.w);
     const k = Number(e.currentTarget.dataset.k);
     this.jumpToDay((w - 1) * 7 + k);

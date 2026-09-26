@@ -52,7 +52,7 @@
       <view class="week-days">
         <view class="day-chip {{item.done ? 'day-chip--done' : ''}} {{pressed === 'd' + week.w + 'k' + item.k ? 'hover-tint' : ''}}"
               wx:for="{{week.days}}" wx:key="k"
-              data-w="{{week.w}}" data-k="{{item.k}}" data-pk="d{{week.w}}k{{item.k}}" bindtouchstart="onTileDown" bindtouchend="onTileUp" bindtouchcancel="onTileUp" bindtouchmove="onTileUp" catchtap="onDayTap">{{item.k}}</view>
+              data-w="{{week.w}}" data-k="{{item.k}}" data-pk="d{{week.w}}k{{item.k}}" bindtouchstart="onChipDown" bindtouchmove="onChipMove" bindtouchend="onChipEnd" bindtouchcancel="onChipCancel" catchtap="onDayTap">{{item.k}}</view>
       </view>
     </view>
   </block>
