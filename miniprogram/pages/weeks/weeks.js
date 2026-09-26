@@ -23,13 +23,13 @@ Page({
   applyTheme() { theme.applyPage(this); theme.syncTabBar(this); },
   onLoad() { theme.applyPage(this); theme.syncTabBar(this); },
   onShow() {
+    // 按压态兜底清零放最前：万一 DOM 随旧帧带回 tint，这里的清除渲染越早发出闪现越短
+    if (this.data.pressed) this.setData({ pressed: '' });
     theme.syncTabBar(this, 1);
     this.applyTheme();
     store.onResume();
     // 标题兜底：今日页动态设过「Day N · 周X」后，未设过标题的 tab 页原生标题可能为空
     try { wx.setNavigationBarTitle({ title: '18个月计划总览' }); } catch (e) {}
-    // 按压态兜底清零：switchTab 跳转时 touchend 可能不触发，返回后残留按压底色
-    if (this.data.pressed) this.setData({ pressed: '' });
     this.refresh();
   },
 
@@ -101,11 +101,20 @@ Page({
   // ① 原生 hover 会沿节点链激活——点日格连父级周卡一起亮（「整个周磁贴按压反馈」）；
   // ② switchTab 跳转时 hover 清理不可靠，返回周计划后按压底色残留（实机翻车）。
   // touchmove 也清：在磁贴上起手滑动（滚动列表）时不该亮按压态。
+  // ⚠️ v1.1.21 补两条（真机仍残留的根因）：
+  // ③ 日格 touch 冒泡会把 pressed 覆盖成父级周卡的 pk（亮的是整卡不是日格）→ 日格改 catchtouch* 断开冒泡；
+  // ④ touchend 的清除 setData 可能来不及在页面隐藏前刷到渲染层，回来时 webview 恢复旧 DOM
+  //    （数据已清、DOM 还带 tint）→ onShow 兜底清除异步生效 = 「先看到残留再弹起」的竞态。
+  //    修 = 跳转前同步清 pressed + 延迟 100ms 再 switchTab（保证清除渲染先落），onHide 再兜底一次。
   onTileDown(e) {
     const k = e.currentTarget.dataset.pk;
     if (this.data.pressed !== k) this.setData({ pressed: k });
   },
   onTileUp() {
+    if (this.data.pressed) this.setData({ pressed: '' });
+  },
+  onHide() {
+    // 离开本页即清按压态：switchTab 期间 touchend 可能没跑，数据层不留脏状态
     if (this.data.pressed) this.setData({ pressed: '' });
   },
 
@@ -116,10 +125,13 @@ Page({
   },
 
   // 跳转到某一天：today 是 tabBar 页面，必须用 switchTab（旧实现用 navigateTo，必然失败）
+  // 先清按压态并延迟 100ms 再跳：让「清除 tint」的渲染先于页面隐藏落到渲染层，
+  // 否则回来时 webview 恢复带 tint 的旧 DOM，出现「残留一下才弹起」的竞态闪现（v1.1.21）
   jumpToDay(day) {
     const app = getApp();
+    if (this.data.pressed) this.setData({ pressed: '' });
     if (app && app.globalData) app.globalData.jumpDay = day;
-    wx.switchTab({ url: '/pages/today/today' });
+    setTimeout(() => { wx.switchTab({ url: '/pages/today/today' }); }, 100);
   },
 
   // 点某周 → 查看该周周一（Day = (w-1)*7+1）
