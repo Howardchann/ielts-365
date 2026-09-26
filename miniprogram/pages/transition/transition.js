@@ -10,10 +10,12 @@ Page({
 
   onLoad(options) {
     theme.bind(this)
+    const targetTab = options.tab || 'random'
+    wx.setStorageSync('__reviewDeepLinkTab', targetTab)
     this.setData({
       dark: theme.isDark(),
       pageStyle: theme.pageStyle(),
-      targetTab: options.tab || 'random'
+      targetTab
     })
   },
 
@@ -21,14 +23,9 @@ Page({
     theme.sync(this)
     if (this._started) return
     this._started = true
-    const tab = this.data.targetTab || 'random'
-    // Give this page one rendered frame before switchTab. The page is an
-    // opaque, theme-matched bridge, so the destination Tab is never exposed
-    // until the bridge itself has been painted.
+    // Give the opaque bridge one frame to paint before switchTab.
     setTimeout(() => {
-      wx.switchTab({
-        url: `/pages/review/review?tab=${encodeURIComponent(tab)}`
-      })
+      wx.switchTab({ url: '/pages/review/review' })
     }, 32)
   }
 })
