@@ -120,7 +120,9 @@ Page({
         if(rp&&rp.data){
           if(rp.data.tab===tab){go();return;}
           let done=false;const once=()=>{if(done)return;done=true;go();};
-          rp.setData({tab},once);setTimeout(once,400);
+          // 盖罩（v1.1.31）：改 tab 与罩纯背景罩合并一次 setData——渲染完成后才 switchTab，
+          // 且切换瞬间合成器补出的任何旧帧都只是背景色，旧 tab 内容无帧可现（灭瞬移的根本法）
+          rp.setData({tab,veil:true},once);setTimeout(once,400);
           return;
         }
       }

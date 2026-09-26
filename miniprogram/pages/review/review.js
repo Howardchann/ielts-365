@@ -41,6 +41,11 @@ Page({
 
   applyTheme() { theme.applyPage(this); theme.syncTabBar(this); },
   onShow() {
+    // 盖罩清除（v1.1.31）放第一行：deep-link 预切换时罩上的纯背景罩，页面可见前尽早撤掉。
+    // 逻辑：设置页在隐藏的本页上 setData({tab,veil:true}) 后才 switchTab——切换瞬间合成器
+    // 无论补出哪一帧（含未及刷新的旧帧），都只可能是「纯背景色」或「目标 tab」，旧 tab 内容
+    // 物理上无帧可现；本行在内容露出前撤罩，用户最多看到一帧纯背景色（观感=正常页面底色）
+    if (this.data.veil) this.setData({ veil: false });
     // 设置页「学习进度」跳转指定 tab（v1.1.27）：重点词→starred、复习记录→random。
     // switchTab 无法带参 → 经 globalData.reviewTab 传递，消费后立即清掉（不影响正常切 tab）
     const app = getApp();

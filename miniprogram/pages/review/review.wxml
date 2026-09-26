@@ -1,5 +1,6 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="page-root {{dark ? 'theme-dark' : ''}}">
+<view class="page-veil" wx:if="{{veil}}"></view>
 <!-- 复习页 -->
 <view class="tab-row">
   <view class="tab {{tab === 'random' ? 'tab--on' : ''}}" data-tab="random" hover-class="hover-dim" hover-stay-time="120" bindtap="onTab">随机抽查</view>

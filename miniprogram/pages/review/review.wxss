@@ -40,3 +40,7 @@
   .star-tile { border-radius: 12px; padding: 10px 14px; }
   .star-tile + .star-tile { margin-top: 10px; }
 }
+
+/* deep-link 盖罩（v1.1.31）：设置页跨栈预切换期间罩住整页，保证切换瞬间的任何合成帧
+   都只是纯页面底色而非旧 tab 内容；review.onShow 第一行撤罩。跟随主题变量明暗自适应 */
+.page-veil{position:fixed;left:0;top:0;right:0;bottom:0;background:var(--bg);z-index:999}
