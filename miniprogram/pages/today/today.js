@@ -11,6 +11,7 @@ Page({
     dark: theme.isDark(),
     pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
     viewDay: 1,
+    totalDays: plan.TOTAL_DAYS,
     todayNum: 0,
     preStart: false,
     daysToStart: 0,
@@ -142,6 +143,13 @@ Page({
     // 准备期（preStart）点「先看看 Day 1」：必须退出准备期卡片，否则 renderDay 渲染了也被 wx:if 盖住
     this.setData({ preStart: false });
     this.renderDay(t);
+  },
+
+  resetView() {
+    // 清除学习记录后由设置页调用：丢弃浏览位置，下次 onShow 走默认落点
+    // （startDate 已重置为下一个周一 → todayNum=0 → 自动进准备期倒计时卡片）
+    this._daySig = null;
+    this.setData({ viewDay: 0 });
   },
 
   fb() { return this.selectComponent('#fb'); },

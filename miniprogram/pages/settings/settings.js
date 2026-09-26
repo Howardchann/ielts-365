@@ -86,7 +86,12 @@ Page({
   _buildCal(y,m){const first=new Date(y,m,1),lead=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();const p=n=>('0'+n).slice(-2);const t=new Date(),tIso=t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate());const grid=[];for(let i=0;i<lead;i++)grid.push({blank:true,iso:'b'+i});for(let d=1;d<=days;d++){const iso=y+'-'+p(m+1)+'-'+p(d);grid.push({d,iso,dis:iso<'2025-01-01'||iso>'2028-12-31',sel:iso===this.data.startDate,today:iso===tIso});}return{grid,label:y+' 年 '+(m+1)+' 月',canPrev:!(y===2025&&m===0),canNext:!(y===2028&&m===11)};},
   shiftMonth(e){const dir=Number(e.currentTarget.dataset.dir);let{y,m}=this.data.cal;m+=dir;if(m<0){m=11;y--;}if(m>11){m=0;y++;}if((dir<0&&(y===2025&&m===0))||(dir>0&&(y===2028&&m===11))){return;}const g=this._buildCal(y,m);this.setData({'cal.y':y,'cal.m':m,'cal.label':g.label,'cal.grid':g.grid,'cal.canPrev':g.canPrev,'cal.canNext':g.canNext});},
   closeCal(){this.setData({'cal.show':false});},
-  pickDay(e){const ds=e.currentTarget.dataset;if(ds.dis==='true'||ds.dis===true)return;const iso=ds.iso;let d=new Date(iso+'T00:00:00');const off=(d.getDay()+6)%7;if(off)d.setDate(d.getDate()-off);const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(off?('已对齐到周一 '+ms):'开始日期已更新');},
+  pickDay(e){const ds=e.currentTarget.dataset;if(ds.dis==='true'||ds.dis===true)return;const iso=ds.iso;let d=new Date(iso+'T00:00:00');const off=(d.getDay()+6)%7;if(off)d.setDate(d.getDate()-off);
+  // 对齐后的周一若已过去 → 顺延到下周周一：避免「开学第一天已过期 N 天」的补课怪状态；
+  // 直接选过去某个完整周的周一（off=0）仍保留，供有意从某周补课的用户使用
+  const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());let moved='';
+  if(off&&d<today){d.setDate(d.getDate()+7);moved='next';}
+  const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(moved==='next'?'已顺延到下周周一 '+ms:(off?'已对齐到周一 '+ms:'开始日期已更新'));},
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
   backupSummaryOf(text){try{const o=JSON.parse(text);return (o&&typeof o.summary==='string')?o.summary:'';}catch(e){return '';}},
@@ -95,7 +100,7 @@ Page({
   onHideBackup(){this.setData({showBackup:false});},onShowImport(){this.setData({showImport:true,showBackup:false,importText:''});},onHideImport(){this.setData({showImport:false,importText:''});},onImportInput(e){this.setData({importText:e.detail.value});},
   doImport(mode){const text=(this.data.importText||'').trim();if(!text){this.fb().toast('请先粘贴备份内容');return;}let r;try{r=store.importBackup(text,mode);}catch(e){this.fb().modal({title:'导入失败',content:e.message||String(e),showCancel:false});return;}this.setData({showImport:false,importText:''});this.refresh();const bs=this.backupSummaryOf(text);const head=mode==='merge'?'合并完成':'覆盖完成';const detail=(bs?('该备份：'+bs+'\n\n'):'')+(mode==='merge'?('新增 '+r.addedDays+' 天打卡、'+r.addedWords+' 个重点词\n合并后共 '+r.totalDays+' 天、'+r.totalWords+' 个重点词\n已恢复 '+r.reviewWords+' 个复习记录'):('已替换为备份中的 '+r.totalDays+' 天打卡、'+r.totalWords+' 个重点词、'+r.reviewWords+' 个复习记录'));this.fb().modal({title:head,content:detail,showCancel:false});},
   onImportMerge(){this.doImport('merge');},onImportReplace(){this.doImport('replace');},
-  onResetProgress(){this.fb().modal({title:'清除学习记录',content:'将清空全部打卡、收藏与复习记录，云端一并清除，其他设备同步后同样清空——无法撤销。建议先「导出备份」，确定从 0 开始吗？',confirmText:'清除',danger:true,onConfirm:()=>{store.resetProgress();this.refresh();this.fb().toast('已清除，重新开始',1500);}});},
+  onResetProgress(){this.fb().modal({title:'清除学习记录',content:'将清空全部打卡、收藏与复习记录，云端一并清除，其他设备同步后同样清空——无法撤销。建议先「导出备份」，确定从 0 开始吗？',confirmText:'清除',danger:true,onConfirm:()=>{store.resetProgress();getCurrentPages().forEach(p=>{if(p.resetView)p.resetView();});this.refresh();this.fb().toast('已清除，重新开始',1500);}});},
   // 云同步状态：只更新这一小块，避免每次 store 变更都整页 refresh
   refreshCloud(){
     const sr=store.cloudStatus();const p=n=>String(n).padStart(2,'0');

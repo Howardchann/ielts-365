@@ -11,6 +11,8 @@ Page({
     phases: [],       // [{p, name, shortName, range, doneCount, totalWeeks, percent, isCurrentPhase, weeks:[...]}]
     todayNum: 0,
     currentWeek: 0,
+    daysToStart: 0,       // 准备期横幅（todayNum=0 时显示）
+    startDateText: '',
     totalChecked: 0,
     totalDays: plan.TOTAL_DAYS,
     totalPercent: '0.0',  // WXML 的 {{}} 不支持函数调用（如 toFixed），必须在 JS 算好再传入
@@ -29,6 +31,15 @@ Page({
   refresh() {
     const todayNum = plan.currentDayFromStart(store.get('startDate'));
     const currentWeek = todayNum > 0 ? Math.ceil(todayNum / 7) : 0;
+    // 准备期（todayNum=0）：顶部横幅需要开始日期与倒计时天数
+    const startDate = store.get('startDate') || plan.DEFAULT_START;
+    let daysToStart = 0, startDateText = '';
+    if (todayNum === 0) {
+      const sd = new Date(startDate + 'T00:00:00');
+      const now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      daysToStart = Math.ceil((sd - today) / 86400000);
+      startDateText = (sd.getMonth() + 1) + ' 月 ' + sd.getDate() + ' 日';
+    }
     // 默认只展开当前周所属阶段，避免一次性渲染 546 个节点
     const currentPhase = currentWeek > 0 ? (plan.WEEKS[currentWeek - 1] || {}).p || 1 : 1;
     const phases = [];
@@ -65,13 +76,15 @@ Page({
       ? '100.0'
       : (totalChecked * 100 / plan.TOTAL_DAYS).toFixed(1);
     // 同值守卫：周表全部状态由 checkedDays 派生，无变化就不再整树 setData（切 tab 闪屏根源）
-    const sig = [totalChecked, (store.get('checkedDays') || []).length, todayNum].join('|');
+    const sig = [totalChecked, (store.get('checkedDays') || []).length, todayNum, startDate].join('|');
     if (sig === this._weeksSig) return;
     this._weeksSig = sig;
     this.setData({
       phases,
       todayNum,
       currentWeek,
+      daysToStart,
+      startDateText,
       totalChecked,
       totalDays: plan.TOTAL_DAYS,
       totalPercent,

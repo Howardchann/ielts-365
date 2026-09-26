@@ -10,6 +10,17 @@
 
 ---
 
+## 2026-09-26（晚 2）· 清除记录回归准备期 + 边界按钮置灰 + 日期顺延规则 + 周计划准备期横幅（v1.1.14）
+
+四项均经用户拍板（AskUserQuestion 三问全选推荐项）：
+
+1. **清除记录后今日页不回倒计时（bug 修复）**：`resetProgress` 已把 startDate 重置回下一个周一（todayNum=0），但 today.onShow 的「保持浏览位置」分支（`viewDay` 有值即沿用）让页面停在 Day 1。修复 = today.js 新增 `resetView()`（清 `_daySig`、viewDay 置 0），设置页 onResetProgress 确认后 `getCurrentPages().forEach(p => p.resetView && p.resetView())`。
+2. **Day 1 / Day 564 边界按钮置灰**：`.nav-btn--dis`（opacity .35）+ hover-class 条件化，不隐藏（保三段布局对称）；today data 加 `totalDays` 供 wxml 判断。
+3. **日期对齐规则升级**：选非周一且对齐后的周一已过去 → 顺延到下周周一（toast「已顺延到下周周一 MM-DD」）；直接选过去完整周的周一仍保留补课语义。星期轴绑死 Day1=周一，这是必须对齐周一的原因。
+4. **周计划页准备期横幅**：`todayNum===0` 时顶部显示「计划 X 月 X 日开始——还有 N 天开学」；`daysToStart/startDateText` 进 data 初始化（防首帧空文案）；`_weeksSig` 加入 startDate（改开始日期同值守卫能感知）。
+
+**遗留观察项**：清除记录后偶发闪白（未再复现）——与 v1.1.13 同族的后台页延迟重绘机制，原生底色已随 v1.1.13 修正，残留大概率为合成器级缓存帧；再复现时录屏交 `tools/_flash-scan.py` 重扫。
+
 ## 2026-09-26（晚）· 第三类白闪修复：nativeBars 全局去重 → 按页去重（v1.1.13）
 
 **用户真机复现**：手动切色系后，每个页面的**首次**进入闪白光、再进不闪；两个方向都闪"白"光。

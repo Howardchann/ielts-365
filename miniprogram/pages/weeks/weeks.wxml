@@ -1,6 +1,12 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="page-root {{dark ? 'theme-dark' : ''}}">
 <!-- 学习计划总览（78 周 / 18 个月） -->
+<!-- 准备期横幅：计划未开始时解释为何进度全为 0 -->
+<view class="card" wx:if="{{todayNum === 0}}">
+  <view class="tip-box" style="margin-top:0;">
+    <view class="tip-text">计划 {{startDateText}} 开始——还有 {{daysToStart}} 天开学。进度从开学当天起累计，现在可以先浏览全表熟悉节奏</view>
+  </view>
+</view>
 <view class="card stat-card">
   <view class="stat-row">
     <view class="stat-item">

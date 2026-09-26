@@ -16,12 +16,12 @@
   <!-- 日期导航 -->
   <view class="card day-head">
     <view class="day-nav">
-      <view class="nav-btn" hover-class="nav-btn--press" hover-stay-time="120" bindtap="prevDay">‹ 前一天</view>
+      <view class="nav-btn {{viewDay > 1 ? '' : 'nav-btn--dis'}}" hover-class="{{viewDay > 1 ? 'nav-btn--press' : 'none'}}" hover-stay-time="120" bindtap="prevDay">‹ 前一天</view>
       <view class="day-title">
         <view class="day-num">Day {{dayNum}}</view>
         <view class="day-dow">{{dowText}} · 第{{weekNum}}周</view>
       </view>
-      <view class="nav-btn" hover-class="nav-btn--press" hover-stay-time="120" bindtap="nextDay">后一天 ›</view>
+      <view class="nav-btn {{viewDay < totalDays ? '' : 'nav-btn--dis'}}" hover-class="{{viewDay < totalDays ? 'nav-btn--press' : 'none'}}" hover-stay-time="120" bindtap="nextDay">后一天 ›</view>
     </view>
     <view class="phase-line">{{phaseName}} · {{theme}}</view>
     <view class="is-today" wx:if="{{dayNum !== todayNum && todayNum > 0}}" hover-class="hover-dim" hover-stay-time="120" bindtap="backToToday">回到今天（Day {{todayNum}}）</view>
