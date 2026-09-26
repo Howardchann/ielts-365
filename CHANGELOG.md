@@ -10,6 +10,17 @@
 
 ---
 
+## 2026-09-26（晚）· 第三类白闪修复：nativeBars 全局去重 → 按页去重（v1.1.13）
+
+**用户真机复现**：手动切色系后，每个页面的**首次**进入闪白光、再进不闪；两个方向都闪"白"光。
+
+**根因（v1.1.12 之前一直存在，被前两轮修复掩盖）**：`theme.js nativeBars` 的 `lastNav/lastWin` 去重是**模块级全局变量**，但 `setNavigationBarColor`/`setBackgroundColor` 是**只作用于当前页**的 API：
+- 切主题时 `onAppearance` 遍历 `getCurrentPages()` 逐页 `applyPage` → 只有第一页（settings 自己）真正调到 API，其余页面被全局标记跳过，且**之后每页 onShow 时也因全局标记已同值而不补设**；
+- 后果：非当前页的原生窗口底色停留在旧主题（若系统是浅色，深色模式下原生底也是浅色 → 两个方向都闪"白"）；
+- 后台页的 setData 渲染被微信延迟到首次显示 → 首次进入该页时 webview 重绘的瞬间露出旧色原生底 = 白光；再进不闪（重绘已完成）。
+
+**修复**：去重标记改按页存（`page.__nav/__win`），`nativeBars(dark, page)` 只在 page 是栈顶（当前页）时调 API；后台页在自身 onShow → applyPage 时补设（duration 0，与首帧重绘同窗）。auto 模式仍直接 return 交给 theme.json。
+
 ## 2026-09-26（傍晚）· 文案全量定稿 + 切页白光第二链路修复（v1.1.12）
 
 **切页白光根因修复（用户录屏重扫抓到，6 处整页浅色闪现各 1-3 帧）**：

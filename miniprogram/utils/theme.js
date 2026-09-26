@@ -19,19 +19,23 @@ function isDark() {
 }
 
 // 原生栏只在「手动模式」下接管；auto 模式完全交给 darkmode+theme.json（跟随系统自动切）。
-// 之前每次 onShow 都无条件 setNavigationBarColor/setBackgroundColor（自带 200ms 动画），
-// 且 auto 模式下与 theme.json 互相拉扯 —— 这就是切页闪屏的来源。
-let lastNav = null, lastWin = null;
-function nativeBars(dark) {
+// ⚠️ setNavigationBarColor/setBackgroundColor 只作用于「当前页」的窗口 —— 后台页调了无效。
+// 去重标记必须按页存（page.__nav/__win），不能模块级全局：否则主题切换时只有当前页
+// 被更新，其余页面的原生窗口底色停留在旧主题；等它们首次显示、webview 延迟重绘时
+// 露出旧色底 = 「切色系后每个页面第一次进入闪白光」。后台页在自己 onShow 时补设。
+function nativeBars(dark, page) {
   if (mode() === 'auto') return;
+  const stack = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+  const cur = stack.length ? stack[stack.length - 1] : null;
+  if (page && cur && cur !== page) return; // 后台页：跳过，等它 onShow 时再补
   const nav = dark ? '#0E1618' : '#176B5B';
-  if (lastNav !== nav) {
-    lastNav = nav;
+  const win = dark ? '#0E1618' : '#F3F8EF';
+  if (!page || page.__nav !== nav) {
+    if (page) page.__nav = nav;
     try { wx.setNavigationBarColor({ frontColor: '#ffffff', backgroundColor: nav, animation: { duration: 0, timingFunc: 'linear' } }); } catch (e) {}
   }
-  const win = dark ? '#0E1618' : '#F3F8EF';
-  if (lastWin !== win) {
-    lastWin = win;
+  if (!page || page.__win !== win) {
+    if (page) page.__win = win;
     try { wx.setBackgroundColor({ backgroundColor: win }); } catch (e) {}
   }
 }
@@ -45,7 +49,7 @@ function applyPage(page) {
   const pageStyle = dark ? 'background-color:#0E1618;' : 'background-color:#F3F8EF;';
   if (page.data.pageStyle !== pageStyle) patch.pageStyle = pageStyle;
   if (Object.keys(patch).length) page.setData(patch);
-  nativeBars(dark);
+  nativeBars(dark, page);
 }
 
 // 通用同值守卫：微信 setData 无深度 diff，同值也整树重渲染（切页闪屏根源）。

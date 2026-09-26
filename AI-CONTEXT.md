@@ -264,6 +264,8 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 
 **已知平台限制（别再试图代码修复）**：主题切换瞬间 tabBar/内容可能错位 1 帧（≈42ms，18 次中约 4 次）= 合成器级（两个渲染层不同 vsync 上屏），JS 层无法消除。页面级切页白闪由 v1.1.11（backgroundColorContent）+ v1.1.12（页面 data 初始化 dark）双修复，**别把两类白闪混为一谈**。
 
+**第三类白闪（v1.1.13 修复，2026-09-26）**：「手动切色系后，每个页面的**首次**进入闪白光、再进不闪」。根因 = `theme.js nativeBars` 的 `lastNav/lastWin` 去重是**模块级全局**，而 `setNavigationBarColor/setBackgroundColor` **只作用于当前页**——主题切换遍历后台页时只有第一页真正生效，其余页面原生窗口底色停在旧主题；后台页 setData 渲染被微信延迟到首次显示，webview 重绘瞬间露出旧色底。修复 = 去重标记改**按页存**（`page.__nav/__win`）+ 只对当前页调 API，后台页在自己 onShow 首次补设（duration 0）。**改 nativeBars 时三条铁律**：① 去重状态绝不能放模块级变量；② 后台页调原生栏 API 无效，必须等 onShow；③ `mode()==='auto'` 直接 return（交给 theme.json），别加逻辑。
+
 **tabBar 结构**：`custom-tab-bar` 已从 cover-view 改 view + SVG data-URI（8 张 PNG 弃用但文件仍在 images/），dark 状态经 `syncTabBar` 同步。
 
 ---
