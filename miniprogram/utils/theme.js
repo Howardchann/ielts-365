@@ -37,12 +37,12 @@ function nativeBars(dark) {
 }
 
 // 页面级应用：data.dark 驱动根 view 的 theme-dark 类；pageStyle 走 <page-meta>
-// （page 选择器的背景 .theme-dark 够不到，不覆盖会露白条：margin 塌陷处/底部预留区/回弹区）
+// 浅/深两态都显式指定窗口背景，避免从另一主题切回来时先短暂露出默认窗口底色。
 function applyPage(page) {
   const dark = isDark();
   const patch = {};
   if (page.data.dark !== dark) patch.dark = dark;
-  const pageStyle = dark ? 'background-color:#0E1618;' : '';
+  const pageStyle = dark ? 'background-color:#0E1618;' : 'background-color:#F3F8EF;';
   if (page.data.pageStyle !== pageStyle) patch.pageStyle = pageStyle;
   if (Object.keys(patch).length) page.setData(patch);
   nativeBars(dark);
