@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>喇叭 / 删除键 实际尺寸对比 · 2026-09-26</title>
+<style>
+  :root{
+    --bg:#F3F8EF; --card:#FFFFFF; --ink:#24332F; --ink2:#5F6D68; --muted:#8B9893;
+    --green:#176B5B; --soft:#F0F7F3; --line:#E9F0EC; --star-off:#C7D0CC;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    padding:24px 16px 96px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:420px;margin:0 auto}
+  h1{font-size:19px;margin-bottom:6px}
+  .sub{font-size:12.5px;color:var(--muted);line-height:1.7;margin-bottom:20px}
+  .note{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ink2);line-height:1.8;margin-bottom:18px}
+  h2{font-size:15.5px;margin:26px 0 4px}
+  .h2sub{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7}
+
+  /* ===== 手机同款：词行 ===== */
+  .phone{background:var(--card);border-radius:14px;padding:2px 16px;box-shadow:0 1px 4px rgba(36,51,47,.06)}
+  .word-row{display:flex;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--line)}
+  .phone .word-row:last-child{border-bottom:none}
+  .word-en{font-size:16px;font-weight:700;color:var(--ink)}
+  .word-pos{font-size:11px;color:var(--green);font-style:italic;margin-left:5px}
+  .word-zh{font-size:13px;color:var(--ink2);margin-top:2px}
+  .word-main{flex:1;min-width:0}
+  /* 播放键盒：真机 56rpx=28px，font-size 32rpx=16px（与词同），strut 对齐机制照抄 */
+  .word-speak{flex-shrink:0;width:28px;height:28px;font-size:16px;text-align:center;margin-right:0}
+  .word-speak::before{content:'\200B'}
+  .spk-ico{display:inline-block;vertical-align:middle;width:.75em;height:.75em;
+    background:center/contain no-repeat;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%23176B5B'/%3E%3C/svg%3E");}
+  .spk-a .spk-ico{width:.85em;height:.85em}
+  .spk-b .spk-ico{width:.9em;height:.9em}
+  .spk-c .spk-ico{width:1em;height:1em}
+
+  /* ===== 手机同款：重点词磁贴 + 删除键 ===== */
+  .star-tile{background:var(--card);border-radius:12px;padding:10px 14px}
+  .star-tile + .star-tile{margin-top:10px}
+  .rm-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;align-self:center}
+  .rm-a .rm-btn{width:28px;height:28px}
+  .rm-b .rm-btn{width:32px;height:32px}
+  .rm-c .rm-btn{width:36px;height:36px}
+  .rm-ico{width:10px;height:10px;background:center/contain no-repeat;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M5%205l14%2014M19%205L5%2019'%20fill='none'%20stroke='%23F0705F'%20stroke-width='2.6'%20stroke-linecap='round'/%3E%3C/svg%3E")}
+  .rm-a .rm-ico{width:13px;height:13px}
+  .rm-b .rm-ico{width:15px;height:15px}
+  .rm-c .rm-ico{width:17px;height:17px}
+
+  /* ===== 选项标注 ===== */
+  .opt{border:2px solid transparent;border-radius:14px;padding:6px 10px;margin:0 -10px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+  .opt:hover{background:var(--soft)}
+  .opt.sel{border-color:var(--green);background:var(--soft)}
+  .opt-tag{display:inline-flex;align-items:center;gap:8px;margin-bottom:2px}
+  .opt-name{font-size:13px;font-weight:700;color:var(--green)}
+  .opt-spec{font-size:11.5px;color:var(--muted)}
+  .badge{font-size:10.5px;font-weight:700;color:#fff;background:var(--muted);border-radius:99px;padding:1.5px 8px}
+  .badge.cur{background:#A6B2AD}
+  .badge.rec{background:var(--green)}
+
+  /* 底部选择条 */
+  .bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));font-size:13px;text-align:center;color:var(--ink2)}
+  .bar b{color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>喇叭 / 删除键 · 实际尺寸对比</h1>
+  <div class="sub">2026-09-26 · 尺寸按真机 375 逻辑宽 1:1 渲染（1rpx = 0.5px），此处看到的就是手机上的实际大小。图标、颜色、字号、对齐机制全部照抄线上代码，仅图形尺寸不同。</div>
+  <div class="note">点任意一行为它打勾，底部会汇总你的选择；把两行的选择告诉我即可（如"单词喇叭 B、删除键 A"）。改完上传体验版后我会再出「实际应用前后对比图」给你终验。</div>
+
+  <!-- ============ 单词播放键 ============ -->
+  <h2>① 单词行播放喇叭（今日页 / 词表）</h2>
+  <div class="h2sub">例句喇叭（0.85em ≈ 11px）你已确认没问题，不动；以下只调单词行喇叭。改系数的话，随机复习大词的喇叭会同步按比例放大（同类型一致不受影响）。</div>
+
+  <div class="phone">
+    <div class="opt" data-g="spk" data-v="现状 0.75em（12px）">
+      <div class="opt-tag"><span class="opt-name">现状</span><span class="badge cur">0.75em · 24rpx（12px）</span></div>
+      <div class="word-row">
+        <div class="word-main"><div><span class="word-en">hello</span><span class="word-pos">interj.</span></div><div class="word-zh">你好；喂（打招呼）</div></div>
+        <div class="word-speak"><span class="spk-ico"></span></div>
+      </div>
+    </div>
+    <div class="opt spk-a" data-g="spk" data-v="A 0.85em（13.6px）">
+      <div class="opt-tag"><span class="opt-name">A</span><span class="badge rec">0.85em ≈ 27rpx（13.6px）</span><span class="opt-spec">与例句喇叭同系数 · +13%</span></div>
+      <div class="word-row">
+        <div class="word-main"><div><span class="word-en">hello</span><span class="word-pos">interj.</span></div><div class="word-zh">你好；喂（打招呼）</div></div>
+        <div class="word-speak"><span class="spk-ico"></span></div>
+      </div>
+    </div>
+    <div class="opt spk-b" data-g="spk" data-v="B 0.9em（14.4px）">
+      <div class="opt-tag"><span class="opt-name">B</span><span class="badge">0.9em ≈ 29rpx（14.4px）</span><span class="opt-spec">+20%，仍低于词字高</span></div>
+      <div class="word-row">
+        <div class="word-main"><div><span class="word-en">hello</span><span class="word-pos">interj.</span></div><div class="word-zh">你好；喂（打招呼）</div></div>
+        <div class="word-speak"><span class="spk-ico"></span></div>
+      </div>
+    </div>
+    <div class="opt spk-c" data-g="spk" data-v="C 1em（16px）">
+      <div class="opt-tag"><span class="opt-name">C</span><span class="badge">1em = 32rpx（16px）</span><span class="opt-spec">与单词字同高 · +33%，可能偏大</span></div>
+      <div class="word-row">
+        <div class="word-main"><div><span class="word-en">hello</span><span class="word-pos">interj.</span></div><div class="word-zh">你好；喂（打招呼）</div></div>
+        <div class="word-speak"><span class="spk-ico"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 删除键 ============ -->
+  <h2 style="margin-top:30px">② 重点词复习 · 磁贴删除键</h2>
+  <div class="h2sub">珊瑚线 ✕ 在 24 viewBox 里 stroke=2.6，SVG 放大时线条会等比例变粗（10px→线宽约1.1px，15px→约1.6px），不用另调 stroke。热区同步加大（wxss 一并改）。</div>
+
+  <div class="phone" style="background:transparent;box-shadow:none;padding:0">
+    <div class="star-tile opt" data-g="rm" data-v="现状 20rpx（10px）">
+      <div class="opt-tag"><span class="opt-name">现状</span><span class="badge cur">20rpx（10px）· 热区22px</span></div>
+      <div class="word-row" style="border-bottom:none;padding:2px 0">
+        <div class="word-main"><div><span class="word-en">family</span><span class="word-pos">n.</span></div><div class="word-zh">家；家庭</div></div>
+        <div class="rm-btn"><span class="rm-ico"></span></div>
+      </div>
+    </div>
+    <div class="star-tile opt rm-a" data-g="rm" data-v="A 26rpx（13px）">
+      <div class="opt-tag"><span class="opt-name">A</span><span class="badge">26rpx（13px）· 热区28px</span><span class="opt-spec">+30%</span></div>
+      <div class="word-row" style="border-bottom:none;padding:2px 0">
+        <div class="word-main"><div><span class="word-en">family</span><span class="word-pos">n.</span></div><div class="word-zh">家；家庭</div></div>
+        <div class="rm-btn"><span class="rm-ico"></span></div>
+      </div>
+    </div>
+    <div class="star-tile opt rm-b" data-g="rm" data-v="B 30rpx（15px）">
+      <div class="opt-tag"><span class="opt-name">B</span><span class="badge rec">30rpx（15px）· 热区32px</span><span class="opt-spec">+50%，接近例句喇叭的存在感</span></div>
+      <div class="word-row" style="border-bottom:none;padding:2px 0">
+        <div class="word-main"><div><span class="word-en">family</span><span class="word-pos">n.</span></div><div class="word-zh">家；家庭</div></div>
+        <div class="rm-btn"><span class="rm-ico"></span></div>
+      </div>
+    </div>
+    <div class="star-tile opt rm-c" data-g="rm" data-v="C 34rpx（17px）">
+      <div class="opt-tag"><span class="opt-name">C</span><span class="badge">34rpx（17px）· 热区36px</span><span class="opt-spec">+70%，可能压过词本身</span></div>
+      <div class="word-row" style="border-bottom:none;padding:2px 0">
+        <div class="word-main"><div><span class="word-en">family</span><span class="word-pos">n.</span></div><div class="word-zh">家；家庭</div></div>
+        <div class="rm-btn"><span class="rm-ico"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bar" id="bar">在上方点选你认可的大小，这里会显示你的选择</div>
+
+<script>
+  const sel={spk:null,rm:null};
+  document.querySelectorAll('.opt').forEach(function(el){
+    el.addEventListener('click',function(){
+      const g=el.dataset.g;
+      document.querySelectorAll('.opt[data-g="'+g+'"]').forEach(function(o){o.classList.remove('sel')});
+      el.classList.add('sel'); sel[g]=el.dataset.v;
+      const bar=document.getElementById('bar');
+      let t=[];
+      if(sel.spk)t.push('单词喇叭：<b>'+sel.spk+'</b>');
+      if(sel.rm)t.push('删除键：<b>'+sel.rm+'</b>');
+      bar.innerHTML=t.length?('已选 —— '+t.join('　·　')+'　（把这行话发给 AI 即可）'):'在上方点选你认可的大小，这里会显示你的选择';
+    });
+  });
+</script>
+</body>
+</html>

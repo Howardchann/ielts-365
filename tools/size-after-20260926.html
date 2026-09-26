@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>实际应用前后对比 · 喇叭 0.9em / 删除键 30rpx · 2026-09-26</title>
+<style>
+  :root{
+    --bg:#F3F8EF; --card:#FFFFFF; --ink:#24332F; --ink2:#5F6D68; --muted:#8B9893;
+    --green:#176B5B; --soft:#F0F7F3; --line:#E9F0EC;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFFang SC","Microsoft YaHei",sans-serif;
+    padding:24px 16px 60px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:420px;margin:0 auto}
+  h1{font-size:19px;margin-bottom:6px}
+  .sub{font-size:12.5px;color:var(--muted);line-height:1.7;margin-bottom:16px}
+  .vs{display:flex;gap:10px;margin-bottom:22px}
+  .vs>div{flex:1;min-width:0}
+  .vs-label{font-size:12px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .old .vs-label{color:#A6B2AD}.new .vs-label{color:var(--green)}
+  .pill{font-size:10px;font-weight:700;color:#fff;border-radius:99px;padding:1px 7px}
+  .pill.old{background:#A6B2AD}.pill.new{background:var(--green)}
+  h2{font-size:15.5px;margin:28px 0 10px}
+  .h2sub{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.7}
+
+  /* ===== 手机同款组件（前后唯一差异 = 尺寸参数，其余照抄线上） ===== */
+  .phone{background:var(--card);border-radius:14px;box-shadow:0 1px 4px rgba(36,51,47,.06)}
+  .word-row{display:flex;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--line)}
+  .word-row:last-child{border-bottom:none}
+  .word-en{font-size:16px;font-weight:700;color:var(--ink)}
+  .word-pos{font-size:11px;color:var(--green);font-style:italic;margin-left:5px}
+  .word-zh{font-size:13px;color:var(--ink2);margin-top:2px}
+  .word-main{flex:1;min-width:0}
+  .word-speak{flex-shrink:0;width:28px;height:28px;font-size:16px;text-align:center}
+  .word-speak::before{content:'\200B'}
+  .spk-ico{display:inline-block;vertical-align:middle;background:center/contain no-repeat;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%23176B5B'/%3E%3C/svg%3E")}
+  .old .spk-ico{width:12px;height:12px}      /* .75em × 16px */
+  .new .spk-ico{width:14.4px;height:14.4px}  /* .9em × 16px */
+
+  /* 重点词磁贴（真实 3 行内容） */
+  .star-tile{background:var(--card);border-radius:12px;padding:10px 14px}
+  .star-tile .word-row{border-bottom:none;padding:1px 0}
+  .word-example{font-size:12.5px;color:var(--muted2);margin-top:3px;padding-left:2px}
+  .rm-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;align-self:center}
+  .old .rm-btn{width:22px;height:22px}                       /* 44rpx，无补偿 */
+  .new .rm-btn{width:32px;height:32px;margin-right:-5px}     /* 64rpx + margin-right:-10rpx */
+  .rm-ico{background:center/contain no-repeat;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M5%205l14%2014M19%205L5%2019'%20fill='none'%20stroke='%23F0705F'%20stroke-width='2.6'%20stroke-linecap='round'/%3E%3C/svg%3E")}
+  .old .rm-ico{width:10px;height:10px}
+  .new .rm-ico{width:15px;height:15px}
+  .anchor{position:relative}
+  .anchor::after{content:'';position:absolute;right:14px;top:0;bottom:0;width:1px;
+    background:repeating-linear-gradient(to bottom,#F0705F 0 4px,transparent 4px 8px);opacity:.55}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>实际应用前后对比（已按你选的 B 改完代码）</h1>
+  <div class="sub">375 逻辑宽 1:1 渲染。左=线上现状，右=本次修改后，其余全部同款。确认没问题我就打体验版包上传。</div>
+
+  <h2 style="margin-top:0">① 单词行播放喇叭（今日页词表 / 重点词磁贴）</h2>
+  <div class="h2sub">0.75em(12px) → 0.9em(14.4px)。例句喇叭 0.85em 不变；随机复习大词的喇叭按同系数自动 42→50rpx（同类型一致）。</div>
+  <div class="vs">
+    <div class="old"><div class="vs-label"><span class="pill old">改前</span>0.75em · 12px</div>
+      <div class="phone"><div class="word-row">
+        <div class="word-main"><div><span class="word-en">introduce</span><span class="word-pos">v.</span></div><div class="word-zh">介绍；引进</div></div>
+        <div class="word-speak"><span class="spk-ico"></span></div>
+      </div></div>
+    </div>
+    <div class="new"><div class="vs-label"><span class="pill new">改后</span>0.9em · 14.4px</div>
+      <div class="phone"><div class="word-row">
+        <div class="word-main"><div><span class="word-en">introduce</span><span class="word-pos">v.</span></div><div class="word-zh">介绍；引进</div></div>
+        <div class="word-speak"><span class="spk-ico"></span></div>
+      </div></div>
+    </div>
+  </div>
+
+  <h2>② 重点词磁贴 · 删除键（真实 3 行内容）</h2>
+  <div class="h2sub">20rpx(10px) → 30rpx(15px)，热区 44→64rpx。位置优化：热区加大后用 margin-right:-10rpx 向外扩进磁贴 padding，<b>✕ 的光学锚点不动</b>（不会因热区变大而往里缩）。</div>
+  <div class="vs">
+    <div class="old"><div class="vs-label"><span class="pill old">改前</span>10px · 热区22px</div>
+      <div class="star-tile"><div class="word-row">
+        <div class="word-speak"><span class="spk-ico" style="width:12px;height:12px"></span></div>
+        <div class="word-main"><div><span class="word-en">family</span><span class="word-pos">n.</span></div><div class="word-zh">家；家庭</div><div class="word-example">There are four people in my family.</div></div>
+        <div class="rm-btn"><span class="rm-ico"></span></div>
+      </div></div>
+    </div>
+    <div class="new anchor"><div class="vs-label"><span class="pill new">改后</span>15px · 热区32px · 锚点不动</div>
+      <div class="star-tile"><div class="word-row">
+        <div class="word-speak"><span class="spk-ico" style="width:14.4px;height:14.4px"></span></div>
+        <div class="word-main"><div><span class="word-en">family</span><span class="word-pos">n.</span></div><div class="word-zh">家；家庭</div><div class="word-example">There are four people in my family.</div></div>
+        <div class="rm-btn"><span class="rm-ico"></span></div>
+      </div></div>
+      <div style="font-size:10.5px;color:#F0705F;margin-top:6px;text-align:right">⟵ 虚线 = 改前 ✕ 中线位置（两侧锚点一致）</div>
+    </div>
+  </div>
+
+  <div class="vs">
+    <div class="old"><div class="vs-label"><span class="pill old">改前</span>短例句场景</div>
+      <div class="star-tile"><div class="word-row">
+        <div class="word-speak"><span class="spk-ico" style="width:12px;height:12px"></span></div>
+        <div class="word-main"><div><span class="word-en">meet</span><span class="word-pos">v.</span></div><div class="word-zh">遇见；结识</div><div class="word-example">Nice to meet you.</div></div>
+        <div class="rm-btn"><span class="rm-ico"></span></div>
+      </div></div>
+    </div>
+    <div class="new"><div class="vs-label"><span class="pill new">改后</span>短例句场景</div>
+      <div class="star-tile"><div class="word-row">
+        <div class="word-speak"><span class="spk-ico" style="width:14.4px;height:14.4px"></span></div>
+        <div class="word-main"><div><span class="word-en">meet</span><span class="word-pos">v.</span></div><div class="word-zh">遇见；结识</div><div class="word-example">Nice to meet you.</div></div>
+        <div class="rm-btn"><span class="rm-ico"></span></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="sub" style="margin-top:20px">垂直位置不变：仍按磁贴上下沿中线居中（09-26 定稿规则，align-self:center 未动）。</div>
+</div>
+</body>
+</html>
