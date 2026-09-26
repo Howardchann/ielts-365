@@ -12,6 +12,12 @@
 
 /* 日签与周信息左对齐（让出 80rpx 进度环宽度），整卡成两列网格 */
 .week-days{margin-left:0}.day-chip{flex:1;text-align:center;font-size:22rpx;color:var(--muted);background:var(--bg);border-radius:8rpx;padding:8rpx 0}.day-chip--done{background:var(--soft2);color:var(--green);font-weight:700}
+/* 按压态（v1.1.23）：app.wxss 的 .hover-tint 同优先级但先加载，会被上面 .day-chip/.phase-tile
+   自身的 background 压过 → v1.1.22 真机日格无按压反馈的根因。用双类选择器抬高优先级，
+   按压色统一主题 --press-green / --press2（与 btn-press 同源，明暗两套齐备） */
+.phase-tile.hover-tint{background:var(--press-green)}
+.day-chip.hover-tint{background:var(--press-green)}
+.day-chip--done.hover-tint{background:var(--press2)}
 .week-words{font-size:22rpx;color:var(--muted);margin-top:4rpx}
 
 /* iPad / 宽屏覆盖（纯追加，手机端不受影响），字号 = rpx × 0.5 */
