@@ -91,7 +91,7 @@ Page({
   // 直接选过去某个完整周的周一（off=0）仍保留，供有意从某周补课的用户使用
   const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());let moved='';
   if(off&&d<today){d.setDate(d.getDate()+7);moved='next';}
-  const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(moved==='next'?'已顺延到下周周一 '+ms:(off?'已对齐到周一 '+ms:'开始日期已更新'));},
+  const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);getCurrentPages().forEach(p=>{if(p.resetView)p.resetView();});this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(moved==='next'?'已顺延到下周周一 '+ms:(off?'已对齐到周一 '+ms:'开始日期已更新'));},
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
   backupSummaryOf(text){try{const o=JSON.parse(text);return (o&&typeof o.summary==='string')?o.summary:'';}catch(e){return '';}},

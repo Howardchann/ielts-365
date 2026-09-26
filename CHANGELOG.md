@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-09-26（晚 3）· 今日页回准备期的真根因：viewDay 初始化为 1（v1.1.15）
+
+用户实测 v1.1.14：改日期/清除记录后今日页依旧 Day 1。排查发现两层：
+
+1. **`today.js` data 初始化 `viewDay: 1`（老 bug，本轮真根因）**：首次 onShow 必命中「保持浏览位置」分支——**冷启动后准备期用户永远看到 Day 1，倒计时卡从未有机会显示**；清除/改日期后若重启过小程序，新页面又带着 `viewDay:1` 出世。修复 = 初始化改 `viewDay: 0`（falsy → 首次 onShow 走默认落点）。「保持浏览位置」的语义不变：只有用户真实浏览过（renderDay 写入过 viewDay）才会保留。
+2. **`pickDay` 漏接 resetView**：改开始日期后今日页浏览位置未丢弃。修复 = 与 onResetProgress 同款 `getCurrentPages().forEach(p => p.resetView && p.resetView())`。
+3. **准备期「回到准备期」入口**：准备期从周计划跳转到某天浏览后（preStart 被清、viewDay 有值），原先进不回倒计时卡。今日页 day-head 加 `todayNum === 0` 时的「回到准备期」链接（`backToPrep`：preStart=true + viewDay=0）。周计划→某天的跳转本身保留（预览语义合理）。
+
 ## 2026-09-26（晚 2）· 清除记录回归准备期 + 边界按钮置灰 + 日期顺延规则 + 周计划准备期横幅（v1.1.14）
 
 四项均经用户拍板（AskUserQuestion 三问全选推荐项）：

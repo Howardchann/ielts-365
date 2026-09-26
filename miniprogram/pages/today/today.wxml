@@ -25,6 +25,7 @@
     </view>
     <view class="phase-line">{{phaseName}} · {{theme}}</view>
     <view class="is-today" wx:if="{{dayNum !== todayNum && todayNum > 0}}" hover-class="hover-dim" hover-stay-time="120" bindtap="backToToday">回到今天（Day {{todayNum}}）</view>
+    <view class="is-today" wx:if="{{todayNum === 0}}" hover-class="hover-dim" hover-stay-time="120" bindtap="backToPrep">回到准备期</view>
   </view>
 
   <!-- 标题与目标 -->

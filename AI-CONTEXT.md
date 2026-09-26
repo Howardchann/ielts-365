@@ -141,7 +141,9 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 **日期与准备期规则（2026-09-26 v1.1.14 定稿，用户拍板）**：
 - **开始日期对齐**：设置页选非周一日期自动对齐到当周周一；**若该周一已过去，顺延到下周周一**（避免"开学第一天已过期 N 天"的补课怪状态）。直接选过去某个完整周的周一仍保留（有意补课用）。星期轴是绑死的：Day 1 恒为周一，改这条规则前想清楚。
 - **准备期（todayNum=0）**：今日页=倒计时卡片；周计划页顶部加"计划 X 月 X 日开始——还有 N 天"横幅（weeks.js `daysToStart/startDateText`，sig 含 startDate 防改日期不刷新）；复习页=空态，无需改。
-- **清除学习记录**：`store.resetProgress()` 把 startDate 重置回下一个周一；**必须同时调用今日页的 `resetView()`**（设置页 onResetProgress 里 `getCurrentPages().forEach`），否则 today 的"保持浏览位置"分支会让页面停在 Day 1 不回倒计时卡。
+- **清除学习记录 / 修改开始日期**：`store.resetProgress()` 把 startDate 重置回下一个周一；**两条路径（onResetProgress、pickDay）都必须同时调用今日页的 `resetView()`**（`getCurrentPages().forEach`），否则 today 的"保持浏览位置"分支会让页面停在 Day 1 不回倒计时卡。
+- **today 的 `viewDay` 必须初始化为 0**（v1.1.15 修的老 bug）：初始化为真值会让**冷启动首次 onShow 就命中"保持浏览位置"分支**——准备期用户永远看到 Day 1。只有 renderDay 真实写入过的浏览位置才允许被保留。
+- **准备期返回出口**：todayNum=0 时今日页 day-head 显示「回到准备期」（`backToPrep`），供从周计划跳转预览某天后返回倒计时卡；周计划→某天的跳转本身保留（预览语义）。
 - **Day 1 / Day 564 边界**：前一天/后一天按钮置灰（`.nav-btn--dis`，opacity .35），不隐藏——保三段布局对称。
 
 ### 2.5 云同步：**2026-09-23 按用户决策恢复**（只在 `cloud-sync` 分支生效）

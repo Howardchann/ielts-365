@@ -10,7 +10,10 @@ Page({
     // onLoad 的 setData 实测晚 1-3 帧才上屏（09-26 录屏 f103/116/128 白光根因）
     dark: theme.isDark(),
     pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
-    viewDay: 1,
+    // ⚠️ 必须初始化为 0（falsy）：首次 onShow 才会走「默认落点」分支（准备期倒计时卡/
+    // 第一个未完成日）。若是 1，冷启动直接命中「保持浏览位置」分支，准备期用户永远
+    // 看到 Day 1——09-26 用户实测清除记录/改日期后仍显示 Day 1 的根因之一
+    viewDay: 0,
     totalDays: plan.TOTAL_DAYS,
     todayNum: 0,
     preStart: false,
@@ -146,10 +149,17 @@ Page({
   },
 
   resetView() {
-    // 清除学习记录后由设置页调用：丢弃浏览位置，下次 onShow 走默认落点
+    // 清除记录/改开始日期后由设置页调用：丢弃浏览位置，下次 onShow 走默认落点
     // （startDate 已重置为下一个周一 → todayNum=0 → 自动进准备期倒计时卡片）
     this._daySig = null;
     this.setData({ viewDay: 0 });
+  },
+
+  backToPrep() {
+    // 准备期浏览某天后返回倒计时卡（todayNum=0 时今日页顶部「回到准备期」入口）
+    speech.stop();
+    this._daySig = null;
+    this.setData({ preStart: true, viewDay: 0 });
   },
 
   fb() { return this.selectComponent('#fb'); },
