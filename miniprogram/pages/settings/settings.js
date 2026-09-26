@@ -107,17 +107,25 @@ Page({
   onStatTap(e){
     if(this.data.statPress)this.setData({statPress:''});
     const url=e.currentTarget.dataset.url,tab=e.currentTarget.dataset.tab;
+    // go：切 tab 前统一起跳点（按压色保持亮到切走，无空窗）
+    const go=()=>{setTimeout(()=>{wx.switchTab({url});},80);};
     if(tab){
       const app=getApp();
       if(app&&app.globalData){
         app.globalData.reviewTab=tab;
-        // 跨栈预切换（v1.1.28）：复习页实例常驻（tab 页不卸载），藏着的页面上先改 tab，
-        // switchTab 过去首帧即目标 tab，消灭「先见旧 tab 再瞬移」的闪现
+        // 跨栈预切换（v1.1.28→29）：复习页实例常驻，先改它的 tab 再跳。
+        // v1.1.28 固定延迟 100ms 赌不赢隐藏页的渲染时机（真机仍见瞬移）→
+        // 改用 setData 完成回调（渲染真正落盘才起跳），400ms 兜底防回调失联
         const rp=app.globalData._reviewPage;
-        if(rp&&rp.data&&rp.data.tab!==tab)rp.setData({tab});
+        if(rp&&rp.data){
+          if(rp.data.tab===tab){go();return;}
+          let done=false;const once=()=>{if(done)return;done=true;go();};
+          rp.setData({tab},once);setTimeout(once,400);
+          return;
+        }
       }
     }
-    setTimeout(()=>{wx.switchTab({url});},100);
+    go();
   },
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
