@@ -214,7 +214,7 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 | 行内喇叭（词/例句/语法/大词行） | 行容器 `align-items:baseline` + 喇叭盒零宽空格 strut + 图标 `vertical-align:middle`（渲染引擎现算 x-height 中心，有无降部词通用） |
 | 宽屏媒体查询 | 与主规则同步改，别只改一处 |
 
-**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）。改版前的 8 张原版 PNG 存档在仓库 `assets/tabicon-original-20260926/`（含 README；`D:\idea\_tabicon_backup_0926\` 为仓库外同源备份）。
+**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）。改版前的 8 张原版 PNG 存档在仓库 `assets/tabicon-original-20260926/`（含 README；仓库外的 `D:\idea\_tabicon_backup_0926\` 等历代图标备份已于 09-26 清理，以仓库内存档为唯一备份）。
 
 **最终妥协（2026-09-26 用户确认收尾，不是遗留 bug，别再当待办修）**：
 
@@ -538,7 +538,7 @@ ielts-365/
 4. **同一文件不要并行发 Edit**；改完 `grep` 复验（工具返回 success 不代表生效）。
 5. 全部 JS 跑一遍 `node --check`。
 6. 音频/数据有变动 → 跑**全量差集核对**（不是抽样）。
-7. 有语音链路改动 → 跑 mock 行为测试 `_test_speech_signed.js`（**它比语法检查值钱**：曾抓到 `tryUrl` 丢兜底这个真 bug）。
+7. 有语音链路改动 → 跑 mock 行为测试（**它比语法检查值钱**：曾抓到 `tryUrl` 丢兜底这个真 bug）。⚠️ 该测试脚本 `_test_speech_signed.js` 于 2026-09-26 清理时被删（当时未入仓）——若要重建，按 CHANGELOG 09-20 节的测试思路重写，核心断言：precheck 失败仍直连播放一次、播放失败清 URL 缓存重签、playToken 旧回调作废。
 8. 改完更新本文件与 [CHANGELOG.md](./CHANGELOG.md)。
 
 ---
