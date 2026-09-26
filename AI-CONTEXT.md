@@ -214,7 +214,7 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 | 行内喇叭（词/例句/语法/大词行） | 行容器 `align-items:baseline` + 喇叭盒零宽空格 strut + 图标 `vertical-align:middle`（渲染引擎现算 x-height 中心，有无降部词通用） |
 | 宽屏媒体查询 | 与主规则同步改，别只改一处 |
 
-**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）。改版前的 8 张原版 PNG 存档在仓库 `assets/tabicon-original-20260926/`（含 README；仓库外的 `D:\idea\_tabicon_backup_0926\` 等历代图标备份已于 09-26 清理，以仓库内存档为唯一备份）。
+**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）；**同轴不同色描边严禁叠画**——红针垫在更长的绿分针下会从红针顶端露出绿边（clock 图标已翻车，修法=红针接管分针全长，绿针只留时针，09-26 用户真机截图抓到）。改版前的 8 张原版 PNG 存档在仓库 `assets/tabicon-original-20260926/`（含 README；仓库外的 `D:\idea\_tabicon_backup_0926\` 等历代图标备份已于 09-26 清理，以仓库内存档为唯一备份）。
 
 **最终妥协（2026-09-26 用户确认收尾，不是遗留 bug，别再当待办修）**：
 
