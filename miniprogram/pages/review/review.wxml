@@ -30,7 +30,7 @@
 </block>
 <block wx:if="{{tab === 'starred'}}">
   <view class="card" wx:if="{{!starred.length}}"><view class="empty-text">还没有重点词——在学习页点词右侧的<view class="ico-inline ico-heart"></view>即可收藏，随机抽查会优先复习它们</view></view>
-  <view class="star-list" wx:else><view class="star-tile" wx:for="{{starred}}" wx:key="w"><view class="word-row"><view class="word-speak {{playingWord === item.w ? 'playing' : ''}}" hover-class="speak-hover" hover-stay-time="0" data-word="{{item.w}}" bindtap="onSpeakStarred"><view class="spk-ico {{playingWord === item.w ? 'spk-ico--on' : ''}}"></view></view><view class="word-main"><view><text class="word-en">{{item.w}}</text><text class="word-pos">{{item.p}}</text></view><view class="word-zh">{{item.m}}</view><view class="word-example">{{item.e}}</view></view><view class="word-remove" data-index="{{index}}" hover-class="word-remove--press" hover-stay-time="0" bindtap="onRemoveStarred">✕</view></view></view></view>
+  <view class="star-list" wx:else><view class="star-tile" wx:for="{{starred}}" wx:key="w"><view class="word-row"><view class="word-speak {{playingWord === item.w ? 'playing' : ''}}" hover-class="speak-hover" hover-stay-time="0" data-word="{{item.w}}" bindtap="onSpeakStarred"><view class="spk-ico {{playingWord === item.w ? 'spk-ico--on' : ''}}"></view></view><view class="word-main"><view><text class="word-en">{{item.w}}</text><text class="word-pos">{{item.p}}</text></view><view class="word-zh">{{item.m}}</view><view class="word-example">{{item.e}}</view></view><view class="word-remove" data-index="{{index}}" hover-class="word-remove--press" hover-stay-time="0" bindtap="onRemoveStarred"><view class="rm-ico"></view></view></view></view></view>
 </block>
 
 <feedback id="fb"/>

@@ -28,7 +28,7 @@
 <view class="phase-grid">
   <view class="phase-tile {{openPhase === phase.p ? 'phase-tile--open' : ''}} {{phase.isCurrentPhase ? 'phase-tile--cur' : ''}}"
         wx:for="{{phases}}" wx:key="p" wx:for-item="phase"
-        data-p="{{phase.p}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onPhaseTap">
+        data-p="{{phase.p}}" hover-class="hover-tint" hover-start-time="0" hover-stay-time="120" bindtap="onPhaseTap">
     <view class="tile-name">{{phase.shortName}}</view>
     <view class="tile-meta">第 {{phase.range}} 周 · {{phase.doneCount}}/{{phase.totalWeeks}} 周</view>
     <view class="tile-bar"><view class="tile-fill" style="width:{{phase.percent}}%"></view></view>
@@ -39,7 +39,7 @@
   <block wx:if="{{openPhase === phase.p}}">
     <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}}"
           wx:for="{{phase.weeks}}" wx:key="w" wx:for-item="week"
-          data-w="{{week.w}}" hover-class="hover-dim" hover-stay-time="120" bindtap="onWeekTap">
+          data-w="{{week.w}}" hover-class="hover-tint" hover-start-time="0" hover-stay-time="120" bindtap="onWeekTap">
       <view class="week-line">
         <view class="week-ring" style="background: conic-gradient(#176B5B {{week.checked / 7 * 100}}%, #E9F0EC 0)"><view class="week-ring-num {{week.isCurrent ? 'week-ring-num--current' : (week.isPast ? 'week-ring-num--past' : '')}}">{{week.w}}</view></view>
         <view class="week-info">
@@ -51,7 +51,7 @@
       <view class="week-days">
         <view class="day-chip {{item.done ? 'day-chip--done' : ''}}"
               wx:for="{{week.days}}" wx:key="k"
-              data-w="{{week.w}}" data-k="{{item.k}}" hover-class="hover-dim" hover-stay-time="120" catchtap="onDayTap">{{item.k}}</view>
+              data-w="{{week.w}}" data-k="{{item.k}}" hover-class="hover-tint" hover-start-time="0" hover-stay-time="120" catchtap="onDayTap">{{item.k}}</view>
       </view>
     </view>
   </block>
