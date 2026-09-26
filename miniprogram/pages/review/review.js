@@ -49,6 +49,10 @@ Page({
       app.globalData.reviewTab = null;
       if (t !== this.data.tab) { this.setData({ tab: t }); if (t === 'due') this.onNextDue(); }
     }
+    // 暴露实例给跨栈预切换（v1.1.28）：tab 页常驻不卸载，设置页在 switchTab「之前」直接对
+    // 本实例 setData 换 tab，切过来首帧即目标 tab——否则 webview 先恢复上次旧 tab 的 DOM、
+    // onShow 的 setData 晚一帧才换，出现「random→starred 瞬移」闪现（v1.1.27 真机实锤）
+    if (app && app.globalData) app.globalData._reviewPage = this;
     theme.syncTabBar(this, 2);
     this.applyTheme();
     store.onResume();

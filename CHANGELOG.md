@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-09-26（下午 9）· 复习页跨栈预切换：灭掉 deep-link 换 tab 的瞬移闪现（v1.1.28）
+
+**用户反馈（v1.1.27 真机，4 点验收全过，此为细磨）**：先点「复习记录」跳复习页（random tab）→ 回设置页 → 再点「重点词」——切过去的一瞬能看到页面从 random **瞬移**到 starred。
+
+**根因**：复习页是常驻 tab 页，switchTab 时 webview **先恢复上次离开的旧 tab DOM**，`onShow` 里的换 tab `setData` 晚一帧生效 → 旧 tab 可见一瞬。
+
+**修法（跨栈预切换）**：tab 页常驻不卸载 → `review.onShow` 把实例挂到 `globalData._reviewPage`；设置页 `onStatTap` 在 switchTab **之前**直接对藏着的复习页实例 `setData({tab})`——切过去首帧即目标 tab。`onShow` 的 flag 消费保留（兼容复习页本次会话尚未打开过、实例还不存在的首次加载场景）。
+
+---
+
 ## 2026-09-26（下午 8）· 设置页跳转二轮：hover-class 残影 + 重点词直落 starred tab（v1.1.27）
 
 **用户反馈（v1.1.26 真机）**：①跳转返回设置页**残影仍在**——v1.1.26 用原生 hover-class 的判断错了，它切 tab 返回后清理同样不可靠（与周计划页同病，`switchTab` 场景 hover-class 就没有可靠过）；②「重点词」跳到的是复习页默认 tab（随机复习），不是重点词卡片区。

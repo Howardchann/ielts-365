@@ -107,7 +107,16 @@ Page({
   onStatTap(e){
     if(this.data.statPress)this.setData({statPress:''});
     const url=e.currentTarget.dataset.url,tab=e.currentTarget.dataset.tab;
-    if(tab){const app=getApp();if(app&&app.globalData)app.globalData.reviewTab=tab;}
+    if(tab){
+      const app=getApp();
+      if(app&&app.globalData){
+        app.globalData.reviewTab=tab;
+        // 跨栈预切换（v1.1.28）：复习页实例常驻（tab 页不卸载），藏着的页面上先改 tab，
+        // switchTab 过去首帧即目标 tab，消灭「先见旧 tab 再瞬移」的闪现
+        const rp=app.globalData._reviewPage;
+        if(rp&&rp.data&&rp.data.tab!==tab)rp.setData({tab});
+      }
+    }
     setTimeout(()=>{wx.switchTab({url});},100);
   },
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
