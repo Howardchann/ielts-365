@@ -92,6 +92,9 @@ Page({
   // 不再有「还有 -5 天开学」的负数态；补课语义随之废除（过去的周一已选不到）。
   if(off)d.setDate(d.getDate()+(7-off));
   const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);getCurrentPages().forEach(pg=>{if(pg.resetView)pg.resetView();});this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(off?'已顺延到周一 '+ms:'开始日期已更新');},
+  // 学习进度数字跳转（v1.1.26 方案B）：已完成天数→周计划（打卡明细）；重点词/复习记录→复习页。
+  // 都是 tab 页走 switchTab；按压反馈用原生 hover-class（切 tab 后微信自动清理，无残留问题）
+  onStatTap(e){wx.switchTab({url:e.currentTarget.dataset.url});},
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
   backupSummaryOf(text){try{const o=JSON.parse(text);return (o&&typeof o.summary==='string')?o.summary:'';}catch(e){return '';}},
