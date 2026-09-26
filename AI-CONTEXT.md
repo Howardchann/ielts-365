@@ -202,7 +202,7 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 | `auto`（默认） | **不碰原生栏 API**——完全交给 `theme.json` + `app.json darkmode:true`（@navBg/@navTxt/@winBg 自动跟随系统） |
 | 手动浅 / 深 | 才调 `setNavigationBarColor`，**仅值变化时调**（`lastNav` 缓存），`duration:0` 防动画闪烁 |
 
-- **page 元素够不到 page 背景**：深色 page 背景必须靠 4 页 wxml 首行 `<page-meta page-style="{{pageStyle}}"/>` 动态注入；`.theme-dark` 类挂在页面根 view。新页面要支持深色，这两样缺一不可。
+- **page 元素够不到 page 背景**：深色 page 背景必须靠 4 页 wxml 首行 `<page-meta page-style="{{pageStyle}}"/>` 动态注入；`.theme-dark` 类挂在页面根 view。新页面要支持深色，这两样缺一不可。（v1.1.11 起 `app.json` 的 `backgroundColorContent` 已提供原生层首帧底色，治首帧白闪；pageStyle 仍保留，负责手动模式运行时切换。）
 - `app.wxss` 已 token 化（page 挂 ~24 个浅色 CSS 变量 + `.theme-dark` 覆盖组）。**新增样式禁止写死颜色**，一律 `var(--…)`，否则深色模式下出现白块/漏网（踩过多轮）。深色图标变体由 `tools/darkicons.js` 生成，别手改。
 - **同值守卫是硬规则**：微信 `setData` 无深度 diff，**同值也整树重渲染**（切 tab 频闪的根源）。今后所有 onShow 类 `setData` 一律走 `theme.sameSet(page, patch)`（逐 key JSON 比对）+ `theme.syncTabBar(page, active)`（tabBar dark/active 双守卫）；页面级大数据渲染用签名位串守卫（today `_daySig` / weeks `_weeksSig` / review 比对模式）。**不要退回裸 setData。**
 
@@ -214,13 +214,28 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 | 行内喇叭（词/例句/语法/大词行） | 行容器 `align-items:baseline` + 喇叭盒零宽空格 strut + 图标 `vertical-align:middle`（渲染引擎现算 x-height 中心，有无降部词通用） |
 | 宽屏媒体查询 | 与主规则同步改，别只改一处 |
 
-**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）；**同轴不同色描边严禁叠画**——红针垫在更长的绿分针下会从红针顶端露出绿边（clock 图标已翻车，修法=红针接管分针全长，绿针只留时针，09-26 用户真机截图抓到）。改版前的 8 张原版 PNG 存档在仓库 `assets/tabicon-original-20260926/`（含 README；仓库外的 `D:\idea\_tabicon_backup_0926\` 等历代图标备份已于 09-26 清理，以仓库内存档为唯一备份）。
+**SVG tab 图标**：单一来源 `tools/gen-tabicons.js` → data-URI 注入 `custom-tab-bar/index.wxss` 标记区。**别直接手改 wxss 里的 data-URI**（会被下次生成覆盖）；要改图标就改脚本重生成。硬约束：`url()` 内单引号必须 `%27` 转义；**任何弧线（A 命令）的 sweep/large-arc flag 改动必须渲染验证**——口算无解时 SVG 会静默换圆心画出碎弧（已翻车一次，用户截图抓到）；**同轴不同色描边严禁叠画**，且**叠画层级由绘制顺序决定**——clock 选中态历经三版定稿（①红针垫长绿分针下→绿针顶端露绿边；②红针接管分针全长→用户否了"红色抢主位"；③**定稿：红针仍指 12 点（V8.5），绘制顺序红先绿后，绿针尾部圆头压住红针尾部**——红是点缀不抢几何，只让绿盖住红尾，09-26 用户真机确认）。改版前的 8 张原版 PNG 存档在仓库 `assets/tabicon-original-20260926/`（含 README；仓库外的 `D:\idea\_tabicon_backup_0926\` 等历代图标备份已于 09-26 清理，以仓库内存档为唯一备份）。**图标类改动流程硬规则：改图 → 可视化效果图 → 用户确认 → 才上传/推送，严禁抢跑同步。**
+
+**频闪问题终局（2026-09-26 v1.1.11 已解决，录屏 652 帧逐帧验收）**：
+
+**尝试史（按时间序，别重复走弯路）**：
+
+| 版本 | 尝试 | 效果 |
+|---|---|---|
+| v1.1.3 | 原生栏 `setNavigationBarColor` duration:0 防动画 | 不够，白闪仍在 |
+| v1.1.5 | 同值守卫（`sameSet`/`syncTabBar`/签名位串）消除"同值 setData 整树重渲染" | 消掉一层，仍有残留 |
+| v1.1.7 | （另一 AI）tabBar dark 进组件 data 初始化 + 浅色也显式设窗口背景 | 压掉 tabBar 首帧先亮后暗 |
+| **v1.1.11** | **`app.json` window.`backgroundColorContent: "@bgContent"`**（theme.json 加 bgContent 浅 #F3F8EF/深 #0E1618） | **治本**——原生容器层属性，页面创建第一帧底色即正确，区别于 page-meta 的 JS 前端层注入（首帧后才生效） |
+
+**验收结论**（用户 27s 真机录屏，`tools/rec-flicker-scan.py` 逐帧扫描）：深色稳态 0 白闪、切 tab 0 颜色突变；残留仅主题切换瞬间 tabBar/内容错位 **18 次中 4 次、每次恰 1 帧（42ms）**——合成器级（页面渲染层与 tabBar 组件层不同 vsync 上屏），**JS 层无法再压，用户接受，别再当待办修**。
+
+**图标-文字间距**：全局 token `--ico-gap: 10rpx`（app.wxss page 变量组），`.ico` 的 margin-right 及"图标在文字后"的按钮（today 完成打卡/今日已完成内联 style）一律引用它，**禁止再写散装 margin 值**；宽屏媒体查询里 `.ico` 是 `margin-right:5px` 刻意保留 px 定值（宽屏 rpx 缩放不同，5px 为等值），别"统一"成 var。
 
 **最终妥协（2026-09-26 用户确认收尾，不是遗留 bug，别再当待办修）**：
 
 | 项 | 定性 |
 |---|---|
-| 切 tab 残留频闪 | 同值守卫已消除"同值重渲染"层；残留 = **微信平台首帧**（切 tab 重建渲染层，JS 主题变量首帧后生效），代码层无法根除。用户明确接受。最后可试未试：手动模式把 windowBg 写进 theme.json（收益有限，未做） |
+| 主题切换瞬间 tabBar 1 帧错位 | 合成器级（见上"频闪问题终局"），用户接受 |
 | 图标/喇叭居中 | 机制已定稿（flex 按钮 + baseline/middle，Edge 渲染自检 12 上下文全过），但**真机未逐项像素复核**——v1.1.6 后用户反馈个别按钮图标仍偏高，选择不再逐个核验（"当成功了吧"）。若日后重启此项，用 `tools/measure-screenshot.py` 对真机截图测量，别回手调常量老路 |
 | GitHub 推送弹窗 | 系统级 `credential.helper = helper-selector` 曾导致每次推送弹三选项选择器窗口。已在全局 `.gitconfig` 用**空 helper 清空累积列表**再直挂 GCM（凭据已存，username=Howardchann），`git credential fill` 实测静默返回——**推送全程无窗口** |
 
@@ -232,10 +247,11 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 | `tools/icon-align.js` | canvas 墨水盒测量（12 个上下文），量图标在容器内的光学偏移 |
 | `tools/measure-screenshot.py` | PIL 对**真机截图**逐像素测量（1px=750/1440rpx；深色模式按检测色定位元素） |
 | `tools/align-v116-check.html` | 对齐机制回归页（baseline/middle/flex 按钮） |
+| `tools/rec-flicker-scan.py` | **真机录屏逐帧闪烁扫描**（cv2 三区中位色亮度→L/D 二值→错位帧清单）；频闪验收以它为准，别靠肉眼 |
 
 ⚠️ **Edge 无头截图的窗宽钳制伪影**：`--window-size` 宽度小于 ~500px 会被钳到 ~500 布局再裁成请求宽 → **右侧元素看似"溢出"其实是截图伪影**。自检页用"宽窗口 + 固定 max-width:375px 内容列"的写法规避。
 
-**已知平台限制（别再试图代码修复）**：切 tab 时残留的轻微频闪 = **微信首帧问题**（切 tab 重建渲染层，JS 注入主题变量在首帧后生效），同值守卫只能消除"同值重渲染"层。用户已确认接受。最后可试未试的点：手动模式把 windowBg 也写进 theme.json（收益有限）。
+**已知平台限制（别再试图代码修复）**：主题切换瞬间 tabBar/内容可能错位 1 帧（≈42ms，18 次中约 4 次）= 合成器级（两个渲染层不同 vsync 上屏），JS 层无法消除。页面级白闪已由 v1.1.11 `backgroundColorContent` 根治（见"频闪问题终局"），**别把这两者混为一谈**。
 
 **tabBar 结构**：`custom-tab-bar` 已从 cover-view 改 view + SVG data-URI（8 张 PNG 弃用但文件仍在 images/），dark 状态经 `syncTabBar` 同步。
 
