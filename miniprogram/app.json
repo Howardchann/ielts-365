@@ -10,6 +10,7 @@
     "navigationBarTitleText": "开溜6.5",
     "navigationBarTextStyle": "@navTxt",
     "backgroundColor": "@winBg",
+    "backgroundColorContent": "@bgContent",
     "backgroundTextStyle": "dark"
   },
   "darkmode": true,

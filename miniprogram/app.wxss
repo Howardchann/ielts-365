@@ -9,6 +9,7 @@ page {
   --disabled-bg: #EDF3F0; --disabled-ink: #A6B2AD; --star-off: #C7D0CC; --dis2: #D5DDD9;
   --red: #C0392B; --red-press: #A93226; --red-soft: #FDECEA;
   --line: #E9F0EC; --cur-line: #9ED8C5; --cur-bg: #F8FCF9; --field: #FBFDFC;
+  --ico-gap: 10rpx; /* 图标-文字统一间距：所有 .ico / 图标在后的按钮一律引用此 token */
   background:var(--bg);
   color:var(--ink);
   font-size:28rpx;
@@ -43,7 +44,7 @@ page {
 /* 按钮改 flex 后，图标垂直居中由 flex 现算，不再依赖 vertical-align 手调数值（该值仅对非 flex 场景兜底） */
 .btn-ghost::after { border:none; }
 /* 文字按钮裸图标（线条风 SVG data-URI，与喇叭同语言）：颜色固定随类，危险按钮用红色版；随字号缩放 */
-.ico{display:inline-block;width:30rpx;height:30rpx;background:center/contain no-repeat;margin-right:10rpx;vertical-align:-8rpx}
+.ico{display:inline-block;width:30rpx;height:30rpx;background:center/contain no-repeat;margin-right:var(--ico-gap);vertical-align:-8rpx}
 .ico-play{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%205v14l11-7z'%20fill='%23176B5B'/%3E%3C/svg%3E")}
 .ico-stop{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20x='6.5'%20y='6.5'%20width='11'%20height='11'%20rx='2.5'%20fill='%23176B5B'/%3E%3C/svg%3E")}
 .ico-check{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M4.5%2012.8l5%205L19.5%207'%20fill='none'%20stroke='%23176B5B'%20stroke-width='2.4'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E")}
