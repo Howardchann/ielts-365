@@ -1,7 +1,11 @@
+// custom-tab-bar/index.js —— 四个 tab 的选中态与主题状态
+// 主题在组件 data 初始化阶段就确定，避免首帧先亮后暗；active/dark 在 attached 阶段一次 setData，避免两次重绘。
+const theme = require('../utils/theme.js');
+
 Component({
   data: {
     active: 0,
-    dark: false,
+    dark: theme.isDark(),
     list: [
       { pagePath: 'pages/today/today', text: '今日', key: 'clock' },
       { pagePath: 'pages/weeks/weeks', text: '周计划', key: 'cal' },
@@ -14,26 +18,18 @@ Component({
       this.syncActive();
     }
   },
-  pageLifetimes: {
-    show() {
-      this.syncActive();
-    }
-  },
   methods: {
     syncActive() {
       const pages = getCurrentPages();
       const page = pages[pages.length - 1];
-      if (!page) return;
-      const route = page.route || '';
+      const route = page ? (page.route || '') : '';
       const active = this.data.list.findIndex(item => item.pagePath === route);
-      if (active >= 0 && active !== this.data.active) {
-        this.setData({ active });
-      }
-      // 深色模式跟随页面主题（theme.js 在页面 onShow / 系统换色时调用 applyTheme 链到这里）
-      try {
-        const theme = require('../utils/theme.js');
-        if (theme.isDark() !== this.data.dark) this.setData({ dark: theme.isDark() });
-      } catch (e) {}
+      const dark = theme.isDark();
+      const patch = {};
+      if (active >= 0 && active !== this.data.active) patch.active = active;
+      if (dark !== this.data.dark) patch.dark = dark;
+      // active + dark 合并成一次更新，避免首次进入页面先亮/先高亮错误项再二次修正。
+      if (Object.keys(patch).length) this.setData(patch);
     },
     onTap(e) {
       const index = Number(e.currentTarget.dataset.index);
