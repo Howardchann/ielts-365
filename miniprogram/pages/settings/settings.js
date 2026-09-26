@@ -61,10 +61,12 @@ Page({
     totalChecked:0,totalDays:plan.TOTAL_DAYS,starredCount:0,reviewCount:0,appVersion:buildLabel(),aboutCardLabel:ABOUT_CARD_LABEL,aboutTitle:ABOUT_TITLE,engineLabel:'',engineHint:'',backupText:'',showBackup:false,importText:'',showImport:false,voiceTesting:false,voiceLabel:'试听发音',
     cloudOn:true,cloudMeta:'',cloudErr:'',cloudTip:'',syncing:false,sheet:{show:false,title:'',options:[],index:0,key:''},cal:{show:false,y:0,m:0,label:'',grid:[],canPrev:true,canNext:true},
     // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
-    dark:theme.isDark(),pageStyle:theme.isDark()?'background-color:#0E1618;':''},
+    dark:theme.isDark(),pageStyle:theme.isDark()?'background-color:#0E1618;':'',
+    statPress:''},
   onLoad(){theme.applyPage(this);theme.syncTabBar(this);const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?'停止朗读':'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}if(this._offStore){this._offStore();this._offStore=null;}},
-  onShow(){theme.syncTabBar(this,3);this.applyTheme();theme.sameSet(this,{appearanceMode:theme.mode()});try{wx.setNavigationBarTitle({title:'设置'});}catch(e){}this.refresh();},
+  onShow(){if(this.data.statPress)this.setData({statPress:''});theme.syncTabBar(this,3);this.applyTheme();theme.sameSet(this,{appearanceMode:theme.mode()});try{wx.setNavigationBarTitle({title:'设置'});}catch(e){}this.refresh();},
+  onHide(){if(this.data.statPress)this.setData({statPress:''});},
   applyTheme(){theme.applyPage(this);theme.syncTabBar(this);},
   /* 外观三态：跟随系统 / 浅色 / 深色。切换后通知栈内所有页面 + tabBar 即时换肤 */
   onAppearance(e){const m=e.currentTarget.dataset.mode;if(!m||m===theme.mode())return;theme.setMode(m);this.setData({appearanceMode:m});getCurrentPages().forEach(p=>{if(p.applyTheme)p.applyTheme();});},
@@ -92,9 +94,22 @@ Page({
   // 不再有「还有 -5 天开学」的负数态；补课语义随之废除（过去的周一已选不到）。
   if(off)d.setDate(d.getDate()+(7-off));
   const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);getCurrentPages().forEach(pg=>{if(pg.resetView)pg.resetView();});this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(off?'已顺延到周一 '+ms:'开始日期已更新');},
-  // 学习进度数字跳转（v1.1.26 方案B）：已完成天数→周计划（打卡明细）；重点词/复习记录→复习页。
-  // 都是 tab 页走 switchTab；按压反馈用原生 hover-class（切 tab 后微信自动清理，无残留问题）
-  onStatTap(e){wx.switchTab({url:e.currentTarget.dataset.url});},
+  // 学习进度数字跳转（v1.1.26 方案B → v1.1.27 二轮修）：①原生 hover-class 切 tab 返回后残影
+  // （微信清理不可靠，与周计划页同病）→ 改 data.statPress 手动按压态：touchstart 亮 / touchmove 灭
+  // （滚动不拖亮块）/ touchend 不灭灯（tap 紧随跳转）/ tap 未派发 350ms 兜底 / onShow·onHide 双兜底。
+  // ②跳转前清态 + 延迟 100ms switchTab（v1.1.21 铁律，防返回残影）。
+  // ③重点词→复习页 starred tab、复习记录→random tab：经 globalData.reviewTab 传递（switchTab
+  //   无法带参），review.onShow 消费后清标记。
+  onStatDown(e){const k=e.currentTarget.dataset.pk;if(this.data.statPress!==k)this.setData({statPress:k});},
+  onStatMove(){if(this.data.statPress)this.setData({statPress:''});},
+  onStatEnd(){clearTimeout(this._statTimer);this._statTimer=setTimeout(()=>{if(this.data.statPress)this.setData({statPress:''});},350);},
+  onStatCancel(){clearTimeout(this._statTimer);if(this.data.statPress)this.setData({statPress:''});},
+  onStatTap(e){
+    if(this.data.statPress)this.setData({statPress:''});
+    const url=e.currentTarget.dataset.url,tab=e.currentTarget.dataset.tab;
+    if(tab){const app=getApp();if(app&&app.globalData)app.globalData.reviewTab=tab;}
+    setTimeout(()=>{wx.switchTab({url});},100);
+  },
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
   backupSummaryOf(text){try{const o=JSON.parse(text);return (o&&typeof o.summary==='string')?o.summary:'';}catch(e){return '';}},

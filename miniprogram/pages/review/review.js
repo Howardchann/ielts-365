@@ -41,6 +41,14 @@ Page({
 
   applyTheme() { theme.applyPage(this); theme.syncTabBar(this); },
   onShow() {
+    // 设置页「学习进度」跳转指定 tab（v1.1.27）：重点词→starred、复习记录→random。
+    // switchTab 无法带参 → 经 globalData.reviewTab 传递，消费后立即清掉（不影响正常切 tab）
+    const app = getApp();
+    if (app && app.globalData && app.globalData.reviewTab) {
+      const t = app.globalData.reviewTab;
+      app.globalData.reviewTab = null;
+      if (t !== this.data.tab) { this.setData({ tab: t }); if (t === 'due') this.onNextDue(); }
+    }
     theme.syncTabBar(this, 2);
     this.applyTheme();
     store.onResume();
