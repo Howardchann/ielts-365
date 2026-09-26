@@ -1,5 +1,6 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="page-root {{dark ? 'theme-dark' : ''}}">
+<nav-bar title="{{navTitle}}" />
 <view class="page-veil" wx:if="{{veil}}"></view>
 <!-- 复习页 -->
 <view class="tab-row">

@@ -1,5 +1,6 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="page-root {{dark ? 'theme-dark' : ''}}">
+<nav-bar title="{{navTitle}}" />
 <!-- 学习计划总览（78 周 / 18 个月） -->
 <!-- 准备期横幅：计划未开始时解释为何进度全为 0 -->
 <view class="card" wx:if="{{todayNum === 0}}">

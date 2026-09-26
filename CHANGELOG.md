@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-09-26（晚 15）· 自定义导航栏收官：周计划/复习页接入，原生导航栏 API 全退役（v1.1.34）
+
+**改动**（v1.1.33 模式照搬至剩余两页，四页至此全部自定义导航栏）：
+1. `weeks.json` / `review.json`：`navigationStyle: "custom"` + 引入 `nav-bar` 组件；
+2. `weeks.wxml` / `review.wxml`：`page-root` 下插入 `<nav-bar title="{{navTitle}}" />`（review 在 veil 盖罩之下，盖罩 z-999 覆盖全屏不受影响）；
+3. `weeks.js` / `review.js`：data 增加 `navTitle`（「18个月计划总览」/「复习巩固」），onShow 里的 `setNavigationBarTitle` 标题兜底删除（原生标题已不存在，错乱土壤清除）；
+4. **theme.js 瘦身**：`nativeBars` 里 `setNavigationBarColor` 分支整段删除（四页全 custom 后成死代码），只剩 `setBackgroundColor`（下拉露底窗口色，手动模式）；文件头注释同步改写；
+5. **死标记清理**：`navCustom` 字段（原供 theme.js 判别跳过原生栏）已无读取方，四页 data 全部移除；
+6. **配置收口**：`app.json` window 移除 `navigationBarBackgroundColor: @navBg` / `navigationBarTextStyle: @navTxt`，`theme.json` 同步删除 `navBg`/`navTxt` 变量（winBg/bgContent 保留管容器底色）。
+
+**意义**：`setNavigationBarColor` / `setNavigationBarTitle` 在整个 miniprogram 内零调用（grep 验证），darkmode+手切打架闪白的根因 API 彻底退役；四页栏色由 `<nav-bar>` 的 `var(--nav-bg/--nav-fg)` 随 `.theme-dark` 同帧切换。
+
+**遗留（定性见 AI-CONTEXT 快照）**：切主题后每 tab 首次进入仍闪 1-3 帧旧主题（合成器缓存帧，JS 层不可治）；根治=SPA 单页容器，远期单独立项。
+
+---
+
 ## 2026-09-26（晚 14）· 自定义导航栏第一版：组件 + 今日/设置页；.ico-inline em 化收口（v1.1.33）
 
 **改造对象**：官方 wechat-miniprogram/awesome-skyline 的 navigation-bar 组件（examples/address-book，194 行）裁剪为 tabBar 页形态——无返回键、无 slot、标题直传，四件套落在 `components/nav-bar/`。

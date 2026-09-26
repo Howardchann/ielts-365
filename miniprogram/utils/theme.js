@@ -1,6 +1,7 @@
 // utils/theme.js —— 外观三态：跟随系统(auto，默认) / 浅色(light) / 深色(dark)
 // 页面内容换肤 = CSS 变量：page 选择器挂浅色 token，页面根 view 挂 .theme-dark 时整组覆盖；
-// 原生导航栏/窗口背景 = darkmode+theme.json 管「跟随系统」，运行时用 setNavigationBarColor/setBackgroundColor 覆盖。
+// 原生导航栏已全退役（v1.1.33~34 四页 <nav-bar> 自定义）；窗口背景 = darkmode+theme.json
+// 管「跟随系统」，手动模式运行时用 setBackgroundColor 覆盖（下拉露底色）。
 const KEY = 'appearance';
 
 function mode() { try { return wx.getStorageSync(KEY) || 'auto'; } catch (e) { return 'auto'; } }
@@ -18,26 +19,16 @@ function isDark() {
   return m === 'dark' || (m === 'auto' && sysTheme() === 'dark');
 }
 
-// 原生栏只在「手动模式」下接管；auto 模式完全交给 darkmode+theme.json（跟随系统自动切）。
-// ⚠️ setNavigationBarColor/setBackgroundColor 只作用于「当前页」的窗口 —— 后台页调了无效。
-// 去重标记必须按页存（page.__nav/__win），不能模块级全局：否则主题切换时只有当前页
-// 被更新，其余页面的原生窗口底色停留在旧主题；等它们首次显示、webview 延迟重绘时
-// 露出旧色底 = 「切色系后每个页面第一次进入闪白光」。后台页在自己 onShow 时补设。
+// 窗口背景（下拉露底）手动模式接管；auto 模式完全交给 darkmode+theme.json（跟随系统自动切）。
+// ⚠️ v1.1.34 起四页全部自定义导航栏，setNavigationBarColor 已彻底退役（darkmode+手切打架 =
+// 首帧闪白的根因 API）；栏色由 <nav-bar> 的 CSS 变量 var(--nav-bg) 随 .theme-dark 同帧切换。
+// setBackgroundColor 只作用「当前页」窗口，去重标记按页存（page.__win），后台页在 onShow 时补设。
 function nativeBars(dark, page) {
   if (mode() === 'auto') return;
   const stack = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
   const cur = stack.length ? stack[stack.length - 1] : null;
   if (page && cur && cur !== page) return; // 后台页：跳过，等它 onShow 时再补
-  const nav = dark ? '#0E1618' : '#176B5B';
   const win = dark ? '#0E1618' : '#F3F8EF';
-  // 自定义导航页（v1.1.33 today/settings）：栏色由 CSS 变量 var(--nav-bg) 随 .theme-dark
-  // 同帧切换，绝不能再调 setNavigationBarColor（darkmode+手切打架 = 首帧闪白的根因）；
-  // 窗口背景（下拉露底）仍归本函数管。
-  const customNav = page && page.data && page.data.navCustom;
-  if (!customNav && (!page || page.__nav !== nav)) {
-    if (page) page.__nav = nav;
-    try { wx.setNavigationBarColor({ frontColor: '#ffffff', backgroundColor: nav, animation: { duration: 0, timingFunc: 'linear' } }); } catch (e) {}
-  }
   if (!page || page.__win !== win) {
     if (page) page.__win = win;
     try { wx.setBackgroundColor({ backgroundColor: win }); } catch (e) {}

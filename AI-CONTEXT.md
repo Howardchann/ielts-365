@@ -4,29 +4,46 @@
 >
 > 它记录了本项目中几个「看起来奇怪但刻意如此」的设计。这些决定都踩过坑，如果你不理解背景就"顺手优化"，很可能把修好的 bug 改回去。完整变更历史见 [CHANGELOG.md](./CHANGELOG.md)。
 >
-> **最后更新：2026-09-26 晚**（当日 v1.1.14~v1.1.33 共 20 版：文案定稿/行内图标/三类白闪/周磁贴按压四轮/喇叭删除键定稿/设置页跳转/deep-link 盖罩/图标对齐统一/**自定义导航栏第一版**；v1.1.33 待真机验收后推送。下一步：v1.1.34 周计划/复习页接入 + theme.js 瘦身，见下方快照）
+> **最后更新：2026-09-26 晚**（当日 v1.1.14~v1.1.34 共 21 版：文案定稿/行内图标/三类白闪/周磁贴按压四轮/喇叭删除键定稿/设置页跳转/deep-link 盖罩/图标对齐统一/**自定义导航栏两版收官——四页全 custom，原生导航栏 API 全退役**；v1.1.33~34 验收后推送。下一步：SPA 化远期立项，见下方快照）
 
 ---
 
-## ⚡ 当前进度快照（2026-09-26 19:10，v1.1.33 已改完待真机验收）
+## ⚡ 当前进度快照（2026-09-26 19:46，v1.1.34 改完待真机验收）
 
-**基线**：v1.1.14~v1.1.32 已推 GitHub（e894bfe）。**v1.1.33（自定义导航栏第一版）已改完、未推**——上传体验版后等用户真机验收，过了再推。
+**基线**：v1.1.14~v1.1.32 已推 GitHub（e894bfe）。**v1.1.33~34（自定义导航栏）已改完、未推**——上传体验版等真机验收，过了再推。
 
 **v1.1.33 内容**：
 1. **`components/nav-bar/`（新增）**：官方 awesome-skyline navigation-bar 裁剪版（tabBar 页形态：无返回键/标题直传）。关键差异：几何计算**模块加载期同步**（首帧即正确、零 setData，官方是 attached 异步）；颜色一律 `var(--nav-bg/--nav-fg)`（app.wxss page 块浅色 + .theme-dark 深色组），**不跟 prefers-color-scheme**（三态主题下媒体查询会错）。
-2. **today/settings 两页切 `navigationStyle:custom`**：json 加 `navigationBarTextStyle:"white"`（状态栏前景，两主题恒白成立）；data 加 `navCustom:true` + `navTitle`；today `_setTitle` 改 `sameSet({navTitle})`（标题 data 化，换 tab 不串）；v1.1.17 的原生标题兜底只剩 weeks/review 需要。
-3. **theme.js nativeBars**：`page.data.navCustom` 为真 → 跳过 setNavigationBarColor（**darkmode+手切打架的根因 API**），setBackgroundColor 保留。
-4. **`.ico-inline` em 化收口**：26rpx→1em、-4rpx→-.125em；宽屏 13px/-2px→1em/-.125em（容器 13px，完全等值）。图标三元组普查全部收敛，该遗留清零。
+2. **today/settings 两页切 `navigationStyle:custom`**：json 加 `navigationBarTextStyle:"white"`（状态栏前景，两主题恒白成立）；data 加 `navTitle`；today `_setTitle` 改 `sameSet({navTitle})`（标题 data 化，换 tab 不串）。
+3. **`.ico-inline` em 化收口**：26rpx→1em、-4rpx→-.125em；宽屏 13px/-2px→1em/-.125em（容器 13px，完全等值）。图标三元组普查全部收敛，该遗留清零。
+
+**v1.1.34 内容（2026-09-26 19:46）**：
+1. **weeks/review 接入 nav-bar**：json 切 `navigationStyle:custom`、wxml 插 `<nav-bar title>`、data 加 `navTitle`（「18个月计划总览」/「复习巩固」）；onShow 的 `setNavigationBarTitle` 标题兜底删除（v1.1.17 引入的错乱土壤随之清除）。
+2. **theme.js 瘦身**：`nativeBars` 的 `setNavigationBarColor` 分支整段删除（只剩 `setBackgroundColor` 管下拉露底窗口色，手动模式）。
+3. **死标记/死配置清理**：`navCustom`（无读取方）四页 data 全删；app.json window 移除 `@navBg/@navTxt`、theme.json 删 `navBg/navTxt`（winBg/bgContent 保留管容器底色）。
+4. **里程碑**：`setNavigationBarColor`/`setNavigationBarTitle` 全项目零调用（grep 验证），darkmode+手切打架闪白的根因 API 彻底退役；四页栏色由 `<nav-bar>` CSS 变量随 `.theme-dark` 同帧切换。
 
 **遗留问题（已知、未根治、有缓解）**：
-1. **deep-link 瞬移**：盖罩法 v1.1.32 后极短残帧仍在（合成器层，JS 赌不赢）。唯一根治=SPA 单页容器，大重构未拍板。
-2. **weeks/review 仍原生栏**（v1.1.34 接入 + theme.js nativeBars 瘦身）：手动模式下原生栏链路在这两页仍在，闪白只在切到这两页可能残留。
+1. **deep-link 瞬移 + 切主题后切 tab 闪旧主题**：同根=合成器缓存帧（JS 赌不赢，_rec4.mp4 逐帧实锤），盖罩法已缓解 deep-link；切主题残留定性见下「录屏逐帧定性」，用户未拍板缓解方案。唯一根治=SPA 单页容器，大重构未拍板。
+2. **切主题后新建页面首帧容器底色**（@winBg/@bgContent 跟系统不跟应用）：手动主题≠系统主题时冷启动+每 tab 首次进入可见，官方无运行时 API，结构性残留。
 3. 主题切换瞬间 tabBar 1 帧错位：合成器级，用户已接受。
 
+**闪白残留层调研（2026-09-26 晚，官方文档+awesome-skyline+TDesign/Vant 检索后定性）**：
+- **官方机制边界**：`theme` 属性、`wx.onThemeChange`、媒体查询外的原生层换肤，**全部强制依赖 darkmode:true**（官方文档明文）→ auto 模式离不开 darkmode；theme.json 的 @ 变量是**配置静态值，页面首次加载读取，运行时手动切换无法改写**（无 backgroundColorContent 运行时 API）→ 手动模式与 darkmode 的冲突是**结构性**的，只能缩小、不能消除。
+- **公开库共同答案**：TDesign 小程序=darkmode+prefers-color-scheme+Design Token，**只跟系统、无手动切换**，且官方明示"原生导航栏自行适配"；Vant Weapp=CSS 变量+根类名，纯 webview 层。**没有任何公开库解决"手动主题下原生层不闪"——它们的方案=全自定义导航+tabBar，把原生层缩到只剩窗口容器**。
+- **我们 v1.1.33 后仍跟系统的层**：①theme.json @winBg/@bgContent（窗口容器首帧底色）跟系统不跟应用——手动主题≠系统主题时，**新建页面首帧**容器色错；②weeks/review 原生导航栏；③已创建页面在手动切换后：webview 内容（CSS 类）与自定义栏（CSS 变量）同帧切，**理论无闪**。
+- **终局（v1.1.34 后可达）**：四页全自定义导航后，残留收窄为「新建页面首帧的容器底色」=冷启动+每 tab 首次进入，且仅当手动主题≠系统主题；已创建页面间切换应零闪。若真机仍闪，拿录屏逐帧定位是哪一层（容器/合成器残帧），别盲修。
+
+**录屏逐帧定性（2026-09-26 晚，_rec4.mp4 385 帧 16s，tools/_rec4-scan.py）**：
+- 用户操作还原：浅色设置页 → f54 切深色（**1 帧完成，当前页零闪 ✓ 自定义栏工作正常**）→ f174 切回浅色（1 帧 ✓）→ f191 切周计划 **闪深色周计划 3 帧**→浅色稳定 → f207 切今日 **闪深色今日 2 帧**→浅色稳定 → f255 再切深色 → f270/f284 切 tab **闪浅色旧页 2-3 帧**→深色稳定。
+- **定性：切主题后首次切回某后台 tab，闪 2-3 帧该页「上次显示时的旧主题完整画面」，然后新主题上屏**。双向都有（浅→深后闪白页=用户说的"闪白屏"；深→浅后闪黑页）。
+- **排除了**：①自定义导航栏本身（f190 设置页绿栏白字正常，当前页切主题 1 帧完成零闪）；②数据层滞后（onAppearance 已遍历 applyTheme 同步后台页 data，代码在 settings.js:74）；③容器 bgContent（残帧是完整渲染页非底色）。
+- **根因=合成器缓存帧**：后台页 setData 渲染被微信延迟到首次显示（v1.1.13 实锤过），像素帧停留在旧主题；切回瞬间合成器补缓存帧 2-3 帧，webview 新帧才上屏。**与 deep-link 瞬移同根同族**，JS 无法阻止缓存帧上屏。
+- **可选缓解（未实施，需用户拍板）**：盖罩法推广到全部 4 页 onHide（review 已有）——把"整页旧主题内容闪"降级为"纯底色闪"；**代价是每次普通切 tab 也变成"1 帧纯底色再出内容"**（现在普通切 tab 缓存帧=正确内容、是无缝的），为 1% 场景劣化 99% 场景，不推荐。**根治=SPA 单页容器**（无页面切换=无跨页缓存帧），与 deep-link 合并立项。当前推荐：接受残留（仅切主题后每 tab 首次进入 1-3 帧），继续 v1.1.34 原计划。
+
 **下一步规划**：
-- **v1.1.34**：weeks/review 接入 nav-bar（weeks 标题「18个月计划总览」、review「复习巩固」都改 data 化）+ theme.js nativeBars 只剩 setBackgroundColor（甚至整段退役）+ app.json window 导航栏配置/theme.json 的 navBg、navTxt 随之清理（winBg、bgContent 保留）。
-- **SPA 化（远期）**：根治 deep-link 瞬移的唯一解，单独立项。
-- **GitHub 攒批惯例不变**：本地提交，用户说"推"才推。
+- **SPA 化（远期，已向用户讲解效果/代价）**：根治 deep-link 瞬移与切主题残留的唯一解（无页面切换=无跨页缓存帧）。四页 js/wxml/wxss 改组件、onShow/onHide 模拟、分享路径与下拉刷新重接、懒挂载策略，伤筋动骨，等用户立项。
+- **GitHub 攒批惯例不变**：本地提交，用户说"推"才推（09-26 晚用户已授权 v1.1.33~34 验收后推送）。
 
 ---
 

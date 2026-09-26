@@ -9,6 +9,8 @@ Page({
     // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
     dark: theme.isDark(),
     pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
+    // 自定义导航栏（v1.1.34）：标题走 data 绑定 <nav-bar title>
+    navTitle: '复习巩固',
     poolSize: 0,
     dueCount: 0,
     current: null,      // {w, m, p, e, starred}
@@ -69,8 +71,6 @@ Page({
     theme.syncTabBar(this, 2);
     this.applyTheme();
     store.onResume();
-    // 标题兜底：今日页动态设过「Day N · 周X」后，未设过标题的 tab 页原生标题可能为空
-    try { wx.setNavigationBarTitle({ title: '复习巩固' }); } catch (e) {}
     this._pool = null;
     this.refreshPool();
     // 收藏列表同值守卫（新数组实例同值也会触发重渲染）

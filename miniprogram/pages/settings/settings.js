@@ -62,8 +62,8 @@ Page({
     cloudOn:true,cloudMeta:'',cloudErr:'',cloudTip:'',syncing:false,sheet:{show:false,title:'',options:[],index:0,key:''},cal:{show:false,y:0,m:0,label:'',grid:[],canPrev:true,canNext:true},
     // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
     dark:theme.isDark(),pageStyle:theme.isDark()?'background-color:#0E1618;':'',
-    // 自定义导航栏（v1.1.33）：标题走 data 绑定 <nav-bar title>；navCustom 供 theme.js 判定
-    navCustom:true,navTitle:'设置',
+    // 自定义导航栏（v1.1.33）：标题走 data 绑定 <nav-bar title>
+    navTitle:'设置',
     statPress:''},
   onLoad(){theme.applyPage(this);theme.syncTabBar(this);const now=new Date(),pad=n=>String(n).padStart(2,'0');this.setData({today:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())});speech.initPlugin();this._offSpeech=speech.onStateChange(p=>this.setData({voiceTesting:!!p.playing,voiceLabel:p.playing?'停止朗读':'试听发音'}));this._offStore=store.onChange(()=>this.refreshCloud());this.refreshCloud();},
   onUnload(){if(this._offSpeech){this._offSpeech();this._offSpeech=null;}if(this._offStore){this._offStore();this._offStore=null;}},

@@ -10,9 +10,7 @@ Page({
     // onLoad 的 setData 实测晚 1-3 帧才上屏（09-26 录屏 f103/116/128 白光根因）
     dark: theme.isDark(),
     pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
-    // 自定义导航栏（v1.1.33）：标题走 data 绑定 <nav-bar title>，不再调 setNavigationBarTitle；
-    // navCustom=true 让 theme.js 手动模式跳过 setNavigationBarColor（栏色由 CSS 变量管）
-    navCustom: true,
+    // 自定义导航栏（v1.1.33）：标题走 data 绑定 <nav-bar title>，不再调 setNavigationBarTitle
     navTitle: '今日计划',
     // ⚠️ 必须初始化为 0（falsy）：首次 onShow 才会走「默认落点」分支（准备期倒计时卡/
     // 第一个未完成日）。若是 1，冷启动直接命中「保持浏览位置」分支，准备期用户永远

@@ -8,6 +8,8 @@ Page({
     // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
     dark: theme.isDark(),
     pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
+    // 自定义导航栏（v1.1.34）：标题走 data 绑定 <nav-bar title>
+    navTitle: '18个月计划总览',
     pressed: '',   // 手动按压态：当前按下的磁贴 pk（见 onTileDown）
     phases: [],       // [{p, name, shortName, range, doneCount, totalWeeks, percent, isCurrentPhase, weeks:[...]}]
     todayNum: 0,
@@ -28,8 +30,6 @@ Page({
     theme.syncTabBar(this, 1);
     this.applyTheme();
     store.onResume();
-    // 标题兜底：今日页动态设过「Day N · 周X」后，未设过标题的 tab 页原生标题可能为空
-    try { wx.setNavigationBarTitle({ title: '18个月计划总览' }); } catch (e) {}
     this.refresh();
   },
 

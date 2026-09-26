@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "复习巩固",
-  "usingComponents": { "feedback": "/components/feedback/feedback" }
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "white",
+  "usingComponents": { "feedback": "/components/feedback/feedback", "nav-bar": "/components/nav-bar/index" }
 }
