@@ -125,8 +125,10 @@ page {
    原生按钮统一「背景变色 + 轻缩放」（不再用透明度——有的按钮看得见有的看不见）；
    文字/图标类（无背景）用变暗 + 缩放 */
 .hover-dim{opacity:.55;transform:scale(.96)}
-/* 磁贴/卡片类按压：改背景变色（重绘属性，修复 hide/show 后部分节点 hover 失效——透明度/缩放是合成器属性，
-   页面切走再切回后部分图层不重绘，按压态不上屏且哪些失效随机） */
+/* 磁贴/卡片类按压：背景变色（重绘属性）。⚠️ v1.1.19 起该类由 weeks 页手动按压态驱动
+   （data.pressed + touchstart/end/cancel/move + onShow 兜底清零），不再走原生 hover-class——
+   原生 hover 会沿节点链激活（点日格连父级周卡一起亮），且 switchTab 跳转时清理不可靠、
+   返回后按压底色残留（实机翻车）。给其他页面接按压态时照 weeks.js 的 onTileDown/onTileUp 模式。 */
 .hover-tint{background:var(--soft)}
 .btn-press{transform:scale(.96)}
 .btn-primary.btn-press{background:var(--press-green);color:var(--green-press)}

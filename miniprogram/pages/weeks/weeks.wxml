@@ -26,9 +26,9 @@
 
 <!-- 方案C：四阶段 2×2 磁贴总览（收起态），点磁贴展开该阶段周列表 -->
 <view class="phase-grid">
-  <view class="phase-tile {{openPhase === phase.p ? 'phase-tile--open' : ''}} {{phase.isCurrentPhase ? 'phase-tile--cur' : ''}}"
+  <view class="phase-tile {{openPhase === phase.p ? 'phase-tile--open' : ''}} {{phase.isCurrentPhase ? 'phase-tile--cur' : ''}} {{pressed === 'p' + phase.p ? 'hover-tint' : ''}}"
         wx:for="{{phases}}" wx:key="p" wx:for-item="phase"
-        data-p="{{phase.p}}" hover-class="hover-tint" hover-start-time="0" hover-stay-time="120" bindtap="onPhaseTap">
+        data-p="{{phase.p}}" data-pk="p{{phase.p}}" bindtouchstart="onTileDown" bindtouchend="onTileUp" bindtouchcancel="onTileUp" bindtouchmove="onTileUp" bindtap="onPhaseTap">
     <view class="tile-name">{{phase.shortName}}</view>
     <view class="tile-meta">第 {{phase.range}} 周 · {{phase.doneCount}}/{{phase.totalWeeks}} 周</view>
     <view class="tile-bar"><view class="tile-fill" style="width:{{phase.percent}}%"></view></view>
@@ -37,9 +37,9 @@
 
 <block wx:for="{{phases}}" wx:key="p" wx:for-item="phase">
   <block wx:if="{{openPhase === phase.p}}">
-    <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}}"
+    <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}} {{pressed === 'w' + week.w ? 'hover-tint' : ''}}"
           wx:for="{{phase.weeks}}" wx:key="w" wx:for-item="week"
-          data-w="{{week.w}}" hover-class="hover-tint" hover-start-time="0" hover-stay-time="120" bindtap="onWeekTap">
+          data-w="{{week.w}}" data-pk="w{{week.w}}" bindtouchstart="onTileDown" bindtouchend="onTileUp" bindtouchcancel="onTileUp" bindtouchmove="onTileUp" bindtap="onWeekTap">
       <view class="week-line">
         <view class="week-ring" style="background: conic-gradient(#176B5B {{week.checked / 7 * 100}}%, #E9F0EC 0)"><view class="week-ring-num {{week.isCurrent ? 'week-ring-num--current' : (week.isPast ? 'week-ring-num--past' : '')}}">{{week.w}}</view></view>
         <view class="week-info">
@@ -49,9 +49,9 @@
         <view class="week-tag" wx:if="{{week.isCurrent}}">本周</view>
       </view>
       <view class="week-days">
-        <view class="day-chip {{item.done ? 'day-chip--done' : ''}}"
+        <view class="day-chip {{item.done ? 'day-chip--done' : ''}} {{pressed === 'd' + week.w + 'k' + item.k ? 'hover-tint' : ''}}"
               wx:for="{{week.days}}" wx:key="k"
-              data-w="{{week.w}}" data-k="{{item.k}}" hover-class="hover-tint" hover-start-time="0" hover-stay-time="120" catchtap="onDayTap">{{item.k}}</view>
+              data-w="{{week.w}}" data-k="{{item.k}}" data-pk="d{{week.w}}k{{item.k}}" bindtouchstart="onTileDown" bindtouchend="onTileUp" bindtouchcancel="onTileUp" bindtouchmove="onTileUp" catchtap="onDayTap">{{item.k}}</view>
       </view>
     </view>
   </block>

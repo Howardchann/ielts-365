@@ -8,6 +8,7 @@ Page({
     // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
     dark: theme.isDark(),
     pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
+    pressed: '',   // 手动按压态：当前按下的磁贴 pk（见 onTileDown）
     phases: [],       // [{p, name, shortName, range, doneCount, totalWeeks, percent, isCurrentPhase, weeks:[...]}]
     todayNum: 0,
     currentWeek: 0,
@@ -27,6 +28,8 @@ Page({
     store.onResume();
     // 标题兜底：今日页动态设过「Day N · 周X」后，未设过标题的 tab 页原生标题可能为空
     try { wx.setNavigationBarTitle({ title: '18个月计划总览' }); } catch (e) {}
+    // 按压态兜底清零：switchTab 跳转时 touchend 可能不触发，返回后残留按压底色
+    if (this.data.pressed) this.setData({ pressed: '' });
     this.refresh();
   },
 
@@ -92,6 +95,18 @@ Page({
       totalPercent,
       openPhase: this.data.openPhase || currentPhase,
     });
+  },
+
+  // 磁贴按压：手动管理（替代原生 hover-class，v1.1.19）。原因有二：
+  // ① 原生 hover 会沿节点链激活——点日格连父级周卡一起亮（「整个周磁贴按压反馈」）；
+  // ② switchTab 跳转时 hover 清理不可靠，返回周计划后按压底色残留（实机翻车）。
+  // touchmove 也清：在磁贴上起手滑动（滚动列表）时不该亮按压态。
+  onTileDown(e) {
+    const k = e.currentTarget.dataset.pk;
+    if (this.data.pressed !== k) this.setData({ pressed: k });
+  },
+  onTileUp() {
+    if (this.data.pressed) this.setData({ pressed: '' });
   },
 
   // 展开/收起阶段列表

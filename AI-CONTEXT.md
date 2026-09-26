@@ -148,7 +148,7 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 - **行内图标简写禁令**：`.ico-inline` 只能用 `background-position/size/repeat` 长写——简写 `background:center/contain no-repeat` 会把 `.ico-spk` 的 background-image 重置为 none（同优先级后者胜），浅色模式图标消失（v1.1.16 修的实机 bug）。
 - **喇叭尺寸 em 化（v1.1.18 用户定稿）**：`.spk-ico` 尺寸一律 `.75em`（例句 `.ex-speak .spk-ico` 为 `.85em`），**禁改回固定 rpx**——em 跟随所在行字号（喇叭盒 font-size 与对齐文字一致），同类型播放键之间严格同大小、与文本墨水同高消除尺寸视差。大词 56rpx 行自动得 42rpx。宽屏断点同样用 em。
 - **删除图标（v1.1.18 裸一定稿）**：`.rm-ico` 珊瑚线条 ✕ SVG dataURI（常态 `#F0705F` stroke 2.6 / 按压 `#C7402E` stroke 3.2），热区 44rpx `align-self:center`。用户否决了圆底方案——**全应用裸图标风格，删除类图标不加底色**。
-- **按压反馈两类（v1.1.18 定稿）**：磁贴/卡片类用 `.hover-tint`（背景变 `var(--soft)`，重绘属性）+ `hover-start-time="0"`——透明度/缩放是合成器属性，页面 hide/show 后部分节点图层不重绘导致按压态随机失效（周计划磁贴实机翻车）；文字/图标小件仍用 `.hover-dim`。
+- **按压反馈两类（v1.1.19 终稿，推翻 v1.1.18 的 hover-tint 方案）**：磁贴/卡片类**禁用原生 hover-class**——它有两条实锤缺陷：①沿节点链激活（点日格连父级周卡一起亮）；②switchTab 跳转时清理不可靠，返回后按压底色残留（只有被点过的卡残留）。正确模式 = **手动按压态**（weeks.js `onTileDown/onTileUp`：data.pressed 存当前 pk，touchstart 亮 / touchend·cancel·move 灭 / onShow 兜底清零；wxml class 三元绑定 `hover-tint`）。文字/图标小件仍可用 `.hover-dim`（无子节点激活与跳转残留问题）。
 
 ### 2.5 云同步：**2026-09-23 按用户决策恢复**（只在 `cloud-sync` 分支生效）
 
