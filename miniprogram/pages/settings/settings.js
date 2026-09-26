@@ -72,10 +72,8 @@ Page({
   shiftMonth(e){const dir=Number(e.currentTarget.dataset.dir);let{y,m}=this.data.cal;m+=dir;if(m<0){m=11;y--;}if(m>11){m=0;y++;}if((dir<0&&(y===2025&&m===0))||(dir>0&&(y===2028&&m===11))){return;}const g=this._buildCal(y,m);this.setData({'cal.y':y,'cal.m':m,'cal.label':g.label,'cal.grid':g.grid,'cal.canPrev':g.canPrev,'cal.canNext':g.canNext});},
   closeCal(){this.setData({'cal.show':false});},
   pickDay(e){const ds=e.currentTarget.dataset;if(ds.dis==='true'||ds.dis===true)return;const iso=ds.iso;let d=new Date(iso+'T00:00:00');const off=(d.getDay()+6)%7;if(off)d.setDate(d.getDate()+(7-off));const p=n=>('0'+n).slice(-2),ms=p(d.getMonth()+1)+'-'+p(d.getDate());const fin=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());store.set('startDate',fin);getCurrentPages().forEach(pg=>{if(pg.resetView)pg.resetView();});this.setData({'cal.show':false,startDate:fin});this.refresh();this.fb().toast(off?'已顺延到周一 '+ms:'开始日期已更新');},
-  // 学习进度数字跳转：deep-link 专用安全帧。
-  // 目标复习页常驻在 tab 栈中时，switchTab 前先把目标实例罩住，再在罩下预切换 tab。
-  // 微信若在 switchTab 瞬间复用旧 webview frame，暴露的也只能是纯背景，而不是旧 tab 内容。
-  // veil 在 review.onShow 中与目标 tab 原子撤除；正常底部 tab 点击不走这里，不增加普通导航的空白帧。
+  // 学习进度数字跳转：本次实验改为透明于用户的过渡桥。
+  // 设置页不再直接 switchTab 到 review，而是先进入不含内容的同色 transition 页面。
   onStatDown(e){const k=e.currentTarget.dataset.pk;if(this.data.statPress!==k)this.setData({statPress:k});},
   onStatMove(){if(this.data.statPress)this.setData({statPress:''});},
   onStatEnd(){clearTimeout(this._statTimer);this._statTimer=setTimeout(()=>{if(this.data.statPress)this.setData({statPress:''});},350);},
@@ -83,24 +81,11 @@ Page({
   onStatTap(e){
     if(this.data.statPress)this.setData({statPress:''});
     const url=e.currentTarget.dataset.url,tab=e.currentTarget.dataset.tab;
-    const go=()=>{setTimeout(()=>{wx.switchTab({url});},80);};
     if(tab){
-      const app=getApp();
-      if(app&&app.globalData){
-        app.globalData.reviewTab=tab;
-        const rp=app.globalData._reviewPage;
-        if(rp&&rp.data){
-          // deep-link 专用：无论目标 tab 是否相同，都先罩住目标实例。
-          // 必须把 veil + tab 放进同一次 setData，并等渲染回调后再 switchTab；
-          // 让隐藏的目标页先把“纯背景安全帧”提交给渲染层。
-          let done=false;
-          const once=()=>{if(done)return;done=true;go();};
-          rp.setData({veil:true,tab},once);setTimeout(once,400);
-          return;
-        }
-      }
+      wx.navigateTo({url:'/pages/transition/transition?tab='+encodeURIComponent(tab)});
+      return;
     }
-    go();
+    setTimeout(()=>{wx.switchTab({url});},80);
   },
   onRate(e){const rate=Number(e.detail.value);speech.setRate(rate);store.set('rate',rate);this.setData({rate,rateText:rate.toFixed(2)+'×'});},
   onTestVoice(){if(this.data.voiceTesting){speech.stop();return;}const d=plan.demo();if(d&&d.example){speech.speak(d.example,{ai:d.ai,kind:'s'});}else{speech.speak('Hello. Nice to meet you. This is your daily learning voice.');}},
