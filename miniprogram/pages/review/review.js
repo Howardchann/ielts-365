@@ -13,7 +13,10 @@ Page({
     navTitle: '复习巩固',
     poolSize: 0,
     dueCount: 0,
-    current: null,      // {w, m, p, e, starred}
+    // v1.1.38 串卡修复：随机/到期两个 tab 各记各的当前词，互不串显。
+    // 旧版共用一份 current —— 到期页设的词切到随机页还在（wxml 两块卡片都绑 {{current}}）
+    currentRandom: null,   // {w, m, p, e, ai, starred}
+    currentDue: null,
     showZh: false,
     starred: [],
     playingWord: '',
@@ -60,7 +63,7 @@ Page({
     if (flag) app.globalData.reviewTab = null;
     if (flag && flag !== this.data.tab) {
       this.setData({ tab: flag, veil: false });
-      if (flag === 'due') this.onNextDue();
+      if (flag === 'due' && !this.data.currentDue) this.onNextDue();
     } else if (this.data.veil) {
       this.setData({ veil: false });
     }
@@ -88,8 +91,10 @@ Page({
   },
 
   onTab(e) {
-    this.setData({ tab: e.currentTarget.dataset.tab });
-    if (e.currentTarget.dataset.tab === 'due') this.onNextDue();
+    const t = e.currentTarget.dataset.tab;
+    this.setData({ tab: t });
+    // v1.1.38：首次进到期页抽一个词（不自动朗读）；已在到期页再点不再换词（保持当前词）
+    if (t === 'due' && !this.data.currentDue) this.onNextDue();
   },
 
   fb() { return this.selectComponent('#fb'); },
@@ -97,20 +102,18 @@ Page({
   onNextDue() {
     const pool = store.dueWords(this.refreshPool());
     if (!pool.length) {
-      this.setData({ current: null });
+      this.setData({ currentDue: null });
       this.fb().toast('今天没有到期词，继续学习即可');
       return;
     }
     const item = pool[Math.floor(Math.random() * pool.length)];
-    const current = Object.assign({}, item, { starred: store.isStarred(item.w) });
-    this._lastWord = item.w;
-    this.setData({ current, showZh: false });
-    speech.speak(current.w, { ai: current.ai, kind: 'w' });
+    // v1.1.38：去掉自动朗读 —— 朗读统一走卡片上的喇叭（onSpeakCurrent），点进卡片是静默的
+    this.setData({ currentDue: Object.assign({}, item, { starred: store.isStarred(item.w) }), showZh: false });
   },
 
   onReviewResult(e) {
     const remembered = e.currentTarget.dataset.result === 'remember';
-    const c = this.data.current;
+    const c = this.data.currentDue;
     if (!c) return;
     store.reviewWord(c.w, remembered);
     // 长文字 toast 在快速连按时反复弹出，像整个模块在闪 —— 改短文案+短时长
@@ -118,19 +121,15 @@ Page({
     // 到期 tab：先算好下一词、一次 setData 直接切换。
     // 旧写法先 setData({current:null}) 再 onNextDue()，中间会渲染一帧
     // 「目前没有到期复习词」空状态 —— 连按闪现整个模块的真凶就是它。
-    if (this.data.tab === 'due') {
-      const pool = store.dueWords(this.refreshPool());
-      if (pool.length) {
-        const item = pool[Math.floor(Math.random() * pool.length)];
-        const next = Object.assign({}, item, { starred: store.isStarred(item.w) });
-        this._lastWord = item.w;
-        this.setData({ current: next, showZh: false });
-        speech.speak(next.w, { ai: next.ai, kind: 'w' });
-        return;
-      }
+    const pool = store.dueWords(this.refreshPool());
+    if (pool.length) {
+      const item = pool[Math.floor(Math.random() * pool.length)];
+      const next = Object.assign({}, item, { starred: store.isStarred(item.w) });
+      this.setData({ currentDue: next, showZh: false }); // v1.1.38：下一词同样不自动朗读
+      return;
     }
-    // 真正没有下一词（到期答完 / 随机 tab）才显示空状态卡片
-    this.setData({ current: null, showZh: false });
+    // 真正没有下一词（到期答完）才显示空状态卡片
+    this.setData({ currentDue: null, showZh: false });
   },
 
   // 抽一个词：优先重点词（30%），并尽量避开上一次抽到的词
@@ -151,7 +150,7 @@ Page({
   onNext() {
     const pool = this.refreshPool();
     if (!pool.length) {
-      this.setData({ current: null });
+      this.setData({ currentRandom: null });
       this.fb().toast('先去打卡几天，词汇池才有内容');
       return;
     }
@@ -159,15 +158,17 @@ Page({
     const item = this.pickItem(pool, starred, this._lastWord);
     this._lastWord = item.w;
     // 重点词池里的对象是副本，没有 starred 字段 —— 必须按单词实际状态回填，否则已收藏的词永远显示"未收藏"
-    const current = Object.assign({}, item, { starred: store.isStarred(item.w) });
-    this.setData({ current, showZh: false });
-    speech.speak(current.w, { ai: current.ai, kind: 'w' });
+    // v1.1.38：去掉自动朗读，与到期 tab 统一为手动喇叭
+    this.setData({ currentRandom: Object.assign({}, item, { starred: store.isStarred(item.w) }), showZh: false });
   },
 
   onShowZh() { this.setData({ showZh: true }); },
 
+  // v1.1.38：当前卡片随 tab 走 —— 两块卡片各绑各的数据，朗读/收藏/释义操作都作用在本 tab 的词上
+  _cur() { return this.data.tab === 'due' ? this.data.currentDue : this.data.currentRandom; },
+
   onSpeakCurrent() {
-    const c = this.data.current;
+    const c = this._cur();
     if (!c) return;
     if (this.data.playingWord === c.w) {
       const r = speech.togglePause();
@@ -179,18 +180,19 @@ Page({
   },
 
   onSpeakExample() {
-    const c = this.data.current;
+    const c = this._cur();
     if (!c || !c.e) return;
     speech.speak(c.e, { ai: c.ai, kind: 's' });
   },
 
   onStarCurrent() {
-    const c = this.data.current;
+    const key = this.data.tab === 'due' ? 'currentDue' : 'currentRandom';
+    const c = this.data[key];
     if (!c) return;
     const starred = store.toggleStar(c);
     this.setData({
       starred: store.get('starredWords') || [],
-      'current.starred': starred,
+      [key + '.starred']: starred,
     });
   },
 

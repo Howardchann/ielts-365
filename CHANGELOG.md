@@ -10,6 +10,19 @@
 
 ---
 
+## 2026-09-27（凌晨）· 复习页交互三修：去自动朗读 / 到期卡片保词 / 串卡 bug 根治（v1.1.38）
+
+**背景**：用户真机反馈复习页三个交互问题。排查定性：①点到期卡片自动读单词 = **刻意设计**（`onNextDue`/`onReviewResult`/`onNext` 末尾均直接 `speech.speak`）②每次点到期卡片换新词 = 刻意设计（`onTab` 每次都重抽）③到期词串显到随机卡片 = **实现耦合副作用，非设计**（两个 tab 的卡片共用同一份 `data.current`）。用户拍板：两个 tab 都去自动朗读、到期保词、两 tab 各记各的词。
+
+**改动**（review.js + review.wxml）：
+1. **去自动朗读**：`onNextDue` / `onReviewResult`（到期下一词）/ `onNext`（随机下一个）三处 `speech.speak` 全部移除——朗读统一走卡片喇叭手动触发。
+2. **到期卡片保词**：`onTab` 改为 `t==='due' && !currentDue` 才抽词；已在到期页再点 tab 不再换词。deep-link 的 `flag==='due'` 同样加保词守卫。
+3. **串卡根治**：`data.current` 拆成 `currentRandom` / `currentDue` 两份独立状态，wxml 两块卡片各绑各的；`_cur()` 辅助函数让朗读/释义/收藏操作作用在**当前 tab 自己的词**上（`onStarCurrent` 用计算键 `[key+'.starred']` 回填）。`_lastWord` 避重逻辑只保留在随机链路。
+
+**影响面**：仅复习页。设置页跨栈预切换只 setData `tab` 字段，不受影响。
+
+---
+
 ## 2026-09-26（晚 16）· deep-link 过渡桥实验：真机证伪并整体回退（v1.1.35~37）
 
 **方案设想**（另一会话实施，提交 `7c445e3..8ad1f23` 共 15 个）：设置页 deep-link 不再直接 switchTab，改为先 `navigateTo` 进一个**纯底色不透明中转页** `pages/transition/`（存目标 tab → 等 1 帧画完底色 → switchTab），复习页 onShow 前从 storage 消费目标 tab——意图是让 switchTab 的「旧缓存帧」变成同色底色而非旧内容，绕开合成器残帧。
