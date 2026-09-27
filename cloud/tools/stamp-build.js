@@ -24,16 +24,26 @@ const OUT = path.join(ROOT, 'miniprogram', 'utils', 'build-info.js');
 const SELF = 'miniprogram/utils/build-info.js';
 
 function gitDir() {
-  const dot = path.join(ROOT, '.git');
-  let st;
-  try { st = fs.statSync(dot); } catch (e) { return null; }
-  if (st.isDirectory()) return dot;
-  // .git 是文件（worktree / submodule）：内容形如 "gitdir: D:/x/.git/worktrees/y"
-  try {
-    const m = /^gitdir:\s*(.+)\s*$/m.exec(fs.readFileSync(dot, 'utf8'));
-    if (m) return path.resolve(ROOT, m[1].trim());
-  } catch (e) {}
-  return null;
+  // v1.1.39 起项目迁入仓库子目录（cloud/ 等 4 实例），工具自身在 <实例>/tools/ 下，
+  // .git 在仓库根 —— 从工具位置向上逐级查找 .git（目录或 gitdir: 文件）。
+  let probe = ROOT;
+  while (true) {
+    const dot = path.join(probe, '.git');
+    let st;
+    try { st = fs.statSync(dot); } catch (e) {
+      const parent = path.dirname(probe);
+      if (parent === probe) return null;
+      probe = parent;
+      continue;
+    }
+    if (st.isDirectory()) return dot;
+    // .git 是文件（worktree / submodule）：内容形如 "gitdir: D:/x/.git/worktrees/y"
+    try {
+      const m = /^gitdir:\s*(.+)\s*$/m.exec(fs.readFileSync(dot, 'utf8'));
+      if (m) return path.resolve(probe, m[1].trim());
+    } catch (e) {}
+    return null;
+  }
 }
 
 function readHead(dir) {
