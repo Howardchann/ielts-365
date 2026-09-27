@@ -1,0 +1,61 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="page-root {{dark ? 'theme-dark' : ''}}">
+<nav-bar title="{{navTitle}}" />
+<!-- 学习计划总览（78 周 / 18 个月） -->
+<!-- 准备期横幅：计划未开始时解释为何进度全为 0 -->
+<view class="card" wx:if="{{todayNum === 0}}">
+  <view class="tip-box" style="margin-top:0;">
+    <view class="tip-text">计划 {{startDateText}} 开始——还有 {{daysToStart}} 天开学。进度从开学当天起累计，现在可以先浏览全表熟悉节奏</view>
+  </view>
+</view>
+<view class="card stat-card">
+  <view class="stat-row">
+    <view class="stat-item">
+      <view class="stat-num">{{totalChecked}}</view>
+      <view class="stat-label">已完成天数</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-num">{{totalDays - totalChecked}}</view>
+      <view class="stat-label">剩余天数</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-num">{{totalPercent}}%</view>
+      <view class="stat-label">总进度</view>
+    </view>
+  </view>
+</view>
+
+<!-- 方案C：四阶段 2×2 磁贴总览（收起态），点磁贴展开该阶段周列表 -->
+<view class="phase-grid">
+  <view class="phase-tile {{openPhase === phase.p ? 'phase-tile--open' : ''}} {{phase.isCurrentPhase ? 'phase-tile--cur' : ''}} {{pressed === 'p' + phase.p ? 'hover-tint' : ''}}"
+        wx:for="{{phases}}" wx:key="p" wx:for-item="phase"
+        data-p="{{phase.p}}" data-pk="p{{phase.p}}" bindtouchstart="onTileDown" bindtouchend="onTileUp" bindtouchcancel="onTileUp" bindtouchmove="onTileUp" bindtap="onPhaseTap">
+    <view class="tile-name">{{phase.shortName}}</view>
+    <view class="tile-meta">第 {{phase.range}} 周 · {{phase.doneCount}}/{{phase.totalWeeks}} 周</view>
+    <view class="tile-bar"><view class="tile-fill" style="width:{{phase.percent}}%"></view></view>
+  </view>
+</view>
+
+<block wx:for="{{phases}}" wx:key="p" wx:for-item="phase">
+  <block wx:if="{{openPhase === phase.p}}">
+    <view class="card week-card {{week.isCurrent ? 'week-card--current' : ''}}"
+          wx:for="{{phase.weeks}}" wx:key="w" wx:for-item="week">
+      <!-- 周卡整块纯展示、不可点（09-26 用户定稿）：日格已覆盖一周每一天，整卡跳转多余；
+           这同时让日格 touch 冒泡失去父级 handler，v1.1.19 的「点日格整卡亮」从结构上根除 -->
+      <view class="week-line">
+        <view class="week-ring" style="background: conic-gradient(#176B5B {{week.checked / 7 * 100}}%, #E9F0EC 0)"><view class="week-ring-num {{week.isCurrent ? 'week-ring-num--current' : (week.isPast ? 'week-ring-num--past' : '')}}">{{week.w}}</view></view>
+        <view class="week-info">
+          <view class="week-theme">{{week.theme}}</view>
+          <view class="week-words">每日 {{week.perDay}} 词 · 本周 {{week.weekTotal}} 词</view>
+        </view>
+        <view class="week-tag" wx:if="{{week.isCurrent}}">本周</view>
+      </view>
+      <view class="week-days">
+        <view class="day-chip {{item.done ? 'day-chip--done' : ''}} {{pressed === 'd' + week.w + 'k' + item.k ? 'hover-tint' : ''}}"
+              wx:for="{{week.days}}" wx:key="k"
+              data-w="{{week.w}}" data-k="{{item.k}}" data-pk="d{{week.w}}k{{item.k}}" bindtouchstart="onChipDown" bindtouchmove="onChipMove" bindtouchend="onChipEnd" bindtouchcancel="onChipCancel" catchtap="onDayTap">{{item.k}}</view>
+      </view>
+    </view>
+  </block>
+</block>
+</view>

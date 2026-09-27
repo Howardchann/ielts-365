@@ -1,0 +1,61 @@
+/* 开溜 · 全局品牌样式 */
+page {
+  background: #F3F8EF;
+  color: #24332F;
+  font-size: 28rpx;
+  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  /* 预留底部空间：避免最后一张卡片贴住/视觉上重叠 tabBar（含全面屏安全区） */
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+}
+.card { background:#fff; border-radius:24rpx; padding:28rpx; margin:20rpx 24rpx; box-shadow:0 4rpx 18rpx rgba(23,107,91,.06); }
+.section-label { font-size:26rpx; font-weight:700; color:#176B5B; margin-bottom:14rpx; letter-spacing:1rpx; }
+.btn-primary { background:#176B5B; color:#fff; border-radius:44rpx; font-size:30rpx; font-weight:700; }
+.btn-primary[disabled] { background:#CBD5D1; color:#fff; }
+.btn-ghost { background:#fff; color:#176B5B; border:2rpx solid #9ED8C5; border-radius:44rpx; font-size:30rpx; }
+.tip-box { background:#FFF7EA; border-left:6rpx solid #FF8A78; border-radius:14rpx; padding:20rpx 24rpx; margin-top:20rpx; }
+.tip-text { color:#68574D; font-size:26rpx; }
+.muted { color:#8B9893; font-size:24rpx; }
+.brand-head { display:flex; align-items:center; padding:20rpx 28rpx 4rpx; }
+.brand-logo { width:76rpx; height:76rpx; flex-shrink:0; }
+.brand-copy { margin-left:16rpx; }
+.brand-name { font-size:36rpx; line-height:1.1; font-weight:800; color:#176B5B; }
+.brand-sub { font-size:22rpx; color:#7B8A84; margin-top:6rpx; }
+.word-row { display:flex; align-items:flex-start; padding:18rpx 0; border-bottom:1rpx solid #E9F0EC; }
+.word-row:last-child { border-bottom:none; }
+.word-speak { flex-shrink:0; width:64rpx; height:64rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; display:flex; align-items:center; justify-content:center; font-size:34rpx; margin-right:20rpx; }
+.word-speak.playing { background:#176B5B; color:#fff; }
+/* 按下即时反馈：小程序里 view 的 :active 不可靠，统一用 hover-class="speak-hover" */
+.word-speak.speak-hover { background:#CBE6DC; }
+.word-speak.playing.speak-hover { background:#0E4C41; }
+.word-main { flex:1; min-width:0; }
+.word-en { font-size:32rpx; font-weight:700; color:#24332F; }
+.word-pos { font-size:22rpx; color:#176B5B; font-style:italic; margin-left:10rpx; }
+.word-zh { font-size:26rpx; color:#5F6D68; margin-top:4rpx; }
+.word-example { font-size:25rpx; color:#82908B; margin-top:6rpx; padding-left:4rpx; }
+/* 例句行：文本占满 + 右侧播放按钮（与语法区 ex-speak 同款，让人一眼看出可以播） */
+.word-example-row { display:flex; align-items:flex-start; }
+.word-example-row .word-example { flex:1; min-width:0; }
+.word-example-row .ex-speak { margin-top:2rpx; }
+.word-star { flex-shrink:0; width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center; font-size:34rpx; color:#C7D0CC; }
+.word-star.on { color:#F5C451; }
+/* 语法例句：一句一行，长句自动折行。
+   关键：flex 子项必须 min-width:0 —— 否则它的自动最小宽度按内容算，长句会被撑成一行不折 */
+.grammar-ex { display:flex; align-items:flex-start; padding:14rpx 0; border-bottom:1rpx solid #EEF4F1; }
+.grammar-ex:last-child { border-bottom:none; }
+.grammar-ex-text { flex:1; min-width:0; font-size:27rpx; line-height:1.75; color:#43504C; white-space:normal; word-break:break-word; overflow-wrap:break-word; }
+.ex-no { flex-shrink:0; width:36rpx; height:36rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; font-size:22rpx; font-weight:700; display:flex; align-items:center; justify-content:center; margin:8rpx 14rpx 0 0; }
+.ex-speak { flex-shrink:0; width:52rpx; height:52rpx; border-radius:50%; background:#E6F4EE; color:#176B5B; display:flex; align-items:center; justify-content:center; font-size:26rpx; margin-left:16rpx; }
+.ex-speak.playing { background:#176B5B; color:#fff; }
+.ex-speak.speak-hover { background:#CBE6DC; }
+.ex-speak.playing.speak-hover { background:#0E4C41; }
+.checkin-btn { margin:24rpx 0; }
+.done-state { text-align:center; color:#176B5B; font-size:28rpx; font-weight:700; padding:16rpx 0; }
+
+/* 开溜 · 图标与触控视觉统一 */
+.icon-button{display:flex;align-items:center;justify-content:center;width:64rpx;height:64rpx;border-radius:18rpx;background:#E6F4EE;color:#176B5B;font-size:30rpx;line-height:1;}
+.icon-button:active{background:#D5EDE3;}
+.icon-star{font-size:34rpx;color:#C7D0CC;}
+.icon-star--on{color:#F5C451;}
+.icon-remove{font-size:28rpx;color:#A6B2AD;}
+.icon-speaker{font-size:28rpx;}

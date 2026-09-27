@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>随机复习 · 大词行喇叭尺寸对比 · 2026-09-26</title>
+<style>
+  :root{
+    --bg:#F3F8EF; --card:#FFFFFF; --ink:#24332F; --ink2:#5F6D68; --muted:#8B9893;
+    --green:#176B5B; --soft:#F0F7F3; --line:#E9F0EC;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    padding:24px 16px 96px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:420px;margin:0 auto}
+  h1{font-size:19px;margin-bottom:6px}
+  .sub{font-size:12.5px;color:var(--muted);line-height:1.7;margin-bottom:16px}
+  .note{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ink2);line-height:1.8;margin-bottom:16px}
+  .phone{background:var(--card);border-radius:14px;box-shadow:0 1px 4px rgba(36,51,47,.06);padding:2px 15px}
+
+  /* ===== 随机复习大词卡（照抄线上结构，random-card padding 50/30 简化为上下示例） ===== */
+  .opt{border:2px solid transparent;border-radius:14px;padding:8px 0 2px;margin:0 -10px;cursor:pointer;transition:border-color .15s,background .15s}
+  .opt:hover{background:var(--soft)}
+  .opt.sel{border-color:var(--green);background:var(--soft)}
+  .opt-tag{display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:2px}
+  .opt-name{font-size:13px;font-weight:700;color:var(--green)}
+  .opt-spec{font-size:11.5px;color:var(--muted)}
+  .badge{font-size:10.5px;font-weight:700;color:#fff;background:var(--green);border-radius:99px;padding:1.5px 8px}
+  .badge.base{background:#A6B2AD}
+  .random-head{display:flex;align-items:baseline;justify-content:center;gap:8px;padding:14px 0 0}
+  .random-word{font-size:28px;font-weight:800;color:var(--ink);line-height:1.3}
+  .word-speak{flex-shrink:0;width:28px;height:28px;font-size:28px;text-align:center}
+  .word-speak::before{content:'\200B'}
+  .spk-ico{display:inline-block;vertical-align:middle;background:center/contain no-repeat;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%209v6h4l5%205V4L7%209H3z%20M16.5%2012c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73%202.5-2.25%202.5-4.02z%20M14%203.23v2.06c2.89.86%205%203.54%205%206.71s-2.11%205.85-5%206.71v2.06c4.01-.91%207-4.49%207-8.77s-2.99-7.86-7-8.77z'%20fill='%23176B5B'/%3E%3C/svg%3E")}
+  .v-base .spk-ico{width:25.2px;height:25.2px}                 /* 0.9em（本次已改基线） */
+  .v-a .spk-ico{width:28px;height:28px}                        /* 1.0em，盒 56rpx 不变 */
+  .v-b .spk-ico{width:30.8px;height:30.8px} .v-b .word-speak{width:32px;height:32px}  /* 1.1em，盒 64rpx */
+  .v-c .spk-ico{width:33.6px;height:33.6px} .v-c .word-speak{width:36px;height:36px}  /* 1.2em，盒 72rpx */
+  .random-zh{margin-top:15px;text-align:center}
+  .random-zh-main{font-size:18px;color:var(--ink2)}
+  .random-zh-ex{font-size:13px;color:var(--muted);margin-top:8px}
+  .random-actions{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding:0 2px 12px;font-size:14px;color:var(--ink2)}
+  .hint{font-size:10.5px;color:var(--muted);text-align:center;margin-top:2px}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));font-size:13px;text-align:center;color:var(--ink2)}
+  .bar b{color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>随机复习 · 大词行喇叭 加大对比</h1>
+  <div class="sub">375 逻辑宽 1:1。大词 56rpx(28px) 区域独立于普通词行，系数可以单独加大，不影响「单词行 0.9em / 例句 0.85em」的定稿。点行打勾，把选择发我。</div>
+  <div class="note">基线 = 本次刚改的 0.9em（50rpx ≈ 25px）。加大后图标会以词的 x 高度中心为锚向上扩展，基线对齐机制不变。B/C 需把喇叭盒（同时是点按热区）从 56rpx 扩到 64/72rpx，代码里各一行。</div>
+
+  <div class="phone">
+    <div class="opt v-base" data-v="基线 0.9em（25.2px）">
+      <div class="opt-tag"><span class="opt-name">基线（已改）</span><span class="badge base">0.9em = 50rpx ≈ 25px</span></div>
+      <div class="random-head"><span class="random-word">family</span><span class="word-speak"><span class="spk-ico"></span></span></div>
+      <div class="random-zh"><div class="random-zh-main">n. 家庭；家人</div><div class="random-zh-ex">There are four people in my family.</div></div>
+      <div class="random-actions"><span>⭐ 收藏</span><span>认识 / 不认识</span></div>
+    </div>
+
+    <div class="opt v-a" data-v="A 1.0em（28px）">
+      <div class="opt-tag"><span class="opt-name">A</span><span class="badge">1em = 56rpx = 28px</span><span class="opt-spec">与词字号同高 · 盒 56rpx 不动</span></div>
+      <div class="random-head"><span class="random-word">family</span><span class="word-speak"><span class="spk-ico"></span></span></div>
+      <div class="random-zh"><div class="random-zh-main">n. 家庭；家人</div><div class="random-zh-ex">There are four people in my family.</div></div>
+      <div class="random-actions"><span>⭐ 收藏</span><span>认识 / 不认识</span></div>
+    </div>
+
+    <div class="opt v-b" data-v="B 1.1em（30.8px）">
+      <div class="opt-tag"><span class="opt-name">B</span><span class="badge">1.1em ≈ 62rpx ≈ 31px</span><span class="opt-spec">超出词字高 · 盒扩 64rpx</span></div>
+      <div class="random-head"><span class="random-word">family</span><span class="word-speak"><span class="spk-ico"></span></span></div>
+      <div class="random-zh"><div class="random-zh-main">n. 家庭；家人</div><div class="random-zh-ex">There are four people in my family.</div></div>
+      <div class="random-actions"><span>⭐ 收藏</span><span>认识 / 不认识</span></div>
+    </div>
+
+    <div class="opt v-c" data-v="C 1.2em（33.6px）">
+      <div class="opt-tag"><span class="opt-name">C</span><span class="badge">1.2em ≈ 67rpx ≈ 34px</span><span class="opt-spec">明显大于词 · 盒扩 72rpx</span></div>
+      <div class="random-head"><span class="random-word">family</span><span class="word-speak"><span class="spk-ico"></span></span></div>
+      <div class="random-zh"><div class="random-zh-main">n. 家庭；家人</div><div class="random-zh-ex">There are four people in my family.</div></div>
+      <div class="random-actions"><span>⭐ 收藏</span><span>认识 / 不认识</span></div>
+    </div>
+  </div>
+  <div class="hint" style="margin-top:10px">普通词行（0.9em=14.4px）与例句（0.85em≈11px）维持上轮定稿，本图只调大词行这一处。</div>
+</div>
+<div class="bar" id="bar">点选后这里显示你的选择</div>
+<script>
+  document.querySelectorAll('.opt').forEach(function(el){
+    el.addEventListener('click',function(){
+      document.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel')});
+      el.classList.add('sel');
+      document.getElementById('bar').innerHTML='已选 —— 大词行喇叭：<b>'+el.dataset.v+'</b>（把这行发我即可）';
+    });
+  });
+</script>
+</body>
+</html>

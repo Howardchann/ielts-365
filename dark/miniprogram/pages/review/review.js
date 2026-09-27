@@ -1,0 +1,222 @@
+// pages/review/review.js —— 复习：随机抽查 + 重点词
+const plan = require('../../utils/data.js');
+const store = require('../../utils/store.js');
+const theme = require('../../utils/theme.js');
+const speech = require('../../utils/speech.js');
+
+Page({
+  data: {
+    // 主题 data 初始化（与 tabBar 同款）：首帧即正确深浅，见 today.js 注释
+    dark: theme.isDark(),
+    pageStyle: theme.isDark() ? 'background-color:#0E1618;' : '',
+    // 自定义导航栏（v1.1.34）：标题走 data 绑定 <nav-bar title>
+    navTitle: '复习巩固',
+    poolSize: 0,
+    dueCount: 0,
+    // v1.1.38 串卡修复：随机/到期两个 tab 各记各的当前词，互不串显。
+    // 旧版共用一份 current —— 到期页设的词切到随机页还在（wxml 两块卡片都绑 {{current}}）
+    currentRandom: null,   // {w, m, p, e, ai, starred}
+    currentDue: null,
+    showZh: false,
+    starred: [],
+    playingWord: '',
+    tab: 'random',      // random | due | starred
+  },
+
+  onLoad() {
+    // 同值守卫：data 已初始化为主题值，此处通常 0 次 setData
+    theme.applyPage(this); theme.syncTabBar(this);
+    // 监听器返回取消函数，页面卸载时注销（旧实现会永久堆积回调）
+    this._offSpeech = speech.onStateChange((payload) => {
+      const upd = { playingWord: payload.playing ? payload.text : '' };
+      if (payload.playing && payload.text) {
+        const lit = Math.round((payload.progress || 0) * payload.text.length);
+        upd.karaLit = payload.text.slice(0, lit);
+        upd.karaRest = payload.text.slice(lit);
+      } else { upd.karaLit = ''; upd.karaRest = ''; }
+      this.setData(upd);
+    });
+  },
+
+  onUnload() {
+    speech.stop();
+    if (this._offSpeech) this._offSpeech();
+    this._offSpeech = null;
+  },
+
+  applyTheme() { theme.applyPage(this); theme.syncTabBar(this); },
+  onHide() {
+    // 盖罩上幕（v1.1.32）：页面被盖住的瞬间就罩纯背景罩。隐藏期间合成器有充足时间把罩
+    // 合成入帧——之后无论从哪切回（底部 tab / 设置页 deep-link），切换瞬间的残帧必然是
+    // 纯背景色，旧 tab 内容物理上无帧可现。（v1.1.28~31 三轮证明：渲染回调后 switchTab
+    // 仍会补出盖罩前旧帧，录屏 s128 实锤——残帧在合成器层，JS 时序赌不赢，只能提前布景）
+    if (!this.data.veil) this.setData({ veil: true });
+  },
+
+  onShow() {
+    // 撤罩与换 tab 合并成一次原子 setData（v1.1.32）：不存在「先撤罩露旧 tab、再换 tab」
+    // 的中间帧。普通返回（无 flag）只撤罩，罩下就是当前 tab 内容，一帧内恢复。
+    // 设置页「学习进度」跳转指定 tab（v1.1.27）：重点词→starred、复习记录→random。
+    // switchTab 无法带参 → 经 globalData.reviewTab 传递，消费后立即清掉（不影响正常切 tab）
+    const app = getApp();
+    const flag = app && app.globalData && app.globalData.reviewTab;
+    if (flag) app.globalData.reviewTab = null;
+    if (flag && flag !== this.data.tab) {
+      this.setData({ tab: flag, veil: false });
+      if (flag === 'due' && !this.data.currentDue) this.onNextDue();
+    } else if (this.data.veil) {
+      this.setData({ veil: false });
+    }
+    // 暴露实例给跨栈预切换（v1.1.28）：tab 页常驻不卸载，设置页在 switchTab「之前」直接对
+    // 本实例 setData 换 tab，切过来首帧即目标 tab——否则 webview 先恢复上次旧 tab 的 DOM、
+    // onShow 的 setData 晚一帧才换，出现「random→starred 瞬移」闪现（v1.1.27 真机实锤）
+    if (app && app.globalData) app.globalData._reviewPage = this;
+    theme.syncTabBar(this, 2);
+    this.applyTheme();
+    store.onResume();
+    this._pool = null;
+    this.refreshPool();
+    // 收藏列表同值守卫（新数组实例同值也会触发重渲染）
+    const starred = store.get('starredWords') || [];
+    const sj = JSON.stringify(starred);
+    if (sj !== this._starredJson) { this._starredJson = sj; this.setData({ starred }); }
+  },
+
+  refreshPool() {
+    if (!this._pool) this._pool = plan.learnedWords(store.get('checkedDays'));
+    // 同值不 setData（setData 无 diff，同值也整树重渲染 → 切 tab 闪屏）
+    const p = this._pool.length, d = store.dueWords(this._pool).length;
+    if (p !== this.data.poolSize || d !== this.data.dueCount) this.setData({ poolSize: p, dueCount: d });
+    return this._pool;
+  },
+
+  onTab(e) {
+    const t = e.currentTarget.dataset.tab;
+    this.setData({ tab: t });
+    // v1.1.38：首次进到期页抽一个词（不自动朗读）；已在到期页再点不再换词（保持当前词）
+    if (t === 'due' && !this.data.currentDue) this.onNextDue();
+  },
+
+  fb() { return this.selectComponent('#fb'); },
+
+  onNextDue() {
+    const pool = store.dueWords(this.refreshPool());
+    if (!pool.length) {
+      this.setData({ currentDue: null });
+      this.fb().toast('今天没有到期词，继续学习即可');
+      return;
+    }
+    const item = pool[Math.floor(Math.random() * pool.length)];
+    // v1.1.38：去掉自动朗读 —— 朗读统一走卡片上的喇叭（onSpeakCurrent），点进卡片是静默的
+    this.setData({ currentDue: Object.assign({}, item, { starred: store.isStarred(item.w) }), showZh: false });
+  },
+
+  onReviewResult(e) {
+    const remembered = e.currentTarget.dataset.result === 'remember';
+    const c = this.data.currentDue;
+    if (!c) return;
+    store.reviewWord(c.w, remembered);
+    // 长文字 toast 在快速连按时反复弹出，像整个模块在闪 —— 改短文案+短时长
+    this.fb().toast(remembered ? '已记住' : '稍后再来', 800);
+    // 到期 tab：先算好下一词、一次 setData 直接切换。
+    // 旧写法先 setData({current:null}) 再 onNextDue()，中间会渲染一帧
+    // 「目前没有到期复习词」空状态 —— 连按闪现整个模块的真凶就是它。
+    const pool = store.dueWords(this.refreshPool());
+    if (pool.length) {
+      const item = pool[Math.floor(Math.random() * pool.length)];
+      const next = Object.assign({}, item, { starred: store.isStarred(item.w) });
+      this.setData({ currentDue: next, showZh: false }); // v1.1.38：下一词同样不自动朗读
+      return;
+    }
+    // 真正没有下一词（到期答完）才显示空状态卡片
+    this.setData({ currentDue: null, showZh: false });
+  },
+
+  // 抽一个词：优先重点词（30%），并尽量避开上一次抽到的词
+  pickItem(pool, starred, avoidWord) {
+    let item = null;
+    for (let tries = 0; tries < 4; tries++) {
+      if (starred.length && Math.random() < 0.3) {
+        item = starred[Math.floor(Math.random() * starred.length)];
+      } else {
+        item = pool[Math.floor(Math.random() * pool.length)];
+      }
+      if (!avoidWord || item.w !== avoidWord || pool.length < 2) break;
+    }
+    return item;
+  },
+
+  // ---- 随机复习 ----
+  onNext() {
+    const pool = this.refreshPool();
+    if (!pool.length) {
+      this.setData({ currentRandom: null });
+      this.fb().toast('先去打卡几天，词汇池才有内容');
+      return;
+    }
+    const starred = store.get('starredWords') || [];
+    const item = this.pickItem(pool, starred, this._lastWord);
+    this._lastWord = item.w;
+    // 重点词池里的对象是副本，没有 starred 字段 —— 必须按单词实际状态回填，否则已收藏的词永远显示"未收藏"
+    // v1.1.38：去掉自动朗读，与到期 tab 统一为手动喇叭
+    this.setData({ currentRandom: Object.assign({}, item, { starred: store.isStarred(item.w) }), showZh: false });
+  },
+
+  onShowZh() { this.setData({ showZh: true }); },
+
+  // v1.1.38：当前卡片随 tab 走 —— 两块卡片各绑各的数据，朗读/收藏/释义操作都作用在本 tab 的词上
+  _cur() { return this.data.tab === 'due' ? this.data.currentDue : this.data.currentRandom; },
+
+  onSpeakCurrent() {
+    const c = this._cur();
+    if (!c) return;
+    if (this.data.playingWord === c.w) {
+      const r = speech.togglePause();
+      this.setData({ playingWord: r === 'paused' ? '' : c.w });
+      return;
+    }
+    speech.speak(c.w, { ai: c.ai, kind: 'w' });
+    this.setData({ playingWord: c.w });
+  },
+
+  onSpeakExample() {
+    const c = this._cur();
+    if (!c || !c.e) return;
+    speech.speak(c.e, { ai: c.ai, kind: 's' });
+  },
+
+  onStarCurrent() {
+    const key = this.data.tab === 'due' ? 'currentDue' : 'currentRandom';
+    const c = this.data[key];
+    if (!c) return;
+    const starred = store.toggleStar(c);
+    this.setData({
+      starred: store.get('starredWords') || [],
+      [key + '.starred']: starred,
+    });
+  },
+
+  // ---- 重点词列表 ----
+  onSpeakStarred(e) {
+    const w = e.currentTarget.dataset.word;
+    if (this.data.playingWord === w) {
+      const r = speech.togglePause();
+      this.setData({ playingWord: r === 'paused' ? '' : w });
+      return;
+    }
+    // 重点词列表只传了单词文本，需从收藏数组里取回音频编号
+    const it = (this.data.starred || []).filter(x => x && x.w === w)[0];
+    speech.speak(w, { ai: it && it.ai, kind: 'w' });
+    this.setData({ playingWord: w });
+  },
+
+  onRemoveStarred(e) {
+    const i = e.currentTarget.dataset.index;
+    const starred = store.get('starredWords') || [];
+    if (i >= 0 && i < starred.length) {
+      store.toggleStar(starred[i]);
+      this.setData({ starred: store.get('starredWords') || [] });
+      this.fb().toast('已移除');
+    }
+  },
+});

@@ -1,0 +1,9 @@
+{
+  "name": "audio-url",
+  "version": "1.0.0",
+  "description": "批量签发云存储音频的临时访问链接（绕过免费期锁定的存储权限）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

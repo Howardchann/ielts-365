@@ -1,0 +1,17 @@
+<!-- 轻提示：白卡 + 绿勾，屏幕中上部 -->
+<view class="fb-toast" wx:if="{{toast.show}}">
+  <view class="fb-toast-ico">✓</view>
+  <text class="fb-toast-msg">{{toast.msg}}</text>
+</view>
+
+<!-- 白卡弹窗：替代原生 showModal 的深色大块 -->
+<view class="fb-mask" wx:if="{{modal.show}}" catchtouchmove="noop" catchtap="noop">
+  <view class="fb-card" catchtap="noop">
+    <view class="fb-title" wx:if="{{modal.title}}">{{modal.title}}</view>
+    <text class="fb-content" wx:if="{{modal.content}}">{{modal.content}}</text>
+    <view class="fb-btns">
+      <view class="fb-btn fb-btn--cancel" wx:if="{{modal.showCancel}}" hover-class="fb-btn--press" bindtap="onCancel">{{modal.cancelText}}</view>
+      <view class="fb-btn fb-btn--confirm {{modal.danger ? 'fb-btn--danger' : ''}}" hover-class="fb-btn--press" bindtap="onConfirm">{{modal.confirmText}}</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "设置",
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "white",
+  "usingComponents": { "feedback": "/components/feedback/feedback", "nav-bar": "/components/nav-bar/index" }
+}

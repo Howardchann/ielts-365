@@ -1,0 +1,4 @@
+{
+  "desc": "开溜6.5 学习计划",
+  "rules": [{ "action": "allow", "page": "*" }]
+}

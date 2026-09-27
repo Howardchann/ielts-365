@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图标一致性实测审计 · ielts-365</title>
+<style>
+:root{
+  --bg:#F3F8EF;--card:#FFFFFF;--ink:#24332F;--ink2:#5F6D68;--muted:#8B9893;
+  --green:#176B5B;--soft:#F0F7F3;--soft2:#E6F4EE;--press-green:#DCEFE7;
+  --line:#E9F0EC;--red:#C0392B;--amber:#B26A00;--ok:#1E8E5A;--heart:#FF8A78;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);padding:28px 16px 120px}
+.wrap{max-width:820px;margin:0 auto}
+h1{font-size:21px;font-weight:800;letter-spacing:.5px}
+.sub{font-size:13px;color:var(--muted);margin:8px 0 24px;line-height:1.7}
+.note{background:#FFF8E8;border:1px solid #F0E0B8;border-radius:12px;padding:10px 14px;font-size:12.5px;color:#7A5B12;line-height:1.7;margin-bottom:22px}
+.card{background:var(--card);border-radius:16px;padding:20px 22px;margin-bottom:20px;box-shadow:0 2px 10px rgba(23,107,91,.06)}
+.card h2{font-size:15px;font-weight:800;color:var(--green);margin-bottom:4px}
+.card .desc{font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.7}
+.verdict{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:8px;vertical-align:2px}
+.v-ok{background:#E2F5EC;color:var(--ok)}
+.v-warn{background:#FFF1E8;color:var(--amber)}
+.phone{background:var(--bg);border-radius:14px;padding:14px;width:375px}
+.row-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--card);margin-bottom:8px}
+.word{font-size:16px;font-weight:800}
+.pos{font-size:12px;color:var(--muted);font-style:italic}
+.wstar{display:inline-flex;align-items:center;justify-content:center;padding:4px;border-radius:8px}
+.tip{font-size:13px;color:var(--ink2);line-height:2}
+.starbig{display:flex;align-items:center;gap:5px;font-size:14px;color:var(--ink2);padding:5px}
+/* 真实尺寸（375 逻辑宽 1rpx=0.5px） */
+.ico{display:inline-block;width:15px;height:15px;background:center/contain no-repeat;margin-right:5px;vertical-align:-4px}
+.star-ico{display:inline-block;vertical-align:middle;width:20px;height:18px;background:center/contain no-repeat}
+.ico-inline{display:inline-block;width:13px;height:13px;vertical-align:-2px;margin:0 2px;background-position:center;background-size:contain;background-repeat:no-repeat}
+.sv-eye{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23176B5B' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z'/%3E%3Ccircle cx='12' cy='12' r='2.6'/%3E%3C/svg%3E")}
+.sv-play{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 5v14l11-7z' fill='%23176B5B'/%3E%3C/svg%3E")}
+.sv-check{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.8l5 5L19.5 7' fill='none' stroke='%23176B5B' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.sv-heart-o{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20.1C7.7 16.9 4 13.7 3 10.7 2.1 7.8 3.8 5.1 6.6 4.6 8.5 4.3 10.5 5.2 12 6.9 13.5 5.2 15.5 4.3 17.4 4.6 20.2 5.1 21.9 7.8 21 10.7 20 13.7 16.3 16.9 12 20.1Z' fill='none' stroke='%23FF8A78' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.sv-heart-f{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20.1C7.7 16.9 4 13.7 3 10.7 2.1 7.8 3.8 5.1 6.6 4.6 8.5 4.3 10.5 5.2 12 6.9 13.5 5.2 15.5 4.3 17.4 4.6 20.2 5.1 21.9 7.8 21 10.7 20 13.7 16.3 16.9 12 20.1Z' fill='%23FF8A78'/%3E%3C/svg%3E")}
+.btn-ghost{background:transparent;color:var(--green);border:none;border-radius:22px;font-size:15px;display:inline-flex;align-items:center;justify-content:center;line-height:1.3;padding:4px 10px;font-family:inherit}
+.btn-primary{background:var(--soft);color:var(--green);border:none;border-radius:22px;font-size:15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1.3;padding:4px 10px;font-family:inherit}
+.done-state{display:flex;align-items:center;justify-content:center;color:var(--green);font-size:14px;font-weight:700;padding:8px 0}
+.btn-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+/* 测量覆盖 */
+.meas{position:relative}
+.ov{position:absolute;pointer-events:none}
+.gapline{height:1px;background:var(--green)}
+.dimtag{position:absolute;font-size:10px;color:var(--green);font-weight:700;white-space:nowrap;background:rgba(255,255,255,.85);padding:0 3px;border-radius:4px}
+.ctl{position:absolute;font-size:10px;font-weight:700;white-space:nowrap}
+.ctl-text{color:#B26A00;border-top:1px dashed #B26A00}
+.ctl-ico{color:#2B6CB0;border-top:1px dashed #2B6CB0}
+.qrow{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.qrow:last-child{border-bottom:none}
+.qnum{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--soft2);color:var(--green);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.qbody{flex:1}
+.qtitle{font-size:13.5px;font-weight:700;margin-bottom:6px}
+.qdemo{margin:8px 0}
+.qans{font-size:12.5px;line-height:1.8}
+.qans b.ok{color:var(--ok)}.qans b.no{color:var(--red)}
+/* 点选 */
+.pick{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:all .15s;background:var(--card)}
+.pick:hover{border-color:var(--green)}
+.pick.sel{border-color:var(--green);background:var(--soft)}
+.pick .cb{flex-shrink:0;width:20px;height:20px;border-radius:6px;border:2px solid var(--muted);margin-top:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.pick.sel .cb{background:var(--green);border-color:var(--green)}
+.pick .pt{font-size:13.5px;font-weight:700}
+.pick .pd{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.7}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:1px}
+.t-safe{background:#E2F5EC;color:var(--ok)}
+.t-zero{background:#E8F0FE;color:#2B6CB0}
+.t-skip{background:#F0F1F3;color:var(--muted)}
+.summary{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:14px 16px;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:9}
+.summary .sin{max-width:788px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.stext{flex:1;font-size:13.5px;font-weight:700;color:var(--green)}
+.hint{font-size:11.5px;color:var(--muted);font-weight:400;display:block;margin-top:2px}
+.codechip{font-family:Menlo,Consolas,monospace;font-size:11px;background:var(--soft);padding:1px 6px;border-radius:5px;color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>图标一致性 · 实测审计</h1>
+  <div class="sub">两个问题的实测结果（375 逻辑宽 1:1，全部数字来自 app.wxss 现行代码，非方案稿）。本页回答"现在是否一致"，末尾是可选的修复项。</div>
+
+  <div class="card">
+    <h2>问① 爱心：不同页面的爱心大小是否一致？<span class="verdict v-ok">✓ 已一致</span></h2>
+    <div class="desc">全应用可点收藏爱心只有 <b>2 处</b>，且共用同一个类 <span class="codechip">.star-ico</span>（40×36rpx 盒，图形 contain 居中实际显示 36×36）；行内示意小爱心 2 处共用 <span class="codechip">.ico-inline.ico-heart</span>（26×26rpx）——是"示意图标"语义，与可点按钮本来就分两档。</div>
+    <div class="phone">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">实例 A · 今日页 词行收藏键（star-ico，20×18px 盒 → 图形 18×18）</div>
+      <div class="row-item"><span class="word">family</span><span class="pos">n. 家庭</span><span style="flex:1"></span><span class="wstar"><span class="star-ico sv-heart-o"></span></span></div>
+      <div style="font-size:11px;color:var(--muted);margin:10px 0 8px">实例 B · 复习页随机复习 收藏按钮（同一个 star-ico 类，同尺寸）</div>
+      <div class="row-item" style="justify-content:center"><span class="starbig"><span class="star-ico sv-heart-f"></span>已收藏</span></div>
+      <div style="font-size:11px;color:var(--muted);margin:10px 0 8px">实例 C/D · 行内示意（今日页提示 / 复习页空态，同一个 ico-heart，13×13px）</div>
+      <div class="tip">可以提前浏览 Day 1 的内容：点<span class="ico-inline sv-heart-o"></span>收藏重点词</div>
+    </div>
+    <div class="desc" style="margin-top:12px">注：<span class="codechip">.star-ico</span> 盒是 40×36 非正方——但图形 contain 居中后视觉就是 18×18 正方，<b>观感零差异</b>，只是代码卫生项。</div>
+  </div>
+
+  <div class="card">
+    <h2>问②③ 文字型按钮图标：间距 / 长宽 / 中心对齐<span class="verdict v-ok">间距✓</span><span class="verdict v-ok">长宽✓</span><span class="verdict v-warn">对齐 3/4</span></h2>
+    <div class="desc">全应用 <b>15 处</b>文字+图标按钮共用一个类 <span class="codechip">.ico</span>（30×30rpx 正方）+ 一个间距 token <span class="codechip">--ico-gap:10rpx</span>——所以前两问<b>天然全等</b>。垂直对齐靠 <span class="codechip">vertical-align:-8rpx</span>（按 30rpx 字号调的魔法数）：30rpx 字的按钮全部对齐；唯一例外 = 「今日已完成」（字号 28rpx，图标仍是 30rpx）。</div>
+    <div class="phone" id="mbox">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">实测 1 · 复习页「显示释义」（btn-ghost，字 15px / 图标 15px / 间距 5px）</div>
+      <div class="btn-row meas"><button class="btn-ghost"><span class="ico sv-eye"></span>显示释义</button></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">实测 2 · 今日页「朗读全部」（btn-ghost，同一 .ico）</div>
+      <div class="btn-row meas"><button class="btn-ghost"><span class="ico sv-play"></span>朗读全部</button></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">实测 3 · 今日页「完成打卡」（btn-primary，图标在文字后）</div>
+      <div class="btn-row meas"><button class="btn-primary">完成打卡<span class="ico sv-check" style="margin-left:5px;margin-right:0"></span></button></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">实测 4 · 今日页「今日已完成」（done-state，字 14px / 图标 15px ← 唯一例外）</div>
+      <div class="btn-row meas"><div class="done-state">今日已完成<span class="ico sv-check" style="margin-left:5px;margin-right:0"></span></div></div>
+    </div>
+    <div class="desc" style="margin-top:12px">蓝虚线 = 图标中心，橙虚线 = 文字中心。实测 1–3 两条线基本重合（偏差 ≤1px，观感对齐）；实测 4 图标比字大 1px、中心偏 ≈1.4px——放大看就是"勾比字大、微微下沉"的头重脚轻。</div>
+  </div>
+
+  <div class="card">
+    <h2>修复项（点选，可多选 / 也可全不选）</h2>
+    <div class="pick" data-k="R1">
+      <div class="cb">✓</div>
+      <div><div class="pt">R1 · .ico em 化（复刻喇叭逻辑）<span class="tag t-safe">30rpx 按钮视觉零变化</span></div>
+      <div class="pd">width:1em;height:1em;vertical-align:-0.14em 随所在按钮字号自适应——「今日已完成」自动 14px 对齐，未来任何字号的按钮不再需要手调魔法数。</div></div>
+    </div>
+    <div class="pick" data-k="R2">
+      <div class="cb">✓</div>
+      <div><div class="pt">R2 · 只修「今日已完成」一处<span class="tag t-skip">最小改动</span></div>
+      <div class="pd">该处图标单独降为 28rpx，其余 14 处不动。改动最小，但下次出现新字号还得手调。</div></div>
+    </div>
+    <div class="pick" data-k="R3">
+      <div class="cb">✓</div>
+      <div><div class="pt">R3 · star-ico 盒正方化（40×36 → 36×36）<span class="tag t-zero">观感零变化</span></div>
+      <div class="pd">纯代码卫生：盒与图形一致，消除 2rpx 水平余量的隐性间隙。图形、大小、位置全不变。</div></div>
+    </div>
+    <div class="pick" data-k="R0">
+      <div class="cb">✓</div>
+      <div><div class="pt">R0 · 全部不动<span class="tag t-skip">维持现状</span></div>
+      <div class="pd">三问实测已基本全等，唯一例外偏差 ≈1.4px 且仅一处——不修也完全说得过去。</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="summary"><div class="sin">
+  <div class="stext" id="sum">点击上方卡片选择修复项<span class="hint">爱心无需修（已一致）；R1/R2 二选一，R3 可叠加</span></div>
+</div></div>
+
+<script>
+document.querySelectorAll('.meas').forEach(function(box){
+  var btns=box.querySelectorAll('.btn-row');
+  btns.forEach(function(row){
+    var txt=row.querySelector('.btn-ghost,.btn-primary,.done-state');
+    var ico=row.querySelector('.ico');
+    if(!txt||!ico)return;
+    var tr=txt.getBoundingClientRect(),ir=ico.getBoundingClientRect(),br=row.getBoundingClientRect();
+    var l1=document.createElement('div');l1.className='ov ctl ctl-text';
+    l1.style.left='0';l1.style.width=br.width+'px';l1.style.top=(tr.top-br.top+tr.height/2)+'px';l1.textContent='文';
+    var l2=document.createElement('div');l2.className='ov ctl ctl-ico';
+    l2.style.left=(ir.right-br.left+4)+'px';l2.style.top=(ir.top-br.top+ir.height/2)+'px';l2.textContent='图';
+    row.appendChild(l1);row.appendChild(l2);
+  });
+});
+var sel={};
+document.querySelectorAll('.pick').forEach(function(p){
+  p.addEventListener('click',function(){
+    var k=p.dataset.k;
+    if(k==='R0'){sel={};if(!p.classList.contains('sel')){p.classList.add('sel');sel.R0=1;}else{p.classList.remove('sel');}
+    }else{document.querySelector('[data-k=R0]').classList.remove('sel');delete sel.R0;
+      p.classList.toggle('sel');if(p.classList.contains('sel'))sel[k]=1;else delete sel[k];}
+    var ks=Object.keys(sel);
+    var map={R1:'.ico em 化',R2:'只修今日已完成',R3:'star-ico 正方盒',R0:'全部不动'};
+    document.getElementById('sum').innerHTML=ks.length?('已选：'+ks.map(function(k){return map[k];}).join(' ＋ ')+'<span class="hint">把这行发我即可定稿，改完上传体验版</span>'):'点击上方卡片选择修复项<span class="hint">爱心无需修（已一致）；R1/R2 二选一，R3 可叠加</span>';
+  });
+});
+</script>
+</body>
+</html>

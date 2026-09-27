@@ -1,0 +1,61 @@
+// utils/theme.js —— 纯浅色实例（light/）：色系调整模块已整体删除，主题定死浅色。
+// 页面内容换肤 = CSS 变量：page 选择器挂浅色 token（本实例 .theme-dark 永不挂上）；
+// 原生导航栏已全退役（四页 <nav-bar> 自定义）；窗口背景 = app.json 静态色（无 darkmode/theme.json）。
+// API 形状与 cloud 实例保持一致（mode/setMode/isDark/applyPage/syncTabBar/sameSet），页面代码零改动。
+function mode() { return 'light'; }
+function setMode() {}
+
+function isDark() { return false; }
+
+// 窗口背景（下拉露底）手动模式接管；auto 模式完全交给 darkmode+theme.json（跟随系统自动切）。
+// ⚠️ v1.1.34 起四页全部自定义导航栏，setNavigationBarColor 已彻底退役（darkmode+手切打架 =
+// 首帧闪白的根因 API）；栏色由 <nav-bar> 的 CSS 变量 var(--nav-bg) 随 .theme-dark 同帧切换。
+// setBackgroundColor 只作用「当前页」窗口，去重标记按页存（page.__win），后台页在 onShow 时补设。
+function nativeBars(dark, page) {
+  if (mode() === 'auto') return;
+  const stack = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+  const cur = stack.length ? stack[stack.length - 1] : null;
+  if (page && cur && cur !== page) return; // 后台页：跳过，等它 onShow 时再补
+  const win = dark ? '#0E1618' : '#F3F8EF';
+  if (!page || page.__win !== win) {
+    if (page) page.__win = win;
+    try { wx.setBackgroundColor({ backgroundColor: win }); } catch (e) {}
+  }
+}
+
+// 页面级应用：data.dark 驱动根 view 的 theme-dark 类；pageStyle 走 <page-meta>
+// 浅/深两态都显式指定窗口背景，避免从另一主题切回来时先短暂露出默认窗口底色。
+function applyPage(page) {
+  const dark = isDark();
+  const patch = {};
+  if (page.data.dark !== dark) patch.dark = dark;
+  const pageStyle = dark ? 'background-color:#0E1618;' : 'background-color:#F3F8EF;';
+  if (page.data.pageStyle !== pageStyle) patch.pageStyle = pageStyle;
+  if (Object.keys(patch).length) page.setData(patch);
+  nativeBars(dark, page);
+}
+
+// 通用同值守卫：微信 setData 无深度 diff，同值也整树重渲染（切页闪屏根源）。
+// 逐 key JSON 比对，只把真正变化的字段交给 setData。页面 data 不含循环引用，可安全序列化。
+function sameSet(page, patch) {
+  const out = {};
+  for (const k in patch) {
+    const nv = patch[k], ov = page.data[k];
+    if (JSON.stringify(nv) !== JSON.stringify(ov)) out[k] = nv;
+  }
+  if (Object.keys(out).length) page.setData(out);
+}
+
+function syncTabBar(page, active) {
+  if (typeof page.getTabBar !== 'function') return;
+  const bar = page.getTabBar();
+  if (!bar) return;
+  const patch = {};
+  const dark = isDark();
+  if (bar.data.dark !== dark) patch.dark = dark;
+  // active 也守卫：各页 onShow 原先无条件 setData({active})，同值也会让整个 tabBar 重渲染（底部闪）
+  if (typeof active === 'number' && bar.data.active !== active) patch.active = active;
+  if (Object.keys(patch).length) bar.setData(patch);
+}
+
+module.exports = { mode, setMode, isDark, applyPage, syncTabBar, sameSet };

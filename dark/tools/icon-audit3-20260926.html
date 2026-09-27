@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>按钮图标对齐 · 根因与统一方案 · ielts-365</title>
+<style>
+:root{
+  --bg:#F3F8EF;--card:#FFFFFF;--ink:#24332F;--muted:#8B9893;
+  --green:#176B5B;--soft:#F0F7F3;--soft2:#E6F4EE;--press-green:#DCEFE7;
+  --line:#E9F0EC;--red:#C0392B;--amber:#B26A00;--ok:#1E8E5A;--blue:#2B6CB0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);padding:28px 16px 120px}
+.wrap{max-width:820px;margin:0 auto}
+h1{font-size:21px;font-weight:800}
+.sub{font-size:13px;color:var(--muted);margin:8px 0 22px;line-height:1.7}
+.card{background:var(--card);border-radius:16px;padding:20px 22px;margin-bottom:20px;box-shadow:0 2px 10px rgba(23,107,91,.06)}
+.card h2{font-size:15px;font-weight:800;color:var(--green);margin-bottom:4px}
+.desc{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.7}
+.verdict{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:8px}
+.v-red{background:#FDECEA;color:var(--red)}
+.v-ok{background:#E2F5EC;color:var(--ok)}
+.phone{background:var(--bg);border-radius:14px;padding:14px;width:375px;max-width:100%}
+.demo-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.demo{margin-bottom:14px}
+.btnrow{position:relative;padding:6px 4px}
+/* ===== 1:1 复刻线上 CSS（375 宽 1rpx=0.5px）===== */
+.btn-ghost{background:transparent;color:var(--green);border:none;border-radius:22px;font-size:15px;display:flex;align-items:center;justify-content:center;line-height:1.3;padding:4px 10px;font-family:inherit}
+.ico{display:inline-block;width:15px;height:15px;background:center/contain no-repeat;margin-right:5px;vertical-align:-4px}
+.sv-stop{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='6.5' y='6.5' width='11' height='11' rx='2.5' fill='%23176B5B'/%3E%3C/svg%3E")}
+/* settings .btn-voice：覆盖为 inline-block（基线机制） */
+.v-a{display:inline-block;align-self:flex-start;padding:4px 16px;font-size:13.5px;white-space:nowrap}
+/* today .btn-speak-all：inline-flex（flex 居中机制） */
+.v-b{font-size:13.5px;padding:4px 10px;display:inline-flex;align-items:center;justify-content:center}
+/* 修复后：统一 flex + 1em 图标 */
+.fix .ico{width:1em;height:1em;vertical-align:-.12em}
+.fix .v-a{display:inline-flex;align-items:center}
+/* ===== 测量线 ===== */
+.mline{position:absolute;left:0;pointer-events:none;font-size:9.5px;font-weight:700;white-space:nowrap}
+.m-ink{border-top:1.5px solid var(--ok);color:var(--ok)}
+.m-ico{border-top:1px dashed var(--blue);color:var(--blue)}
+.moff{position:absolute;right:4px;font-size:10px;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0 4px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;line-height:1.5}
+th{background:var(--soft);color:var(--green);font-weight:700;font-size:11.5px}
+td .mech{font-size:10.5px;padding:1px 6px;border-radius:8px;font-weight:700}
+.m-flex{background:#E2F5EC;color:var(--ok)}
+.m-base{background:#FDECEA;color:var(--red)}
+.pick{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:all .15s;background:var(--card)}
+.pick:hover{border-color:var(--green)}
+.pick.sel{border-color:var(--green);background:var(--soft)}
+.pick .cb{flex-shrink:0;width:20px;height:20px;border-radius:6px;border:2px solid var(--muted);margin-top:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.pick.sel .cb{background:var(--green);border-color:var(--green)}
+.pick .pt{font-size:13.5px;font-weight:700}
+.pick .pd{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.7}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 8px;border-radius:10px;margin-left:6px}
+.t-safe{background:#E2F5EC;color:var(--ok)}
+.t-zero{background:#E8F0FE;color:var(--blue)}
+.t-skip{background:#F0F1F3;color:var(--muted)}
+.summary{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:14px 16px;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:9}
+.sin{max-width:788px;margin:0 auto}
+.stext{font-size:13.5px;font-weight:700;color:var(--green)}
+.hint{font-size:11.5px;color:var(--muted);font-weight:400;display:block;margin-top:2px}
+.legend{display:flex;gap:16px;font-size:11px;margin:8px 2px 0;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.lg{display:inline-block;width:18px;height:0;border-top:2px solid}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>按钮图标对齐 · 根因实锤 + 统一方案</h1>
+  <div class="sub">你观察到的"两个停止按钮一个偏下一个正常"——不是错觉，是 <b>同一个 .ico 类走了两套对齐机制</b>。本页 1:1 复刻线上 CSS 并实测词墨中心线。</div>
+
+  <div class="card">
+    <h2>根因：两套对齐机制并存<span class="verdict v-red">机制分裂</span></h2>
+    <div class="desc">竖直方向上图标怎么摆，取决于按钮的 display：<b>flex 容器里 vertical-align 失效</b>，走 align-items:center（对齐"行盒中心"）；<b>inline-block 里 vertical-align:-8rpx 生效</b>（对齐"基线-4px"，这数字是按 30rpx 字调的）。设置页试听按钮恰好把 display 覆盖成了 inline-block。</div>
+    <div class="phone">
+      <div class="demo-label">实测 A · 设置页「停止试听」btn-voice（display:inline-block → 基线魔法数 -4px，按 15px 字调的，13.5px 字下偏）</div>
+      <div class="demo"><div class="btnrow"><button class="btn-ghost v-a"><span class="ico sv-stop"></span>停止试听</button></div></div>
+      <div class="demo-label">实测 B · 今日页「停止朗读」btn-speak-all（display:inline-flex → flex 居中）</div>
+      <div class="demo"><div class="btnrow"><button class="btn-ghost v-b"><span class="ico sv-stop"></span>停止朗读</button></div></div>
+      <div class="legend">
+        <span><i class="lg" style="border-color:var(--ok)"></i>词墨中心（文字墨水上下沿中点，canvas 实测）</span>
+        <span><i class="lg" style="border-top-style:dashed;border-color:var(--blue)"></i>图标中心</span>
+      </div>
+      <div class="desc" style="margin-top:10px;margin-bottom:0">偏移数字标注在每行右侧（图标中心 − 词墨中心，正=偏下）。线上机制不同 → 两个按钮一个正一个偏，且固定 15px 图标配 13.5px 字本身还有 1.5px 超差。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>统一方案预览（1em 图标 + 全部 flex 居中）<span class="verdict v-ok">预测偏差 ≤0.5px</span></h2>
+    <div class="desc">改法：① <span class="codechip">.ico</span> 尺寸改 <b>1em</b>（图标=所在按钮字号，27rpx 按钮自动 13.5px，done-state 自动 14px）；② <span class="codechip">.btn-voice</span> 去掉 display:inline-block 覆盖（恢复 flex）。<b>flex 居中 = 行盒中心，而 CJK 词墨中心 ≈ 行盒中心</b>（中文字形在字身框里上下基本对称，偏差 <0.5px）——即天然满足你的"词墨上下沿中点"标准，不再需要任何魔法数。下方为改后 1:1 预览：</div>
+    <div class="phone fix">
+      <div class="demo-label">修复后 A · 停止试听（flex + 1em）</div>
+      <div class="demo"><div class="btnrow"><button class="btn-ghost v-a"><span class="ico sv-stop"></span>停止试听</button></div></div>
+      <div class="demo-label">修复后 B · 停止朗读（flex + 1em）</div>
+      <div class="demo"><div class="btnrow"><button class="btn-ghost v-b"><span class="ico sv-stop"></span>停止朗读</button></div></div>
+      <div class="legend">
+        <span><i class="lg" style="border-color:var(--ok)"></i>词墨中心</span>
+        <span><i class="lg" style="border-top-style:dashed;border-color:var(--blue)"></i>图标中心</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>全量盘点：15 处按钮 = 3 档字号 × 2 套机制</h2>
+    <table>
+      <tr><th>字号</th><th>按钮</th><th>机制</th></tr>
+      <tr><td>30rpx</td><td>显示释义 / 不太会 / 立即同步 / 导出备份 / 导入恢复 / 重新复制 / 收起 / 合并导入 / 覆盖导入 / 完成打卡</td><td><span class="mech m-flex">flex 居中</span></td></tr>
+      <tr><td>27rpx</td><td>停止试听（btn-voice）</td><td><span class="mech m-base">inline-block 基线魔法数</span></td></tr>
+      <tr><td>27rpx</td><td>停止朗读（btn-speak-all）/ 取消打卡（btn-cancel）/ 清除学习记录（btn-reset）</td><td><span class="mech m-flex">flex 居中</span></td></tr>
+      <tr><td>28rpx</td><td>今日已完成（done-state）</td><td><span class="mech m-flex">flex 居中</span>（图标 15px 比字大 1px）</td></tr>
+    </table>
+    <div class="desc" style="margin-bottom:0">另有行内示意图标 <span class="codechip">.ico-inline</span>（13px，嵌文案里）是独立语义，不在本表。爱心跨页已一致，无需动。</div>
+  </div>
+
+  <div class="card">
+    <h2>修复项（点选，可多选 / 全不选）</h2>
+    <div class="pick" data-k="F1">
+      <div class="cb">✓</div>
+      <div><div class="pt">F1 · .ico em 化（1em + 兜底 vertical-align:-.12em）<span class="tag t-safe">30rpx 按钮零变化</span></div>
+      <div class="pd">图标随按钮字号缩放，27/28rpx 按钮自动匹配；彻底退役 -8rpx 魔法数，未来任何字号免手调。</div></div>
+    </div>
+    <div class="pick" data-k="F2">
+      <div class="cb">✓</div>
+      <div><div class="pt">F2 · .btn-voice 恢复 flex（移除 display:inline-block 覆盖）<span class="tag t-zero">治"两个停止按钮不一致"的根</span></div>
+      <div class="pd">全应用图标对齐机制归一为 flex 居中 = 词墨中心。该覆盖当年是为自适应宽度加的，width 由内容撑开在 flex 下同样成立。</div></div>
+    </div>
+    <div class="pick" data-k="R3">
+      <div class="cb">✓</div>
+      <div><div class="pt">R3 · star-ico 盒正方化（40×36 → 36×36）<span class="tag t-zero">观感零变化</span></div>
+      <div class="pd">代码卫生：收藏爱心盒与图形一致，消除 2rpx 隐性水平余量。</div></div>
+    </div>
+    <div class="pick" data-k="R0">
+      <div class="cb">✓</div>
+      <div><div class="pt">R0 · 全部不动<span class="tag t-skip">维持现状</span></div>
+      <div class="pd">保持两套机制现状。</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="summary"><div class="sin">
+  <div class="stext" id="sum">点击上方卡片选择修复项<span class="hint">F1+F2 是一组（推荐一起），R3 可叠加；把这行发我即可定稿上传</span></div>
+</div></div>
+
+<script>
+// canvas 实测 CJK 词墨中心，画测量线
+function inkMetrics(text,px,weight){
+  var c=document.createElement('canvas'),x=c.getContext('2d');
+  x.font=(weight||'400')+' '+px+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+  var m=x.measureText(text);
+  return {asc:m.actualBoundingBoxAscent,desc:m.actualBoundingBoxDescent,
+          fAsc:m.fontBoundingBoxAscent||px*0.88,fDesc:m.fontBoundingBoxDescent||px*0.12};
+}
+document.querySelectorAll('.btnrow').forEach(function(row){
+  var btn=row.querySelector('button'),ico=row.querySelector('.ico');
+  var txtNode=[].find.call(btn.childNodes,function(n){return n.nodeType===3&&n.textContent.trim();});
+  if(!txtNode||!ico)return;
+  var br=row.getBoundingClientRect(),ir=ico.getBoundingClientRect();
+  var fs=parseFloat(getComputedStyle(btn).fontSize),w=getComputedStyle(btn).fontWeight;
+  var km=inkMetrics(txtNode.textContent.trim(),fs,w);
+  // 文本 span 包一层以测行盒
+  var span=document.createElement('span');span.style.display='inline-block';span.style.position='absolute';span.style.visibility='hidden';
+  span.style.font=btn.style.font='';span.className='';
+  span.style.fontSize=fs+'px';span.style.fontWeight=w;
+  span.textContent=txtNode.textContent.trim();
+  btn.appendChild(span);
+  var sr=span.getBoundingClientRect();
+  var fAsc=km.fAsc,fDesc=km.fDesc;
+  // 行盒内基线：行盒(top=sr.top) = 半行距 + 基线上方 fAsc
+  var baseline=sr.top+(sr.height-(fAsc+fDesc))/2+fAsc;
+  var inkCenter=baseline-(km.asc-km.desc)/2;
+  var icoCenter=ir.top+ir.height/2;
+  btn.removeChild(span);
+  var off=icoCenter-inkCenter;
+  var dy=row.getBoundingClientRect();
+  var l1=document.createElement('div');l1.className='mline m-ink';
+  l1.style.top=(inkCenter-dy.top)+'px';l1.textContent='词墨';
+  var l2=document.createElement('div');l2.className='mline m-ico';
+  l2.style.top=(icoCenter-dy.top)+'px';l2.textContent='图标';
+  var o=document.createElement('div');o.className='moff';
+  o.style.top=(inkCenter-dy.top-14)+'px';
+  o.style.color=Math.abs(off)<=0.6?'var(--ok)':'var(--red)';
+  o.textContent=(off>=0?'+':'')+off.toFixed(1)+'px';
+  row.appendChild(l1);row.appendChild(l2);row.appendChild(o);
+});
+var sel={};
+document.querySelectorAll('.pick').forEach(function(p){
+  p.addEventListener('click',function(){
+    var k=p.dataset.k;
+    if(k==='R0'){var on=p.classList.contains('sel');document.querySelectorAll('.pick').forEach(function(q){q.classList.remove('sel');});sel={};if(!on){p.classList.add('sel');sel.R0=1;}}
+    else{document.querySelector('[data-k=R0]').classList.remove('sel');delete sel.R0;p.classList.toggle('sel');if(p.classList.contains('sel'))sel[k]=1;else delete sel[k];}
+    var ks=Object.keys(sel);
+    var map={F1:'.ico em 化',F2:'btn-voice 恢复 flex',R3:'star-ico 正方盒',R0:'全部不动'};
+    document.getElementById('sum').innerHTML=ks.length?('已选：'+ks.map(function(k){return map[k];}).join(' ＋ ')+'<span class="hint">把这行发我即可定稿，改完统一上传体验版</span>'):'点击上方卡片选择修复项<span class="hint">F1+F2 是一组（推荐一起），R3 可叠加；把这行发我即可定稿上传</span>';
+  });
+});
+</script>
+</body>
+</html>

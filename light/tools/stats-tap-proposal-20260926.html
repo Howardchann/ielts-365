@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设置页 · 学习进度数字可点方案对比（2026-09-26）</title>
+<style>
+  :root{
+    --bg:#F3F8EF; --card:#FFFFFF; --ink:#24332F; --muted:#8B9893;
+    --green:#176B5B; --line:#E9F0EC; --soft:#F0F7F3; --press-green:#DCEFE7;
+    --dbg:#0E1618; --dcard:#162324; --dink:#E4EEEA; --dmuted:#7E938B;
+    --dgreen:#7CD6B4; --dline:#223430; --dpress:#233C36;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#EEF3F0;color:#24332F;padding:28px 16px 120px}
+  h1{font-size:20px;font-weight:800;color:#176B5B;text-align:center}
+  .sub{font-size:13px;color:#5F6D68;text-align:center;margin:8px 0 24px;line-height:1.6}
+  .grid{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
+  .col{width:375px}
+  .cap{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+  .tag.base{background:#E9F0EC;color:#5F6D68}
+  .tag.a{background:#DCEFE7;color:#176B5B}
+  .tag.b{background:#176B5B;color:#fff}
+  .note{font-size:12px;color:#8B9893;margin-top:6px;line-height:1.6}
+  .phone{border-radius:18px;overflow:hidden;border:1px solid #DDE7E2;cursor:pointer;transition:box-shadow .15s;position:relative}
+  .phone:hover{box-shadow:0 6px 20px rgba(23,107,91,.12)}
+  .phone.picked{outline:3px solid #176B5B;outline-offset:-3px}
+  .phone.picked .cap-pick{opacity:1}
+  .cap-pick{position:absolute;top:10px;right:12px;font-size:16px;color:#176B5B;opacity:0;transition:.15s}
+  .screen{background:var(--bg);padding:14px 12px 20px}
+  .screen.dark{background:var(--dbg)}
+  .card{background:var(--card);border-radius:10px;padding:14px 15px 16px;box-shadow:0 2px 9px rgba(23,107,91,.06)}
+  .screen.dark .card{background:var(--dcard);box-shadow:none}
+  .section-label{font-size:13px;font-weight:700;color:var(--green);margin-bottom:7px;letter-spacing:.5px}
+  .screen.dark .section-label{color:var(--dgreen)}
+  .stat-row{display:flex;justify-content:space-around}
+  .stat-item{text-align:center;padding:6px 10px;margin:0 2px;border-radius:8px}
+  .stat-item.tap{cursor:pointer}
+  .stat-item.press{background:var(--press-green)}
+  .screen.dark .stat-item.press{background:var(--dpress)}
+  .stat-num{font-size:20px;font-weight:800;color:var(--green);line-height:1.2}
+  .screen.dark .stat-num{color:var(--dgreen)}
+  .stat-denom{font-size:12px;font-weight:400;color:var(--muted)}
+  .screen.dark .stat-denom{color:var(--dmuted)}
+  .stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+  .screen.dark .stat-label{color:var(--dmuted)}
+  .arr{display:inline-block;width:7px;height:7px;border-right:1.6px solid var(--muted);border-top:1.6px solid var(--muted);transform:rotate(45deg);margin-left:5px;vertical-align:2px}
+  .screen.dark .arr{border-color:var(--dmuted)}
+  .rest{margin-top:12px;background:var(--card);border-radius:10px;padding:12px 15px;font-size:12px;color:var(--muted);box-shadow:0 2px 9px rgba(23,107,91,.06)}
+  .screen.dark .rest{background:var(--dcard);color:var(--dmuted);box-shadow:none}
+  .sumbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #DDE7E2;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 -4px 16px rgba(0,0,0,.06);z-index:9}
+  .sumtxt{font-size:14px;font-weight:700;color:#176B5B}
+  .sumhint{font-size:12px;color:#8B9893}
+</style>
+</head>
+<body>
+<h1>设置页「学习进度」数字可点 — 方案对比</h1>
+<div class="sub">1:1 真机尺寸（375 逻辑宽）· 明暗两套 · 按压色 = 主题 --press-green<br>点任意「手机」打勾选择，可多选对比；选好把底部分汇总发我</div>
+
+<div class="grid">
+  <!-- 现状 -->
+  <div class="col">
+    <div class="cap"><span class="tag base">现状</span>纯展示，不可点</div>
+    <div class="phone" data-pick="现状">
+      <span class="cap-pick">✔ 已选</span>
+      <div class="screen">
+        <div class="card">
+          <div class="section-label">学习进度</div>
+          <div class="stat-row">
+            <div class="stat-item"><div class="stat-num">3<span class="stat-denom"> / 546</span></div><div class="stat-label">已完成天数</div></div>
+            <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">重点词</div></div>
+            <div class="stat-item"><div class="stat-num">14</div><div class="stat-label">复习记录</div></div>
+          </div>
+        </div>
+        <div class="rest">外观 · 进度同步 · 计划开始日期 …</div>
+      </div>
+    </div>
+    <div class="note">基准对照：无任何交互暗示。</div>
+  </div>
+
+  <!-- 方案 A -->
+  <div class="col">
+    <div class="cap"><span class="tag a">方案 A</span>可点，不加箭头（裸风格）</div>
+    <div class="phone" data-pick="方案A">
+      <span class="cap-pick">✔ 已选</span>
+      <div class="screen">
+        <div class="card">
+          <div class="section-label">学习进度</div>
+          <div class="stat-row">
+            <div class="stat-item tap"><div class="stat-num">3<span class="stat-denom"> / 546</span></div><div class="stat-label">已完成天数</div></div>
+            <div class="stat-item tap press"><div class="stat-num">0</div><div class="stat-label">重点词</div></div>
+            <div class="stat-item tap"><div class="stat-num">14</div><div class="stat-label">复习记录</div></div>
+          </div>
+        </div>
+        <div class="rest">外观 · 进度同步 · 计划开始日期 …</div>
+      </div>
+    </div>
+    <div class="note">三个数字均加 6px 内边距热区 + 按压底色（中间「重点词」演示按住效果）。外观零变化，可发现性靠按压反馈与使用直觉。</div>
+  </div>
+
+  <!-- 方案 B -->
+  <div class="col">
+    <div class="cap"><span class="tag b">方案 B</span>可点 + 数字右下小箭头</div>
+    <div class="phone" data-pick="方案B">
+      <span class="cap-pick">✔ 已选</span>
+      <div class="screen">
+        <div class="card">
+          <div class="section-label">学习进度</div>
+          <div class="stat-row">
+            <div class="stat-item tap"><div class="stat-num">3<span class="stat-denom"> / 546</span></div><div class="stat-label">已完成天数</div></div>
+            <div class="stat-item tap"><div class="stat-num">0<span class="arr"></span></div><div class="stat-label">重点词</div></div>
+            <div class="stat-item tap"><div class="stat-num">14<span class="arr"></span></div><div class="stat-label">复习记录</div></div>
+          </div>
+        </div>
+        <div class="rest">外观 · 进度同步 · 计划开始日期 …</div>
+      </div>
+    </div>
+    <div class="note">数字右下加 7px 小箭头（与「计划开始日期」picker 的箭头同语言），可发现性最好；代价是三列排版出现不对称细节。</div>
+  </div>
+
+  <!-- 方案 A dark -->
+  <div class="col">
+    <div class="cap"><span class="tag a">方案 A</span>深色模式效果</div>
+    <div class="phone" data-pick="方案A-dark">
+      <span class="cap-pick">✔ 已选</span>
+      <div class="screen dark">
+        <div class="card">
+          <div class="section-label">学习进度</div>
+          <div class="stat-row">
+            <div class="stat-item tap press"><div class="stat-num">3<span class="stat-denom"> / 546</span></div><div class="stat-label">已完成天数</div></div>
+            <div class="stat-item tap"><div class="stat-num">0</div><div class="stat-label">重点词</div></div>
+            <div class="stat-item tap"><div class="stat-num">14</div><div class="stat-label">复习记录</div></div>
+          </div>
+        </div>
+        <div class="rest">外观 · 进度同步 · 计划开始日期 …</div>
+      </div>
+    </div>
+    <div class="note">深色按压色 --dpress #233C36（已完成天数演示按住效果）。</div>
+  </div>
+
+  <!-- 方案 B dark -->
+  <div class="col">
+    <div class="cap"><span class="tag b">方案 B</span>深色模式效果</div>
+    <div class="phone" data-pick="方案B-dark">
+      <span class="cap-pick">✔ 已选</span>
+      <div class="screen dark">
+        <div class="card">
+          <div class="section-label">学习进度</div>
+          <div class="stat-row">
+            <div class="stat-item tap"><div class="stat-num">3<span class="stat-denom"> / 546</span></div><div class="stat-label">已完成天数</div></div>
+            <div class="stat-item tap"><div class="stat-num">0<span class="arr"></span></div><div class="stat-label">重点词</div></div>
+            <div class="stat-item tap"><div class="stat-num">14<span class="arr"></span></div><div class="stat-label">复习记录</div></div>
+          </div>
+        </div>
+        <div class="rest">外观 · 进度同步 · 计划开始日期 …</div>
+      </div>
+    </div>
+    <div class="note">深色下箭头颜色跟随 --dmuted，对比略弱于浅色但可辨。</div>
+  </div>
+</div>
+
+<div class="sumbar">
+  <div class="sumtxt" id="sum">未选择</div>
+  <div class="sumhint">点「手机」打勾 · 再点取消</div>
+</div>
+
+<script>
+  const picked = new Set();
+  document.querySelectorAll('.phone').forEach(ph => {
+    ph.addEventListener('click', () => {
+      const k = ph.dataset.pick;
+      if (picked.has(k)) { picked.delete(k); ph.classList.remove('picked'); }
+      else { picked.add(k); ph.classList.add('picked'); }
+      document.getElementById('sum').textContent = picked.size ? '已选：' + [...picked].join('、') : '未选择';
+    });
+  });
+</script>
+</body>
+</html>

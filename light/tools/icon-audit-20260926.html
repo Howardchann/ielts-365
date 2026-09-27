@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图标一致性审计（2026-09-26）· 爱心 &amp; 文字型按钮图标</title>
+<style>
+  :root{
+    --bg:#F3F8EF; --card:#FFF; --ink:#24332F; --ink2:#5F6D68; --muted:#8B9893; --muted2:#9AA8A2;
+    --green:#176B5B; --line:#E9F0EC; --soft:#F0F7F3; --press-green:#DCEFE7;
+    --heart:#FF8A78;
+    --dbg:#0E1618; --dcard:#162324; --dink:#E4EEEA; --dmuted:#7E938B; --dgreen:#7CD6B4; --dline:#223430;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#EEF3F0;color:#24332F;padding:28px 16px 130px}
+  h1{font-size:20px;font-weight:800;color:#176B5B;text-align:center}
+  .sub{font-size:13px;color:#5F6D68;text-align:center;margin:8px 0 26px;line-height:1.7}
+  h2{font-size:16px;font-weight:800;color:#176B5B;margin:34px 0 6px;padding-left:10px;border-left:4px solid #176B5B}
+  .h2sub{font-size:12.5px;color:#8B9893;margin:0 0 14px 14px;line-height:1.7}
+  .grid{display:flex;flex-wrap:wrap;gap:22px;justify-content:center}
+  .col{width:375px}
+  .cap{font-size:13.5px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+  .tag.base{background:#E9F0EC;color:#5F6D68}
+  .tag.a{background:#DCEFE7;color:#176B5B}
+  .tag.b{background:#176B5B;color:#fff}
+  .note{font-size:12px;color:#8B9893;margin-top:6px;line-height:1.65}
+  .phone{border-radius:18px;overflow:hidden;border:1px solid #DDE7E2;cursor:pointer;transition:box-shadow .15s;position:relative;background:var(--bg)}
+  .phone:hover{box-shadow:0 6px 20px rgba(23,107,91,.12)}
+  .phone.picked{outline:3px solid #176B5B;outline-offset:-3px}
+  .phone.picked .cap-pick{opacity:1}
+  .cap-pick{position:absolute;top:10px;right:12px;font-size:15px;color:#176B5B;opacity:0;transition:.15s;z-index:2}
+  .screen{padding:14px 14px 18px}
+  .card{background:var(--card);border-radius:10px;padding:6px 15px;box-shadow:0 2px 9px rgba(23,107,91,.06)}
+  .card.btns{padding:14px 15px}
+  /* ── 词条行（复刻 today.wxss，375 稿 1rpx=0.5px）── */
+  .word-row{display:flex;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line)}
+  .word-row:last-child{border-bottom:none}
+  .word-speak{flex-shrink:0;width:28px;height:28px;font-size:16px;text-align:center;margin-right:8px;display:inline-flex;align-items:center;justify-content:center;align-self:center}
+  .word-main{flex:1;min-width:0}
+  .word-en{font-size:16px;font-weight:700;color:var(--ink)}
+  .word-zh{font-size:13px;color:var(--ink2);margin-top:2px}
+  .word-star{flex-shrink:0;width:32px;height:32px;font-size:16px;text-align:center;align-self:center;display:inline-flex;align-items:center;justify-content:center}
+  .icobox{display:inline-block;background:center/contain no-repeat}
+  .spk{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9v6h4l5 5V4L7 9H3z M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z' fill='%23176B5B'/%3E%3C/svg%3E")}
+  .heart-off{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20.1C7.7 16.9 4 13.7 3 10.7 2.1 7.8 3.8 5.1 6.6 4.6 8.5 4.3 10.5 5.2 12 6.9 13.5 5.2 15.5 4.3 17.4 4.6 20.2 5.1 21.9 7.8 21 10.7 20 13.7 16.3 16.9 12 20.1Z' fill='none' stroke='%23FF8A78' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E")}
+  .heart-on{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20.1C7.7 16.9 4 13.7 3 10.7 2.1 7.8 3.8 5.1 6.6 4.6 8.5 4.3 10.5 5.2 12 6.9 13.5 5.2 15.5 4.3 17.4 4.6 20.2 5.1 21.9 7.8 21 10.7 20 13.7 16.3 16.9 12 20.1Z' fill='%23FF8A78'/%3E%3C/svg%3E")}
+  .hl{position:relative}
+  .hl::after{content:'';position:absolute;inset:-3px -5px;border:1.5px dashed rgba(23,107,91,.45);border-radius:6px;pointer-events:none}
+  .hl-red::after{border-color:rgba(200,80,60,.5)}
+  /* ── 文字型按钮（复刻 app.wxss）── */
+  .btnrow{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .btnrow:last-child{margin-bottom:0}
+  .btn-primary{background:var(--soft);color:var(--green);border-radius:22px;font-size:15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1.3;padding:4px 10px}
+  .btn-ghost{background:transparent;color:var(--green);border-radius:22px;font-size:15px;display:inline-flex;align-items:center;justify-content:center;line-height:1.3;padding:4px 10px}
+  .done-state{display:inline-flex;align-items:center;justify-content:center;color:var(--green);font-size:14px;font-weight:700;padding:8px 0}
+  .bico{display:inline-block;width:15px;height:15px;background:center/contain no-repeat;flex-shrink:0}
+  .gap-l{margin-right:5px}
+  .gap-r{margin-left:5px}
+  .ico-check{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.8l5 5L19.5 7' fill='none' stroke='%23176B5B' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+  .ico-play{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 5v14l11-7z' fill='%23176B5B'/%3E%3C/svg%3E")}
+  .ico-sync{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23176B5B' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12a8 8 0 1 1-2.4-5.7'/%3E%3Cpath d='M18 3v4h-4'/%3E%3C/svg%3E")}
+  /* 方案：em 化图标 */
+  .em1{width:1em;height:1em;vertical-align:-0.14em}
+  .em1heart{width:.9em;height:.9em}
+  .tbl{width:100%;border-collapse:collapse;margin:10px 0 0 14px;font-size:12.5px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 9px rgba(23,107,91,.06)}
+  .tbl th,.tbl td{padding:7px 10px;text-align:left;border-bottom:1px solid #EEF3F0}
+  .tbl th{background:#F0F7F3;color:#176B5B;font-weight:700}
+  .tbl td.bad{color:#C0392B;font-weight:700}
+  .tbl td.ok{color:#176B5B;font-weight:700}
+  .sumbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #DDE7E2;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 -4px 16px rgba(0,0,0,.06);z-index:9}
+  .sumtxt{font-size:14px;font-weight:700;color:#176B5B}
+  .sumhint{font-size:12px;color:#8B9893}
+</style>
+</head>
+<body>
+<h1>图标一致性审计：收藏爱心 &amp; 文字型按钮图标</h1>
+<div class="sub">1:1 真机尺寸（375 逻辑宽）· 全部用线上真实 SVG 与字号渲染<br>虚线框 = 审计标注，非界面元素。点「手机」打勾选择方案，把底部汇总发我定稿</div>
+
+<h2>① 收藏爱心：长宽 &amp; 锚定机制</h2>
+<div class="h2sub">现状 <b>40×36rpx 非正方形盒 + 固定 rpx</b>（爱心 20×18px，比同行的喇叭 14.4px 宽 39%，且不随字号）；喇叭是 <b>0.9em 正方形 + x-height 中线锚定</b>。两套机制不同源。</div>
+<div class="grid">
+  <div class="col">
+    <div class="cap"><span class="tag base">现状</span>爱心 40×36rpx 固定</div>
+    <div class="phone" data-pick="爱心-现状">
+      <span class="cap-pick">✔</span>
+      <div class="screen"><div class="card">
+        <div class="word-row">
+          <span class="word-speak"><span class="icobox spk" style="width:14.4px;height:14.4px"></span></span>
+          <span class="word-main"><span class="word-en">family</span><div class="word-zh">家；家庭</div></span>
+          <span class="word-star hl hl-red"><span class="icobox heart-off" style="width:20px;height:18px"></span></span>
+        </div>
+        <div class="word-row">
+          <span class="word-speak"><span class="icobox spk" style="width:14.4px;height:14.4px"></span></span>
+          <span class="word-main"><span class="word-en">hello</span><div class="word-zh">你好</div></span>
+          <span class="word-star"><span class="icobox heart-on" style="width:20px;height:18px"></span></span>
+        </div>
+      </div></div>
+    </div>
+    <div class="note">红框=爱心。问题：①盒非正方（40×36）②固定 rpx，与喇叭 em 机制不同源③视觉宽度比喇叭大 39%，行内两个裸图标一大一小。</div>
+  </div>
+  <div class="col">
+    <div class="cap"><span class="tag a">方案 A1</span>爱心 0.9em 正方盒（与喇叭同系数）</div>
+    <div class="phone" data-pick="爱心-A1(0.9em)">
+      <span class="cap-pick">✔</span>
+      <div class="screen"><div class="card">
+        <div class="word-row">
+          <span class="word-speak"><span class="icobox spk" style="width:14.4px;height:14.4px"></span></span>
+          <span class="word-main"><span class="word-en">family</span><div class="word-zh">家；家庭</div></span>
+          <span class="word-star hl"><span class="icobox heart-off" style="width:14.4px;height:14.4px"></span></span>
+        </div>
+        <div class="word-row">
+          <span class="word-speak"><span class="icobox spk" style="width:14.4px;height:14.4px"></span></span>
+          <span class="word-main"><span class="word-en">hello</span><div class="word-zh">你好</div></span>
+          <span class="word-star"><span class="icobox heart-on" style="width:14.4px;height:14.4px"></span></span>
+        </div>
+      </div></div>
+    </div>
+    <div class="note">爱心与喇叭严格同大（14.4px）同锚定，「同类型裸图标一致」彻底闭环；心形 contain 居中、天然宽扁不变形。热区 32px 不变，触控不受影响。</div>
+  </div>
+  <div class="col">
+    <div class="cap"><span class="tag b">方案 A2</span>爱心 1em 正方盒（=词字高）</div>
+    <div class="phone" data-pick="爱心-A2(1em)">
+      <span class="cap-pick">✔</span>
+      <div class="screen"><div class="card">
+        <div class="word-row">
+          <span class="word-speak"><span class="icobox spk" style="width:14.4px;height:14.4px"></span></span>
+          <span class="word-main"><span class="word-en">family</span><div class="word-zh">家；家庭</div></span>
+          <span class="word-star hl"><span class="icobox heart-off" style="width:16px;height:16px"></span></span>
+        </div>
+        <div class="word-row">
+          <span class="word-speak"><span class="icobox spk" style="width:14.4px;height:14.4px"></span></span>
+          <span class="word-main"><span class="word-en">hello</span><div class="word-zh">你好</div></span>
+          <span class="word-star"><span class="icobox heart-on" style="width:16px;height:16px"></span></span>
+        </div>
+      </div></div>
+    </div>
+    <div class="note">爱心 16px=词字高，比喇叭略大一号——收藏是低频主动作，略突出有理；介于现状 20px 与 A1 14.4px 之间。</div>
+  </div>
+</div>
+
+<h2>② 文字型按钮图标：尺寸 / 间距 / 水平位置</h2>
+<div class="h2sub">现状 <b>.ico 固定 30rpx（15px）+ vertical-align:-8rpx magic number</b>。间距已是统一 token --ico-gap（10rpx=5px）没问题；问题是图标<b>不随字号</b>：「今日已完成」字号 14px 配 15px 图标（比字大），且换字号时 -8rpx 对齐会漂。</div>
+<table class="tbl">
+  <tr><th>按钮</th><th>字号</th><th>图标</th><th>现状关系</th></tr>
+  <tr><td>完成打卡（btn-primary）</td><td>15px</td><td>15px</td><td class="ok">= 字号 ✓</td></tr>
+  <tr><td>朗读全部 / 停止（btn-ghost）</td><td>15px</td><td>15px</td><td class="ok">= 字号 ✓</td></tr>
+  <tr><td>立即同步 / 试听发音（btn-ghost）</td><td>15px</td><td>15px</td><td class="ok">= 字号 ✓</td></tr>
+  <tr><td>今日已完成（done-state）</td><td class="bad">14px</td><td class="bad">15px</td><td class="bad">图标 &gt; 字号 ✗</td></tr>
+  <tr><td>ico-gap 间距</td><td colspan="2">5px 统一 token</td><td class="ok">✓ 无需动</td></tr>
+</table>
+<div class="grid" style="margin-top:16px">
+  <div class="col">
+    <div class="cap"><span class="tag base">现状</span>.ico 固定 15px</div>
+    <div class="phone" data-pick="按钮-现状">
+      <span class="cap-pick">✔</span>
+      <div class="screen"><div class="card btns">
+        <div class="btnrow"><span class="btn-primary">完成打卡<span class="bico ico-check gap-r"></span></span><span class="done-state hl hl-red">今日已完成<span class="bico ico-check gap-r"></span></span></div>
+        <div class="btnrow"><span class="btn-ghost"><span class="bico ico-play gap-l"></span>朗读全部</span><span class="btn-ghost"><span class="bico ico-sync gap-l"></span>立即同步</span></div>
+      </div></div>
+    </div>
+    <div class="note">红框=「今日已完成」：14px 字配 15px 图标，勾比字大，观感头重脚轻。</div>
+  </div>
+  <div class="col">
+    <div class="cap"><span class="tag a">方案 B</span>.ico 改 1em + vertical-align:-0.14em（复刻喇叭 em 逻辑）</div>
+    <div class="phone" data-pick="按钮-B(1em)">
+      <span class="cap-pick">✔</span>
+      <div class="screen"><div class="card btns">
+        <div class="btnrow"><span class="btn-primary">完成打卡<span class="bico ico-check gap-r em1"></span></span><span class="done-state hl">今日已完成<span class="bico ico-check gap-r em1"></span></span></div>
+        <div class="btnrow"><span class="btn-ghost"><span class="bico ico-play gap-l em1"></span>朗读全部</span><span class="btn-ghost"><span class="bico ico-sync gap-l em1"></span>立即同步</span></div>
+      </div></div>
+    </div>
+    <div class="note">图标恒等于所在按钮字号（15px 按钮→15px 图标、14px 文字→14px 图标），vertical-align 随 em 自适应，任何字号都对齐；间距 token 不动。</div>
+  </div>
+</div>
+
+<div class="sumbar">
+  <div class="sumtxt" id="sum">未选择</div>
+  <div class="sumhint">点「手机」打勾 · 再点取消 · 爱心与按钮方案可分别选</div>
+</div>
+<script>
+  const picked = new Set();
+  document.querySelectorAll('.phone').forEach(ph => {
+    ph.addEventListener('click', () => {
+      const k = ph.dataset.pick;
+      if (picked.has(k)) { picked.delete(k); ph.classList.remove('picked'); }
+      else { picked.add(k); ph.classList.add('picked'); }
+      document.getElementById('sum').textContent = picked.size ? '已选：' + [...picked].join('、') : '未选择';
+    });
+  });
+</script>
+</body>
+</html>

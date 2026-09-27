@@ -1,0 +1,50 @@
+{
+  "pages": [
+    "pages/today/today",
+    "pages/weeks/weeks",
+    "pages/review/review",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarTitleText": "开溜6.5",
+    "backgroundColor": "#F3F8EF",
+    "backgroundColorContent": "#F3F8EF",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#8B9893",
+    "selectedColor": "#176B5B",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/today/today",
+        "text": "今日",
+        "iconPath": "images/today.png",
+        "selectedIconPath": "images/today-active.png"
+      },
+      {
+        "pagePath": "pages/weeks/weeks",
+        "text": "周计划",
+        "iconPath": "images/weeks.png",
+        "selectedIconPath": "images/weeks-active.png"
+      },
+      {
+        "pagePath": "pages/review/review",
+        "text": "复习",
+        "iconPath": "images/review.png",
+        "selectedIconPath": "images/review-active.png"
+      },
+      {
+        "pagePath": "pages/settings/settings",
+        "text": "设置",
+        "iconPath": "images/settings.png",
+        "selectedIconPath": "images/settings-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>交互与图标方案 · 周磁贴按压 / 删除图标色系 / 喇叭等高对齐</title>
+<style>
+:root{--indigo:#4F46E5;--green:#0E9F6E;--green-dk:#176B5B;--ink:#111827;--ink2:#374151;--ink3:#6B7280;--line:#E5E7EB;--bg:#F8FAFC;--soft:#E2EFE4;--red:#E05B4E;--red-soft:#FDEAE7;--coral:#FF8A78}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;padding:32px 16px 90px}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:24px;font-weight:800}
+h2{font-size:18px;font-weight:800;margin:40px 0 10px;padding-left:12px;border-left:4px solid var(--indigo)}
+.sub{color:var(--ink3);font-size:13.5px;margin:4px 0 20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:14px}
+.row2{display:flex;gap:16px;flex-wrap:wrap}
+.cap{font-size:12px;color:var(--ink3);margin:2px 0 8px}
+code{background:#EEF2FF;color:var(--indigo);border-radius:4px;padding:1px 5px;font-size:12px;font-family:Consolas,monospace}
+.fix{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:12px 16px;font-size:13.5px;margin-top:12px}
+.warn{background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:12px 16px;font-size:13px;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:10px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#F3F4F6;font-size:12.5px}
+.muted{color:var(--ink3);font-size:12.5px}
+.pick{display:inline-block;font-size:12px;font-weight:700;color:#fff;background:var(--green);border-radius:20px;padding:2px 12px;margin-left:8px}
+/* —— 手机小样通用 —— */
+.phone{width:330px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#F3F8EF}
+.dk .phone{background:#0E1618}
+.pbar{background:#176B5B;color:#fff;font-size:12.5px;font-weight:700;padding:8px 14px}
+.dk .pbar{background:#114B40}
+.pbd{padding:14px}
+.wcard{background:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 2px 8px rgba(23,107,91,.08)}
+.dk .wcard{background:#16211f}
+.wline{display:flex;align-items:center;gap:10px}
+.ring{width:40px;height:40px;border-radius:50%;background:conic-gradient(#176B5B 0%,#E9F0EC 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dk .ring{background:conic-gradient(#2E9E7F 0%,#22322e 0)}
+.ring i{width:31px;height:31px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:700;color:#6B7280}
+.dk .ring i{background:#16211f;color:#9fb8ae}
+.wname{font-size:14px;font-weight:700}
+.wmeta{font-size:11px;color:#9CA3AF}
+.chips{display:flex;gap:5px;margin-top:9px}
+.chip{flex:1;text-align:center;font-size:12px;color:#4B5563;background:#F3F8EF;border-radius:7px;padding:5px 0}
+.dk .chip{background:#1D2B27;color:#9fb8ae}
+.wcard-press{background:#E2EFE4 !important}
+.dk .wcard-press{background:#1D332c !important}
+.chip-press{background:#DCEBE0 !important}
+.dk .chip-press{background:#25382f !important}
+.leg{font-size:11px;color:#6B7280;margin-top:6px}
+/* —— 词卡小样（复习页磁贴）—— */
+.stile{background:#fff;border-radius:12px;padding:12px 16px;box-shadow:0 2px 8px rgba(23,107,91,.08);display:flex;align-items:center;gap:12px}
+.dk .stile{background:#16211f}
+.spk{width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.spk svg{display:block}
+.wmain{flex:1;min-width:0}
+.wen{font-size:16px;font-weight:700}
+.wpos{font-size:11px;color:#0E9F6E;font-style:italic;margin-left:5px}
+.wzh{font-size:13px;color:#374151;margin-top:1px}
+.wex{font-size:12.5px;color:#9CA3AF;margin-top:2px}
+.del{width:28px;height:28px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;align-self:center}
+.delbare{width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.delbare--press{transform:scale(.88)}
+.dk .delbare{filter:brightness(1.15)}
+.del-a--press{background:#FDEAE7;color:#E05B4E;transform:scale(.88)}
+.del-b{background:#FDEAE7;color:#E05B4E}
+.del-b--press{background:#F6C9C2;color:#B93A2F;transform:scale(.9)}
+.del-c{background:transparent;color:#6B7280}
+.del-c--press{background:#FDEAE7;color:#E05B4E}
+.dk .del-a{color:#5a6a64}.dk .del-c{color:#9fb8ae}
+.dk .del-b{background:#3a2724;color:#E88A7D}
+/* —— 喇叭等高原理图 —— */
+.diagram{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:10px}
+.diagram svg{width:100%;height:auto;display:block}
+.spk-inline{display:inline-block;vertical-align:middle;background:#176B5B;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>交互与图标方案（定稿用）</h1>
+<div class="sub">2026-09-26 13:25（13:40 二稿）· 三件事：周磁贴按压反馈不一致（bug 分析+修复方案）· 删除图标裸图标版 3 选 1 · 喇叭对齐 em vs 统一尺寸二选一。本轮未动任何代码，逐项拍板后一次性实现 → 传体验版 → 你验收 → 才推仓库。</div>
+
+<!-- ============ 1 周磁贴按压 ============ -->
+<h2>一、周磁贴按压反馈不一致（bug）</h2>
+<div class="card">
+<p style="font-size:14px">代码事实：所有周磁贴是<b>同一个模板</b>（<code>weeks.wxml:42</code>，<code>hover-class="hover-dim"</code>），按压样式 <code>.hover-dim{opacity:.55; transform:scale(.96)}</code>。准备期各磁贴数据完全一致（无「本周/已过」差异标记），<b>不存在模板或数据层面的差异</b>——所以「部分磁贴按下去整卡变暗、部分没反应」不是我们的逻辑写错了，指向微信 WebView 的已知不稳定：<b>opacity / transform 属于合成器属性，页面 hide→show（切 tab）后部分节点图层不重绘，hover 态就不上屏</b>；哪些磁贴失效取决于哪些节点没被重绘，恰好符合你看到的「随机、部分」。</p>
+<div class="row2" style="margin-top:14px">
+<div>
+<div class="cap">修复方案：按压反馈改「背景变色」（重绘属性，可靠性最高）</div>
+<div class="phone"><div class="pbar">阶段一 · 基础 3000 词</div><div class="pbd">
+<div class="wcard wcard-press"><div class="wline"><div class="ring"><i>1</i></div><div style="flex:1"><div class="wname">家庭与人物</div><div class="wmeta">第 1-12 周 · 每日 3 词</div></div></div>
+<div class="chips"><div class="chip chip-press">1</div><div class="chip">2</div><div class="chip">3</div><div class="chip">4</div><div class="chip">5</div><div class="chip">6</div><div class="chip">7</div></div></div>
+<div class="wcard"><div class="wline"><div class="ring"><i>2</i></div><div style="flex:1"><div class="wname">校园与学习</div><div class="wmeta">第 13-24 周 · 每日 4 词</div></div></div><div class="chips"><div class="chip">1</div><div class="chip">2</div><div class="chip">3</div><div class="chip">4</div><div class="chip">5</div><div class="chip">6</div><div class="chip">7</div></div></div>
+<div class="leg">按下第 1 周的效果：整卡淡绿底（含 7 个日格一体变暗），松手恢复。深色态同理换深绿底。</div>
+</div></div>
+</div>
+<div style="max-width:280px">
+<div class="cap">改动点</div>
+<table><tr><th>项</th><th>现</th><th>改</th></tr>
+<tr><td>周卡按压</td><td>透明度 .55 + 缩放</td><td>背景变 <code>--soft</code>（淡绿）</td></tr>
+<tr><td>日格按压</td><td>同 hover-dim</td><td>背景加深一档，保留</td></tr>
+<tr><td>阶段磁贴</td><td>同 hover-dim</td><td>同步改背景色</td></tr>
+<tr><td>响应速度</td><td>默认 50ms 延迟</td><td><code>hover-start-time=0</code> 即按即响</td></tr></table>
+<div class="warn" style="margin-top:10px">透明度方案为什么在别的页面正常、唯独这里「部分失效」——与磁贴里的 conic-gradient 进度环（合成层）叠加有关的可能性最大。改背景色后需你实机复验；若仍有个别磁贴无反馈，则登记为平台限制不再追。</div>
+</div>
+</div>
+</div>
+
+<!-- ============ 2 删除图标 ============ -->
+<h2>二、重点词「删除图标」裸图标版：3 选 1<span class="pick">推荐裸一</span></h2>
+<div class="card">
+<p style="font-size:14px;margin-bottom:12px">收到「裸图标、不加圆底」的风格约束后重出。三版全部无底色填充，线条与爱心 off 态同源（珊瑚描边、圆头笔帽），保证与喇叭、爱心同一视觉语言。按压反馈统一为「颜色加深 + 轻缩放」：</p>
+<div class="row2">
+<div>
+<div class="cap">裸一 · 珊瑚红线条 ✕（常态即醒目，与爱心同色系对仗）</div>
+<div class="phone"><div class="pbd" style="padding:10px">
+<div class="stile"><span class="spk"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#176B5B"/></svg></span><div class="wmain"><div><span class="wen">abandon</span><span class="wpos">v.</span></div><div class="wzh">放弃</div><div class="wex">Never abandon your plan.</div></div><div class="delbare"><svg width="19" height="19" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="#FF8A78" stroke-width="2.2" stroke-linecap="round"/></svg></div></div>
+<div class="stile" style="margin-top:8px"><span class="spk"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#176B5B"/></svg></span><div class="wmain"><div><span class="wen">brief</span><span class="wpos">adj.</span></div><div class="wzh">简短的</div></div><div class="delbare delbare--press"><svg width="19" height="19" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="#C24738" stroke-width="2.6" stroke-linecap="round"/></svg></div></div>
+<div class="leg">上：常态（珊瑚红裸 ✕）；下：按压态（加深暗红 + 加粗 + 缩小）。♥收下 / ✕移出，颜色即语义。</div>
+</div></div>
+</div>
+<div>
+<div class="cap">裸二 · 常态深灰，按压变珊瑚红（静默-激活）</div>
+<div class="phone"><div class="pbd" style="padding:10px">
+<div class="stile"><span class="spk"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#176B5B"/></svg></span><div class="wmain"><div><span class="wen">abandon</span><span class="wpos">v.</span></div><div class="wzh">放弃</div></div><div class="delbare"><svg width="19" height="19" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="#9CA3AF" stroke-width="2.2" stroke-linecap="round"/></svg></div></div>
+<div class="stile" style="margin-top:8px"><span class="spk"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#176B5B"/></svg></span><div class="wmain"><div><span class="wen">brief</span><span class="wpos">adj.</span></div><div class="wzh">简短的</div></div><div class="delbare delbare--press"><svg width="19" height="19" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="#FF8A78" stroke-width="2.2" stroke-linecap="round"/></svg></div></div>
+<div class="leg">常态深灰（比现在的浅灰深两档，可见但克制），按下去才变珊瑚红——「这就是删除」的确认感在按压瞬间给出。深色态灰自动提亮。</div>
+</div></div>
+</div>
+<div>
+<div class="cap">裸三 · 线性空心圆 + ✕（无填充，仅描边）</div>
+<div class="phone"><div class="pbd" style="padding:10px">
+<div class="stile"><span class="spk"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#176B5B"/></svg></span><div class="wmain"><div><span class="wen">abandon</span><span class="wpos">v.</span></div><div class="wzh">放弃</div></div><div class="delbare"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#FF8A78" stroke-width="1.8"/><path d="M9 9l6 6M15 9l-6 6" stroke="#FF8A78" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+<div class="stile" style="margin-top:8px"><span class="spk"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#176B5B"/></svg></span><div class="wmain"><div><span class="wen">brief</span><span class="wpos">adj.</span></div><div class="wzh">简短的</div></div><div class="delbare delbare--press"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#C24738" stroke-width="1.8"/><path d="M9 9l6 6M15 9l-6 6" stroke="#C24738" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+<div class="leg">空心描边圆圈（iOS 清除按钮的线性版）——无填充底色，但轮廓感让目标更好点。</div>
+</div></div>
+</div>
+</div>
+<div class="fix">推荐<b>裸一</b>：与爱心 off（珊瑚描边）完全同语言，按压加深+加粗反馈清晰。想界面更素选裸二；想要更大的可点轮廓感选裸三。实现 = ✕ 从文字字符换成 SVG dataURI（与爱心同写法），56rpx 热区不变，按磁贴垂直中线居中。</div>
+</div>
+
+<!-- ============ 3 喇叭等高 ============ -->
+<h2>三、喇叭等高对齐：em 方案 vs 统一尺寸，二选一<span class="pick">推荐统一尺寸</span></h2>
+<div class="card">
+<p style="font-size:14px">你的核心洞察完全正确：<b>视差的根源是「图标高度固定」而文本墨水高度在变</b>——只要图标等高且行框居中，视差就收敛。落地有两条路，先直接回答你上一轮的问题：</p>
+<div class="warn" style="margin-top:10px"><b>你问的完全对：em 方案下，同一页面的喇叭会大小不一。</b>喇叭高度跟随所在行字号——单词行（词 32rpx）→ ≈24rpx，例句行（例句 25rpx）→ ≈21rpx，同一页差 3rpx。虽然比现状（32 vs 26，差 6rpx 且方向无理）更收敛，但确实不满足「同页所有喇叭一样大」。所以补了<b>统一尺寸</b>方案：每页所有喇叭取同一个固定值、各自行框居中——同页严格一致，同样消除视差。两案对比：</div>
+
+<div class="row2" style="margin-top:14px">
+<div>
+<div class="cap">方案 em · 跟随各自文本（同页 24 / 21 微差）</div>
+<div class="diagram" style="padding:10px">
+<svg viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,sans-serif">
+  <rect width="300" height="46" rx="8" fill="#F3F8EF"/>
+  <rect x="12" y="12" width="24" height="24" rx="3" fill="#176B5B" opacity=".18"/><path d="M17 19v10h4l6 5V14l-6 5h-4z" fill="#176B5B"/>
+  <text x="50" y="32" font-size="17" font-weight="700" fill="#111827">abandon</text>
+  <text x="150" y="30" font-size="10" fill="#6B7280">词行喇叭 24rpx</text>
+  <rect y="60" width="300" height="46" rx="8" fill="#F3F8EF"/>
+  <rect x="14" y="72" width="21" height="21" rx="3" fill="#176B5B" opacity=".18"/><path d="M18.5 78v9h3.5l5 4.5V73.5l-5 4.5h-3.5z" fill="#176B5B"/>
+  <text x="50" y="90" font-size="14" fill="#6B7280">Never abandon your plan.</text>
+  <text x="260" y="90" font-size="10" fill="#6B7280">21rpx</text>
+</svg>
+</div>
+<div class="leg">喇叭与所伴文本严格等高：图标:文本比例恒定，但同页两行喇叭差 3rpx（24 vs 21）。</div>
+</div>
+<div>
+<div class="cap">方案 统一 · 同页所有喇叭同一尺寸（24 / 24）</div>
+<div class="diagram" style="padding:10px">
+<svg viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,sans-serif">
+  <rect width="300" height="46" rx="8" fill="#E2EFE4"/>
+  <rect x="12" y="12" width="24" height="24" rx="3" fill="#176B5B" opacity=".18"/><path d="M17 19v10h4l6 5V14l-6 5h-4z" fill="#176B5B"/>
+  <text x="50" y="32" font-size="17" font-weight="700" fill="#111827">abandon</text>
+  <text x="150" y="30" font-size="10" fill="#067A55">24rpx</text>
+  <rect y="60" width="300" height="46" rx="8" fill="#E2EFE4"/>
+  <rect x="14" y="72" width="24" height="24" rx="3" fill="#176B5B" opacity=".18"/><path d="M19 79v10h4l6 5V74l-6 5h-4z" fill="#176B5B"/>
+  <text x="52" y="90" font-size="14" fill="#6B7280">Never abandon your plan.</text>
+  <text x="260" y="90" font-size="10" fill="#067A55">24rpx</text>
+</svg>
+</div>
+<div class="leg">同一页面全部等大：扫一眼就知道「这些都是播放键」。例句行喇叭比例句墨水高约 3rpx，居中后观感几乎无差。</div>
+</div>
+</div>
+
+<h3 style="font-size:14.5px;margin:16px 0 4px">统一尺寸方案 · 全站规格表（SVG 图形不变，纯 CSS）</h3>
+<table>
+<tr><th>位置</th><th>文本字号</th><th>现状喇叭</th><th>统一方案</th><th>效果</th></tr>
+<tr><td>今日页 · 单词行 + 例句行</td><td>32 / 25rpx</td><td>32 / 26rpx</td><td><b>统一 24rpx</b></td><td>词行喇叭≈词墨水等高；例句行居中，观感一致</td></tr>
+<tr><td>复习页 · 收藏词磁贴</td><td>32 / 25rpx</td><td>32 / 26rpx</td><td><b>统一 24rpx</b></td><td>同上</td></tr>
+<tr><td>复习页 · 随机大词</td><td>56rpx</td><td>36rpx</td><td><b>40rpx（本页例外）</b></td><td>56rpx 词墨水≈42rpx，若也用 24 会小得失衡；本页只有这一个喇叭，页内仍是一致的</td></tr>
+<tr><td>复习页 · 重点词删除图标</td><td>—</td><td>56rpx 热区浅灰 ✕</td><td>56rpx 热区 + 裸 ✕ SVG，磁贴中线居中</td><td>色系见第二节</td></tr>
+</table>
+<p class="muted" style="margin-top:8px">若你要求<b>全 app 绝对统一</b>（含随机大词也 24rpx）也可以，代价是大词旁喇叭明显偏小——不推荐，但可做。</p>
+
+<div class="diagram">
+<svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,Microsoft YaHei,sans-serif">
+  <text x="20" y="24" font-size="14" font-weight="700" fill="#111827">现状：喇叭固定 32rpx，跟谁都不一样高</text>
+  <text x="20" y="46" font-size="12" fill="#6B7280">hello 墨水高 ≈ 24rpx（有升部）｜go 墨水高 ≈ 17rpx（无升部）｜喇叭恒 32rpx → 每行观感都不同</text>
+  <!-- 现状：hello 行 -->
+  <g transform="translate(20,70)">
+    <rect width="250" height="52" rx="8" fill="#F3F8EF"/>
+    <rect x="12" y="10" width="32" height="32" rx="3" fill="#176B5B" opacity=".18"/>
+    <path d="M18 20v12h5l7 6V14l-7 6h-5z" fill="#176B5B"/>
+    <text x="56" y="34" font-size="20" font-weight="700" fill="#111827">hello</text>
+    <!-- 墨水参考线 -->
+    <line x1="120" y1="16" x2="240" y2="16" stroke="#E05B4E" stroke-dasharray="3 3" stroke-width="1"/>
+    <line x1="120" y1="40" x2="240" y2="40" stroke="#E05B4E" stroke-dasharray="3 3" stroke-width="1"/>
+    <text x="244" y="20" font-size="10" fill="#E05B4E">墨水上沿</text>
+    <text x="244" y="44" font-size="10" fill="#E05B4E">下沿</text>
+  </g>
+  <!-- 现状：go 行 -->
+  <g transform="translate(320,70)">
+    <rect width="250" height="52" rx="8" fill="#F3F8EF"/>
+    <rect x="12" y="10" width="32" height="32" rx="3" fill="#176B5B" opacity=".18"/>
+    <path d="M18 20v12h5l7 6V14l-7 6h-5z" fill="#176B5B"/>
+    <text x="56" y="34" font-size="20" font-weight="700" fill="#111827">go</text>
+    <line x1="120" y1="24" x2="240" y2="24" stroke="#E05B4E" stroke-dasharray="3 3" stroke-width="1"/>
+    <line x1="120" y1="46" x2="240" y2="46" stroke="#E05B4E" stroke-dasharray="3 3" stroke-width="1" transform="translate(0,-2)"/>
+    <text x="244" y="28" font-size="10" fill="#E05B4E">墨水上沿低</text>
+    <text x="244" y="48" font-size="10" fill="#E05B4E">下沿（降部）</text>
+  </g>
+  <!-- 现状结论 -->
+  <g transform="translate(620,70)"><rect width="260" height="52" rx="8" fill="#FDEAE7"/>
+  <text x="14" y="22" font-size="12" fill="#B93A2F">喇叭 32rpx 固定：对 hello 偏大、</text>
+  <text x="14" y="40" font-size="12" fill="#B93A2F">对 go 偏大且偏上——两行观感各不同</text></g>
+
+  <text x="20" y="172" font-size="14" font-weight="700" fill="#111827">方案：喇叭高度 = 所在行字号的 0.75em（随文本自动等高）</text>
+  <text x="20" y="194" font-size="12" fill="#6B7280">图标与行字号绑定 → 词行喇叭全部等高、行框居中；字号大的行喇叭自动大，字号小的自动小</text>
+  <!-- 新方案：hello -->
+  <g transform="translate(20,214)">
+    <rect width="250" height="52" rx="8" fill="#E2EFE4"/>
+    <rect x="14" y="15" width="24" height="24" rx="3" fill="#176B5B" opacity=".18"/>
+    <path d="M19 23v9h4l6 5V18l-6 5h-4z" fill="#176B5B"/>
+    <text x="56" y="34" font-size="20" font-weight="700" fill="#111827">hello</text>
+    <line x1="120" y1="16" x2="240" y2="16" stroke="#0E9F6E" stroke-dasharray="3 3" stroke-width="1"/>
+    <line x1="120" y1="40" x2="240" y2="40" stroke="#0E9F6E" stroke-dasharray="3 3" stroke-width="1"/>
+    <text x="244" y="20" font-size="10" fill="#0E9F6E">墨水≈图标高 ✓</text>
+  </g>
+  <!-- 新方案：go -->
+  <g transform="translate(320,214)">
+    <rect width="250" height="52" rx="8" fill="#E2EFE4"/>
+    <rect x="14" y="15" width="24" height="24" rx="3" fill="#176B5B" opacity=".18"/>
+    <path d="M19 23v9h4l6 5V18l-6 5h-4z" fill="#176B5B"/>
+    <text x="56" y="34" font-size="20" font-weight="700" fill="#111827">go</text>
+    <line x1="120" y1="24" x2="240" y2="24" stroke="#0E9F6E" stroke-dasharray="3 3" stroke-width="1"/>
+    <line x1="120" y1="46" x2="240" y2="46" stroke="#0E9F6E" stroke-dasharray="3 3" stroke-width="1"/>
+    <text x="244" y="28" font-size="10" fill="#0E9F6E">图标等高居中</text>
+  </g>
+  <g transform="translate(620,214)"><rect width="260" height="52" rx="8" fill="#ECFDF5"/>
+  <text x="14" y="22" font-size="12" fill="#067A55">尺寸视差消失：两行喇叭一样高、</text>
+  <text x="14" y="40" font-size="12" fill="#067A55">都与行框居中；剩余偏差只剩 ±1px 级</text></g>
+</svg>
+</div>
+
+<div class="warn" style="margin-top:12px"><b>诚实边界（两案都适用）</b>：CSS 拿不到单个词的字形墨水盒，所以「逐词墨水定位」不可实现；两个方案消除的都是<b>尺寸视差</b>（图标忽大忽小、忽高忽低的主因）。go / it 这类「无升部词」的墨水中点天然偏下，仍会残留约 1px 级观感差——文字排版的物理事实，任何方案都消不掉，但幅度从现在的 2-3px 收敛到 1px 内。</div>
+<div class="fix"><b>怎么选</b>：要「同页扫过去所有播放键一样大」→ <b>统一尺寸</b>（推荐，直观一致性最强）；要「喇叭严格匹配每行文本的高度」→ em（同页有 3rpx 微差）。两案都是纯 CSS 改动，SVG 资源零改动，可随时互换。</div>
+</div>
+
+<div class="sub" style="margin-top:26px">—— 请拍板：① 周磁贴按压改背景色方案是否照做；② 删除图标选裸一 / 裸二 / 裸三；③ 喇叭选统一尺寸（推荐，24rpx+大词页 40rpx）还是 em 方案。确认后我一次性实现 → 传体验版 → 你真机验收 → 才同步仓库。</div>
+</div>
+</body>
+</html>
