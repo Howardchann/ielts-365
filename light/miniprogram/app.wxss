@@ -9,8 +9,10 @@ page {
   --disabled-bg: #EDF3F0; --disabled-ink: #A6B2AD; --star-off: #C7D0CC; --dis2: #D5DDD9;
   --red: #C0392B; --red-press: #A93226; --red-soft: #FDECEA;
   --line: #E9F0EC; --cur-line: #9ED8C5; --cur-bg: #F8FCF9; --field: #FBFDFC;
-  /* 自定义导航栏（v1.1.33 components/nav-bar）：与原生栏 theme.json 同色（浅 #176B5B/白字） */
-  --nav-bg: #176B5B; --nav-fg: #FFFFFF;
+  /* 自定义导航栏（v1.1.40 方案A浅顶）：nav-bg=窗口底色 #F3F8EF，冷启动首帧与终态零色差，
+     首点 tab「顶部闪 1~2 帧」的感知随之消除；品牌绿退守内容区（按钮/选中态/tab 栏）。
+     回退绿顶：改回 --nav-bg:#176B5B; --nav-fg:#FFFFFF; 即可（仅此一处）。 */
+  --nav-bg: #F3F8EF; --nav-fg: #24332F;
   --ico-gap: 10rpx; /* 图标-文字统一间距：所有 .ico / 图标在后的按钮一律引用此 token */
   background:var(--bg);
   color:var(--ink);
