@@ -106,7 +106,12 @@ page {
 /* 按下即时反馈：无底色后改「缩放+变淡」（小程序里 view 的 :active 不可靠，统一用 hover-class="speak-hover"） */
 .word-speak.speak-hover, .ex-speak.speak-hover { transform:scale(.85); opacity:.6; }
 .word-main { flex:1; min-width:0; }
+.word-head { display:flex; align-items:baseline; flex-wrap:wrap; }
 .word-en { font-size:32rpx; font-weight:700; color:var(--ink); }
+/* 音标（v1.1.43 试验版）：浅绿 pill，点击即朗读该词；播放中反色。
+   注：单音标阶段保留左侧喇叭，等双音标(US/UK)上线再按方案去掉喇叭。 */
+.word-ipa { font-size:22rpx; color:var(--green); margin-left:12rpx; padding:1rpx 12rpx 2rpx; border-radius:999rpx; background:var(--soft); border:1rpx solid var(--card-line); }
+.word-ipa.playing { background:var(--green); color:#FFFFFF; border-color:var(--green); }
 .word-pos { font-size:22rpx; color:var(--green); font-style:italic; margin-left:10rpx; }
 .word-zh { font-size:26rpx; color:var(--ink2); margin-top:4rpx; }
 .word-example { font-size:25rpx; color:var(--muted2); margin-top:6rpx; padding-left:4rpx; }
@@ -200,6 +205,7 @@ page {
   .word-row { padding:7px 0; }
   .word-speak { width:28px; height:28px; font-size:16px; margin-right:8px; }
   .word-en { font-size:16px; }
+  .word-ipa { font-size:11px; margin-left:6px; padding:0 6px 1px; }
   .word-pos { font-size:11px; margin-left:5px; }
   .word-zh { font-size:13px; margin-top:2px; }
   .word-example { font-size:13px; margin-top:3px; padding-left:2px; }

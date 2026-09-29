@@ -84,7 +84,7 @@ function allWords() {
   const out = new Array(lines.length);
   for (let i = 0; i < lines.length; i++) {
     const c = lines[i].split('\t');
-    out[i] = { w: c[0], p: c[1], m: c[2], e: c[3], ai: c[4] | 0 };
+    out[i] = { w: c[0], p: c[1], m: c[2], e: c[3], ai: c[4] | 0, ipa: c[5] || '' };
   }
   _words = out;
   return out;
@@ -126,7 +126,7 @@ function wordsOfStudyDay(di, perDay) {
   const ws = allWords().slice(start, start + perDay);
   const cn = CORE_CNT[di] || 0;
   for (let i = 0; i < ws.length; i++) {
-    ws[i] = { w: ws[i].w, m: ws[i].m, p: ws[i].p, e: ws[i].e, ai: ws[i].ai, core: i < cn };
+    ws[i] = { w: ws[i].w, m: ws[i].m, p: ws[i].p, e: ws[i].e, ai: ws[i].ai, ipa: ws[i].ipa || '', core: i < cn };
   }
   return ws;
 }
