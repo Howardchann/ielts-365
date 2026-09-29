@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "今日计划",
   "navigationStyle": "custom",
-  "navigationBarTextStyle": "white",
+  "navigationBarTextStyle": "black",
   "usingComponents": { "feedback": "/components/feedback/feedback", "nav-bar": "/components/nav-bar/index" }
 }

@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "18个月计划总览",
   "navigationStyle": "custom",
-  "navigationBarTextStyle": "white",
+  "navigationBarTextStyle": "black",
   "usingComponents": { "nav-bar": "/components/nav-bar/index" }
 }
