@@ -10,6 +10,26 @@
 
 ---
 
+## 2026-09-29 · 从 light 同步功能内核（音标 / 复习例句朗读 / 音色兜底），外观配色保持本实例语义
+
+**背景**：light 实例 09-29 推进到 v1.1.45（音标全量注入、复习页例句朗读、音色兜底、学习提示卡描边、浅灰顶等）。用户拍板**只同步功能内核**：cloud / dark 补功能、不补外观；`original/` 落后多代、不发布，不参与同步。
+
+**本次承接（逐处字符串替换，未动任何配色 token）**：
+
+1. `utils/words.js` — 整文件覆盖为 light 版（全量 8000 词含音标，642KB → 762KB）；覆盖前已用 `git diff --no-index` 证明本实例在该文件上无独有内容。
+2. `utils/data.js` — `allWords()` / `wordsOfStudyDay()` 带出第 6 字段 `ipa`。
+3. `pages/today/today.wxml` — 词头容器改 `.word-head`（`flex-wrap`），新增 `<text class="word-ipa">` 纯文本音标。
+4. `app.wxss` — **仅**新增 `.word-head` / `.word-ipa`（24rpx，大屏分支 12px）两条功能规则；`--nav-bg/--nav-fg`、`--card-line`、`.card.tip-box`、窗口底色等**一律未同步**（本实例顶色/底色自带三色语义）。
+5. `pages/review/review.js` — 新增 `_aiOf()`（旧收藏记录缺 `ai` 时按词从词库补查，治「hello 两种音色」）与 `onSpeakStarredEx()`（重点词例句可点朗读，`kind:'s'`）。
+6. `pages/review/review.wxml` / `review.wxss` — 例句行改与今日页同款（文本可点 + 右侧喇叭），`align-items:center`。
+7. `utils/store.js` — `toggleStar` 入库补存 `ai`。
+
+**验收**：`git diff --no-index --stat light/miniprogram cloud/miniprogram` 剩余 12 个文件（app.js / app.json / app.wxss / 4 个页面 json / settings.js+wxml / theme.json / theme.js / build-info.js），**全部为外观、主题机制与版本号**；功能类文件已从差异列表全部消失。
+
+**规则入档**：AI-CONTEXT 新增 §2.8「四实例结构与同步边界」。
+
+---
+
 ## 2026-09-27（午后）· 首点 tab 闪白录屏定性：与色系无关（文档修订，无代码变更）
 
 **背景**：用户以 light 实例 v1.1.39 真机录屏（1000129736.mp4，24fps）反馈：闪白并非「哪个色系能幸免」，而是只要手机后台没有本小程序（冷启动），再次进入后首次点击 4 个 tab 顶部都闪一帧，唯首页（今日）不闪。

@@ -59,7 +59,7 @@
             hover-class="speak-hover" hover-stay-time="120"
             data-text="{{item.w}}" data-ai="{{item.ai}}" data-kind="w" bindtap="onSpeakWord"><view class="spk-ico {{playingText === item.w ? 'spk-ico--on' : ''}}"></view></view>
       <view class="word-main">
-        <view><text class="word-en"><text wx:if="{{playingText === item.w}}" class="kara-lit">{{karaLit}}</text>{{playingText === item.w ? karaRest : item.w}}</text><text class="word-pos">{{item.p}}</text></view>
+        <view class="word-head"><text class="word-en"><text wx:if="{{playingText === item.w}}" class="kara-lit">{{karaLit}}</text>{{playingText === item.w ? karaRest : item.w}}</text><text class="word-ipa" wx:if="{{item.ipa}}">{{item.ipa}}</text><text class="word-pos">{{item.p}}</text></view>
         <view class="word-zh">{{item.m}}</view>
         <view class="word-example-row">
           <view class="word-example"

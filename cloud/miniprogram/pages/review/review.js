@@ -197,6 +197,18 @@ Page({
   },
 
   // ---- 重点词列表 ----
+  // 音频编号兜底（v1.1.40）：旧收藏记录（本版之前）没存 ai → 朗读走在线 TTS，
+  // 与今日页预生成音频音色不一致（hello 两个音色的根因）。缺失时按单词从词库补查。
+  _aiOf(it) {
+    if (it && it.ai) return it.ai;
+    if (!this._aiMap) {
+      const m = {};
+      plan.allWords().forEach(x => { m[x.w] = x.ai; });
+      this._aiMap = m;
+    }
+    return it ? this._aiMap[it.w] || 0 : 0;
+  },
+
   onSpeakStarred(e) {
     const w = e.currentTarget.dataset.word;
     if (this.data.playingWord === w) {
@@ -204,9 +216,22 @@ Page({
       this.setData({ playingWord: r === 'paused' ? '' : w });
       return;
     }
-    // 重点词列表只传了单词文本，需从收藏数组里取回音频编号
+    // 重点词列表只传了单词文本，需从收藏数组里取回音频编号（旧记录经 _aiOf 从词库补）
     const it = (this.data.starred || []).filter(x => x && x.w === w)[0];
-    speech.speak(w, { ai: it && it.ai, kind: 'w' });
+    speech.speak(w, { ai: this._aiOf(it), kind: 'w' });
+    this.setData({ playingWord: w });
+  },
+
+  // 重点词例句朗读（v1.1.40）：对齐今日页——点例句或右侧喇叭都可播，kind:'s' 命中例句预生成音频
+  onSpeakStarredEx(e) {
+    const w = e.currentTarget.dataset.word;
+    if (this.data.playingWord === w) {
+      const r = speech.togglePause();
+      this.setData({ playingWord: r === 'paused' ? '' : w });
+      return;
+    }
+    const it = (this.data.starred || []).filter(x => x && x.e === w)[0];
+    speech.speak(w, { ai: this._aiOf(it), kind: 's' });
     this.setData({ playingWord: w });
   },
 

@@ -161,7 +161,7 @@ function toggleStar(item) {
   const i = list.findIndex(v => v.w === w);
   let added;
   if (i >= 0) { list.splice(i, 1); data.unstarredWords[w] = now; added = false; }
-  else { list.push({ w: item.w, m: item.m, p: item.p, e: item.e, ts: now }); delete data.unstarredWords[w]; added = true; }
+  else { list.push({ w: item.w, m: item.m, p: item.p, e: item.e, ai: item.ai | 0, ts: now }); delete data.unstarredWords[w]; added = true; }
   data.updatedAt = now; saveLocal(); schedulePush(); emit();
   return added;
 }

@@ -346,6 +346,26 @@ H5 版（SpeechSynthesis，各设备可用声音乱七八糟、无法选发音�
 
 **tabBar 结构**：`custom-tab-bar` 已从 cover-view 改 view + SVG data-URI（8 张 PNG 弃用但文件仍在 images/），dark 状态经 `syncTabBar` 同步。
 
+### 2.8 四实例结构与同步边界（**2026-09-29 用户拍板：只同步功能内核**）
+
+仓库根下四个平级目录（**同仓不同目录，不是分支**），各有独立 AI-CONTEXT / CHANGELOG：
+
+| 目录 | 定位 | 发布 |
+|---|---|---|
+| `light/` | **主项 / 唯一上线形态**（纯浅色）；功能开发、体验版、上线都从它出 | ✅ |
+| `cloud/`（本实例） | 三色调整完整版（darkmode + theme.json + 设置页「外观」）；**已降级**为「保留三色调整能力」 | ❌ |
+| `dark/` | 纯深色版 | ❌ |
+| `original/` | `main@95f1a94` 留档快照，落后多代 | ❌ 冻结，不参与同步 |
+
+**本实例从 light 接收什么**（2026-09-29 起）：
+
+- ✅ **同步**：功能内核——音标（`utils/words.js` 数据 + `data.js` 第 6 字段 + 今日页 `.word-head/.word-ipa` 渲染）、复习页重点词例句朗读（`onSpeakStarredEx`）、音色兜底（`_aiOf`）、收藏补存 `ai`（`store.js`），以及今后所有朗读 / 交互 / 数据层修复。
+- ❌ **不同步**：light 的外观与配色——浅灰顶（`--nav-bg/--nav-fg`）、状态栏字色 `navigationBarTextStyle`、学习提示卡描边（`--card-line` + `.card.tip-box`）、窗口底色。**本实例顶色/底色自带三色语义（theme.json + utils/theme.js 换肤），照搬 light 会把换肤改坏。**
+
+⚠️ **承接改动时**：`app.wxss` 是**混装文件**（配色 token 与功能规则同文件）→ **逐处替换，禁止整文件覆盖**；`utils/words.js` 这类纯数据文件可整文件覆盖，但须先 `git diff --no-index` 证明本实例在该文件上无独有内容。
+
+完整规则与验收判据见 `../light/AI-CONTEXT.md` §同步边界；批量脚本 `D:/idea/_ipa_build/sync_core_to_cloud_dark.py`（唯一性断言，匹配数 ≠ 1 即中止不写入）。
+
 ---
 
 ## 3. 已修复的坑（改回去会出事）

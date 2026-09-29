@@ -35,6 +35,9 @@
 .star-tile { background: var(--card); border-radius: 24rpx; padding: 20rpx 28rpx; }
 .star-tile + .star-tile { margin-top: 20rpx; }
 .star-tile .word-row { border-bottom: none; padding: 2rpx 0; }
+/* 重点词例句行（v1.1.40）：结构与今日页同款（文本可点+右侧喇叭）；对齐由 baseline 改 center ——
+   例句折行时喇叭按钮水平垂直居中于整行（09-29 用户定稿），单行时视觉与今日页一致 */
+.star-tile .word-example-row { align-items: center; }
 @media (min-width: 700px) {
   .star-list { margin: 12px auto; max-width: 640px; }
   .star-tile { border-radius: 12px; padding: 10px 14px; }

@@ -97,7 +97,13 @@ page {
 /* 按下即时反馈：无底色后改「缩放+变淡」（小程序里 view 的 :active 不可靠，统一用 hover-class="speak-hover"） */
 .word-speak.speak-hover, .ex-speak.speak-hover { transform:scale(.85); opacity:.6; }
 .word-main { flex:1; min-width:0; }
+.word-head { display:flex; align-items:baseline; flex-wrap:wrap; }
 .word-en { font-size:32rpx; font-weight:700; color:var(--ink); }
+/* 音标（v1.1.44）：纯文本，无底色无描边——朗读入口统一走左侧喇叭，音标只作书面依据，
+   不再自带「可点」暗示（点喇叭读的就是该词本身）。等双音标(US/UK)上线时再让它变成点读目标。
+   v1.1.45：字号 22rpx→24rpx。依据 = 最宽词头 characterization 在真机（含开发者工具的 iPhone 5
+   最小档 320px）实测不折行且与右侧收藏键仍有间距，说明余量充足；rpx 全等比故与分辨率无关。 */
+.word-ipa { font-size:24rpx; color:var(--ink3); margin-left:12rpx; }
 .word-pos { font-size:22rpx; color:var(--green); font-style:italic; margin-left:10rpx; }
 .word-zh { font-size:26rpx; color:var(--ink2); margin-top:4rpx; }
 .word-example { font-size:25rpx; color:var(--muted2); margin-top:6rpx; padding-left:4rpx; }
@@ -191,6 +197,7 @@ page {
   .word-row { padding:7px 0; }
   .word-speak { width:28px; height:28px; font-size:16px; margin-right:8px; }
   .word-en { font-size:16px; }
+  .word-ipa { font-size:12px; margin-left:6px; }
   .word-pos { font-size:11px; margin-left:5px; }
   .word-zh { font-size:13px; margin-top:2px; }
   .word-example { font-size:13px; margin-top:3px; padding-left:2px; }

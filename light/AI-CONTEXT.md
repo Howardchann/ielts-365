@@ -6,6 +6,25 @@
 
 **本实例为仓库主项与唯一上线形态**：深浅模式下的闪白/残影在保留三色调整的 cloud 实例中无法根治，故功能开发与上线以后都从本实例出，直到主题闪白问题找到根治方案。共用逻辑（store/speech/页面结构）的变更需同步回 `cloud/` 与 `dark/`。
 
+### 同步边界（2026-09-29 用户拍板：**只同步功能内核**）
+
+本实例前进后往 `cloud/` 与 `dark/` 同步时**按类别拆开，不要整目录搬运**：
+
+| 类别 | 例子 | 同步？ |
+|---|---|---|
+| **功能内核** | 音标（数据 + 渲染）、复习页例句朗读 `onSpeakStarredEx`、音色兜底 `_aiOf`、收藏补存 `ai`、朗读链路与交互修复 | ✅ 同步 |
+| **外观 / 配色** | `--nav-bg/--nav-fg` 浅灰顶、`navigationBarTextStyle` 状态栏字色、`--card-line` + `.card.tip-box` 描边、窗口底色 | ❌ 不同步 |
+| **本实例独有机制** | 由三态换肤删简而来的静态主题链路 | ❌ 不反向并入 |
+
+`original/` 落后多代、且不发布，**不参与任何同步**（留档冻结）。
+
+**两条硬规则**：
+
+1. `app.wxss` 是**混装文件**（配色 token 与功能规则写在同一个文件里）→ 同步**必须逐处字符串替换，禁止整文件覆盖**，否则本实例的浅顶值会冲掉 cloud 的换肤 token 与 dark 的深色 token。
+2. 纯数据文件（`utils/words.js`）可整文件覆盖，但覆盖前须先用 `git diff --no-index` 证明目标实例在该文件上**无独有内容**。
+
+**手法与验收**：脚本 `D:/idea/_ipa_build/sync_core_to_cloud_dark.py`（带唯一性断言——任一处匹配数 ≠ 1 即中止且不写入；按目标文件实际换行符自适应）。验收判据 = `git diff --no-index --stat light/miniprogram <实例>/miniprogram` 的剩余差异**只剩外观 / 主题 / 版本号**，功能类文件（`data.js` / `store.js` / `words.js` / `today.wxml` / `review.js` / `review.wxml` / `review.wxss`）必须从差异列表消失。
+
 ## 本实例是什么
 
 - 由 cloud 实例 **v1.1.38**（提交 `dbe76dc` 时的 cloud/ 树）派生；
